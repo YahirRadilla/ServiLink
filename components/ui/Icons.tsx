@@ -1,16 +1,25 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 
-
-export const CircleInfoIcon = (props: any) => (
-    <FontAwesome6 name="circle-info" size={24} color="white" {...props} />
+export const InboxIcon = (props: any) => (
+    <MaterialCommunityIcons name="inbox" size={32} color="black" {...props} />
 );
+
+export const NotiIcon = (props: any) => (
+    <MaterialCommunityIcons name="bell-outline" size={32} color="black" {...props} />
+);
+
 
 export const HomeIcon = (props: any) => (
-    <FontAwesome name="home" size={32} color="white" {...props} />
+    <MaterialCommunityIcons name="home-variant-outline" size={32} color="black"  {...props} />
 );
 
-export const InfoIcon = (props: any) => (
-    <FontAwesome name="info" size={32} color="white" {...props} />
+
+
+export const SearchIcon = (props: any) => (
+    <MaterialCommunityIcons name="magnify" size={32} color="black" {...props} />
+);
+
+export const UserIcon = (props: any) => (
+    <MaterialCommunityIcons name="account" size={32} color="black" {...props} />
 );
