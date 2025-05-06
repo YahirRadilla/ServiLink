@@ -1,9 +1,10 @@
 import { Screen } from "@/components/Screen";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { Text } from "react-native";
 
-
 export default function Details() {
+    const { id } = useLocalSearchParams();
+
     return (
         <Screen>
             <Stack.Screen
@@ -12,7 +13,7 @@ export default function Details() {
                 }} />
 
 
-            <Text className="text-teal-400">Id</Text>
+            <Text className="text-teal-400">{id}</Text>
         </Screen>
     )
 }
