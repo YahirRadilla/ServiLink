@@ -12,10 +12,17 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: {
             position: 'absolute',
-            backgroundColor: 'white',
+            backgroundColor: '#161622',
             height: 'auto',
+            borderTopWidth: 0.2,
+            borderColor: '#6A6A70',
+            paddingTop: 12,
+
+            elevation: 0,
+            shadowOpacity: 0,
           },
           tabBarActiveTintColor: '#3D5DC7',
+          tabBarInactiveTintColor: '#484C52',
         }}>
         <Tabs.Screen
           name="index"

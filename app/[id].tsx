@@ -9,7 +9,12 @@ export default function Details() {
         <Screen>
             <Stack.Screen
                 options={{
-                    headerTitle: "Hola"
+                    headerTitle: "Hola",
+                    headerTintColor: "white",
+                    headerStyle: { 
+                        backgroundColor: "#161622" ,
+                        
+                    },
                 }} />
 
 

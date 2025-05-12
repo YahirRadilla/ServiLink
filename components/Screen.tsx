@@ -7,5 +7,5 @@ type ScreenProps = {
 };
 
 export function Screen({ children }: ScreenProps) {
-    return <View className="flex-1 bg-white pt-4 px-2">{children}</View>;
+    return <View className="flex-1 bg-primarybg-servilink pt-4 px-2">{children}</View>;
 }
