@@ -21,7 +21,7 @@ export type TUser = {
 
 export const emptyUser: TUser = {
     id: '',
-    name: '',
+    name: 'yahir',
     lastname: '',
     secondLastname: '',
     address: {
