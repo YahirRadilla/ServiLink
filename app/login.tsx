@@ -9,9 +9,25 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Logo from '../shared/svg/logo.svg';
 
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Pantalla de inicio de sesión
+ * 
+ * Esta pantalla permite al usuario
+ * inicio de sesión con su correo electrónico y contraseña
+ * 
+ * @returns {JSX.Element} Pantalla de inicio de sesión
+ */
+/*******  85079078-6c71-44f5-8929-0a323adf0ff4  *******/
 export default function LoginScreen() {
     const { height } = Dimensions.get('window');
     const navigation = useNavigation();
+
+    const [loginForm, setLoginForm] = React.useState({
+        email: '',
+        password: '',
+        remember: false
+    });
 
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -22,6 +38,10 @@ export default function LoginScreen() {
             headerShown: false,
         });
     }, []);
+
+    const handleClick = () => {
+        console.log(email, password, remember);
+    }
 
     return (
 
@@ -88,12 +108,12 @@ export default function LoginScreen() {
                                 <CustomButton
                                     className='mt-6'
                                     label="Iniciar sesión"
-                                    onPress={() => console.log('Iniciando sesión')}
+                                    onPress={() => handleClick()}
                                 />
 
                                 <View className='flex-row justify-center gap-2 w-full items-center pt-4'>
                                     <Text className='text-white/90'>¿No tienes una cuenta?</Text>
-                                    <Link className='text-links-servilink' href="/forgotPassword">Registrate</Link>
+                                    <Link className='text-links-servilink' href="/register">Registrate</Link>
                                 </View>
 
                             </View>
