@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { HomeIcon, InboxIcon, NotiIcon, SearchIcon, UserIcon } from '@/components/ui/Icons';
+import { HomeIcon, InboxIcon, NotiIcon, SearchIcon, UserIcon } from '@/components/icons/Icons';
 
 export default function TabLayout() {
 
