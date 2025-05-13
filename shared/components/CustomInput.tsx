@@ -32,7 +32,7 @@ export default function CustomInput({
         return (
             <Pressable
                 onPress={() => onCheckedChange?.(!checked)}
-                className="flex-row items-center gap-x-2 pt-4"
+                className="flex-row items-center gap-x-2"
             >
                 <View
                     className={`w-5 h-5 rounded border border-auth-border-servilink items-center justify-center ${checked ? 'bg-primary-servilink border-primary-servilink' : ''
