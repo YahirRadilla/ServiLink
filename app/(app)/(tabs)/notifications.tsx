@@ -2,11 +2,11 @@ import { Screen } from '@/components/Screen';
 import { StyleSheet, Text } from 'react-native';
 
 
-export default function TabTwoScreen() {
+export default function NotificationsScreen() {
     return (
         <Screen>
             <Text className='text-red-700'>
-                Inbox
+                Notifications
             </Text>
         </Screen>
     );

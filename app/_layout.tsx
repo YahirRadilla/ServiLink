@@ -7,11 +7,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
 
-
   return (
     <SafeAreaProvider>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{
+        <Stack.Screen name="(app)/(tabs)" options={{
           headerShown: true,
           headerTitle: '',
           headerStyle: { backgroundColor: '#161622' },
@@ -27,7 +26,6 @@ export default function RootLayout() {
           headerRight: () => {
             return (
               <>
-                
                 <Image className='mr-2' source={require('../assets/images/logo.png')} />
               </>
             )
