@@ -4,8 +4,9 @@ import React from 'react';
 import { HomeIcon, InboxIcon, NotiIcon, SearchIcon, UserIcon } from '@/components/icons/Icons';
 
 export default function TabLayout() {
+
   const session = false;
-  return !session ? <Redirect href="/login" /> :
+  return !session ? <Redirect href="/auth/login" /> :
     (
       <>
         <Tabs
@@ -24,7 +25,8 @@ export default function TabLayout() {
             },
             tabBarActiveTintColor: '#3D5DC7',
             tabBarInactiveTintColor: '#484C52',
-          }}>
+          }}
+        >
           <Tabs.Screen
             name="index"
             options={{
@@ -33,9 +35,9 @@ export default function TabLayout() {
             }}
           />
           <Tabs.Screen
-            name="explore"
+            name="saved"
             options={{
-              title: 'Buscar',
+              title: 'Guardados',
               tabBarIcon: ({ color }) => <SearchIcon color={color} />,
             }}
           />

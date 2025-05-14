@@ -2,7 +2,7 @@ import { Screen } from '@/components/Screen';
 import { StyleSheet, Text } from 'react-native';
 
 
-export default function InboxScreen() {
+export default function Inbox() {
     return (
         <Screen>
             <Text className='text-red-700'>

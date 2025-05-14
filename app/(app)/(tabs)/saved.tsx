@@ -2,7 +2,7 @@ import { Screen } from '@/components/Screen';
 import { StyleSheet, Text } from 'react-native';
 
 
-export default function ExploreScreen() {
+export default function Saved() {
   return (
     <Screen>
       <Text className='text-red-700'>
