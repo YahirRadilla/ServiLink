@@ -1,14 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
-import { Pressable, Text, TextInput, TextInputProps, View } from 'react-native';
+import { Platform, Pressable, Text, TextInput, TextInputProps, View } from 'react-native';
 
 interface CustomInputProps extends TextInputProps {
-    type?: 'text' | 'email' | 'password' | 'number' | 'checkbox';
+    type?: 'text' | 'email' | 'password' | 'number' | 'checkbox' | 'date';
     placeholder?: string;
     className?: string;
     label?: string;
     checked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
+    onDateChange?: (date: Date) => void;
+    value?: any;
+    error?: string;
 }
 
 export default function CustomInput({
@@ -18,15 +22,28 @@ export default function CustomInput({
     label,
     checked = false,
     onCheckedChange,
+    onDateChange,
+    value,
+    error,
     ...rest
 }: CustomInputProps) {
     const [isHidden, setIsHidden] = useState(type === 'password');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
     const isPassword = type === 'password';
     const isCheckbox = type === 'checkbox';
+    const isDate = type === 'date';
 
     const keyboardType =
         type === 'email' ? 'email-address' :
             type === 'number' ? 'numeric' : 'default';
+
+    const handleDateChange = (event: any, selectedDate?: Date) => {
+        setShowDatePicker(Platform.OS === 'ios');
+        if (selectedDate) {
+            onDateChange?.(selectedDate);
+        }
+    };
 
     if (isCheckbox) {
         return (
@@ -47,18 +64,50 @@ export default function CustomInput({
         );
     }
 
+    if (isDate) {
+        return (
+            <View className="gap-y-2">
+                {label && <Text className="text-white/90 pt-4">{label}</Text>}
+
+                <View className="relative w-full">
+                    <Pressable
+                        onPress={() => setShowDatePicker(true)}
+                        className={`w-full px-4 py-3 rounded-xl bg-transparent border ${error ? 'border-red-500' : 'border-auth-border-servilink'} flex-row justify-between items-center`}
+                    >
+                        <Text className={`text-white/50 ${!value ? 'italic' : ''}`}>
+                            {value ? new Date(value).toLocaleDateString() : placeholder || 'Seleccionar fecha'}
+                        </Text>
+                        <Ionicons name="calendar-outline" size={22} color="#888" />
+                    </Pressable>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={value || new Date()}
+                            mode="date"
+                            display="default"
+                            onChange={handleDateChange}
+                        />
+                    )}
+                </View>
+
+                {error && <Text className="text-red-500 text-sm mt-1">{error}</Text>}
+            </View>
+        );
+    }
+
     return (
         <View className="gap-y-2">
             {label && <Text className="text-white/90 pt-4">{label}</Text>}
 
             <View className="relative w-full">
                 <TextInput
-                    className={`w-full px-4 py-3 rounded-xl bg-transparent text-white/90 border border-auth-border-servilink pr-12`}
+                    className={`w-full px-4 py-3 rounded-xl bg-transparent text-white/90 border ${error ? 'border-red-500' : 'border-auth-border-servilink'} pr-12`}
                     placeholder={placeholder}
                     placeholderTextColor="#888"
                     secureTextEntry={isPassword && isHidden}
                     keyboardType={keyboardType}
                     autoCapitalize={type === 'email' ? 'none' : 'sentences'}
+                    value={value}
                     {...rest}
                 />
 
@@ -75,6 +124,8 @@ export default function CustomInput({
                     </Pressable>
                 )}
             </View>
+
+            {error && <Text className="text-red-500 text-sm mt-1">{error}</Text>}
         </View>
     );
 }

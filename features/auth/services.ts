@@ -7,7 +7,7 @@ import {
     signInWithEmailAndPassword,
     signOut
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
 
 export type RegisterUserProps = {
     email: string;
@@ -62,6 +62,12 @@ export const registerUser = async ({ email,
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const uid = result.user.uid;
 
+        const providerDoc = await addDoc(collection(db, "providers"), {
+            rfc: null,
+            servicesOffered: null,
+            status: false,
+        });
+
         const userDoc = {
             name,
             lastname,
@@ -73,7 +79,7 @@ export const registerUser = async ({ email,
             profile_status: profileStatus,
             image_profile: imageProfile,
             birth_date: birthDate,
-            provider_id: providerId
+            provider_id: doc(db, "providers", providerDoc.id)
         };
 
         await setDoc(doc(db, "users", uid), userDoc);

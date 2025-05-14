@@ -1,75 +1,87 @@
-import { CustomButton } from '@/shared/components/CustomButton';
-import CustomInput from '@/shared/components/CustomInput';
-import { Link, router, useNavigation } from 'expo-router';
-import React, { useEffect } from 'react';
-import { Dimensions, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { RegisterUserProps } from '@/features/auth/services';
 import { useAuth } from '@/features/auth/useAuth';
+import { CustomButton } from '@/shared/components/CustomButton';
+import CustomInput from '@/shared/components/CustomInput';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Link, router, useNavigation } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Dimensions, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Yup from 'yup';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
+
+const schema = Yup.object({
+    name: Yup.string().min(3, 'Mínimo 3 caracteres').required('Campo requerido'),
+    lastName: Yup.string().required('Campo requerido'),
+    email: Yup.string().email('Correo inválido').required('Campo requerido'),
+    birthDate: Yup.date().nullable().required('Selecciona una fecha'),
+    phone: Yup.string()
+        .matches(/^[0-9]+$/, 'Solo números')
+        .length(10, 'Debe tener 10 dígitos')
+        .required('Campo requerido'),
+    password: Yup.string().min(6, 'Mínimo 6 caracteres').required('Campo requerido'),
+    remember: Yup.boolean().oneOf([true], 'Debes aceptar los términos'),
+});
 
 export default function RegisterScreen() {
     const { height } = Dimensions.get('window');
     const navigation = useNavigation();
-
-    const [name, setName] = React.useState('');
-    const [lastName, setLastName] = React.useState('');
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [birthDate, setBirthDate] = React.useState('');
-    const [phone, setPhone] = React.useState('');
-    const [remember, setRemember] = React.useState(false);
-
-    const registerData: RegisterUserProps = {
-        email,
-        password,
-        name,
-        lastname: lastName,
-        secondLastname: "",
-        phoneNumber: phone,
-        address: null,
-        profileStatus: "client",
-        imageProfile: "",
-        birthDate: null,
-        providerId: null
-    };
-
     const { register } = useAuth();
 
-    const handleClick = async () => {
-        console.log(registerData);
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            name: '',
+            lastName: '',
+            email: '',
+            birthDate: undefined,
+            phone: '',
+            password: '',
+            remember: false,
+        },
+    });
+
+    const onSubmit = async (data: any) => {
+        const registerData: RegisterUserProps = {
+            email: data.email,
+            password: data.password,
+            name: data.name,
+            lastname: data.lastName,
+            secondLastname: "",
+            phoneNumber: data.phone,
+            address: null,
+            profileStatus: "client",
+            imageProfile: "",
+            birthDate: data.birthDate,
+            providerId: null
+        };
+
         try {
             await register(registerData);
             router.replace('/auth/login');
         } catch (error) {
             console.log(error);
         }
-    }
+    };
 
     useEffect(() => {
-        navigation.setOptions({
-            headerShown: false,
-        });
+        navigation.setOptions({ headerShown: false });
     }, []);
 
     return (
-
-        <SafeAreaView className='flex-1 bg-primarybg-servilink gap-y-14'>
-
-
+        <SafeAreaView className="flex-1 bg-primarybg-servilink gap-y-14">
             <View style={{ height: height / 2.4 }} className="w-full bg-neutral800 absolute top-0 z-1" />
 
             <ScrollView
-                contentContainerStyle={{
-                    flexGrow: 1,
-                    paddingVertical: 24,
-                }}
+                contentContainerStyle={{ flexGrow: 1, paddingVertical: 24 }}
                 keyboardShouldPersistTaps="handled"
             >
-
-
                 <View className="gap-y-10">
                     <View className="w-full flex-col items-center gap-2 pt-5 z-10 ">
                         <Logo />
@@ -77,88 +89,146 @@ export default function RegisterScreen() {
                         <Text className="text-center text-white text-3xl font-bold ">Registrar una cuenta</Text>
                     </View>
 
-
-                    <View className='items-center '>
-                        <View className="w-[95%] max-w-md flex-col items-center  z-0 bg-primarybg-servilink p-4 rounded-xl shadow-md shadow-white">
-
-
+                    <View className="items-center">
+                        <View className="w-[95%] max-w-md flex-col items-center z-0 bg-primarybg-servilink p-4 rounded-xl shadow-md shadow-white">
                             <View className="w-full flex-row gap-2">
                                 <View className="flex-1">
-                                    <CustomInput
-                                        type="text"
-                                        placeholder="Nombre"
-                                        value={name}
-                                        onChangeText={setName}
-                                        label="Nombre"
+                                    <Controller
+                                        control={control}
+                                        name="name"
+                                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                            <CustomInput
+                                                type="text"
+                                                placeholder="Nombre"
+                                                value={value}
+                                                onChangeText={onChange}
+                                                label="Nombre"
+                                                error={error?.message}
+                                            />
+                                        )}
                                     />
                                 </View>
                                 <View className="flex-1">
-                                    <CustomInput
-                                        type="text"
-                                        placeholder="Apellido"
-                                        value={lastName}
-                                        onChangeText={setLastName}
-                                        label="Apellido"
+                                    <Controller
+                                        control={control}
+                                        name="lastName"
+                                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                            <CustomInput
+                                                type="text"
+                                                placeholder="Apellido"
+                                                value={value}
+                                                onChangeText={onChange}
+                                                label="Apellido"
+                                                error={error?.message}
+                                            />
+                                        )}
                                     />
                                 </View>
                             </View>
-                            <View className="w-full" >
-                                <CustomInput
-                                    type="email"
-                                    placeholder="Correo electrónico"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    label="Correo"
+
+                            <View className="w-full">
+                                <Controller
+                                    control={control}
+                                    name="email"
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <CustomInput
+                                            type="email"
+                                            placeholder="Correo electrónico"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            label="Correo"
+                                            error={error?.message}
+                                        />
+                                    )}
                                 />
-                                {/* <CustomInput
-                            type="text"
-                            placeholder="DD/MM/AAAA"
-                            value={birthDate}
-                            onChangeText={setBirthDate}
-                            label="Fecha de nacimiento" 
-                        /> */}
-                                <CustomInput
-                                    type="number"
-                                    placeholder="Número de teléfono"
-                                    value={phone}
-                                    onChangeText={setPhone}
-                                    label="Número de teléfono"
+
+                                <Controller
+                                    control={control}
+                                    name="birthDate"
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <CustomInput
+                                            type="date"
+                                            label="Fecha de nacimiento"
+                                            value={value}
+                                            onDateChange={onChange}
+                                            placeholder="Seleccionar fecha"
+                                            error={error?.message}
+                                        />
+                                    )}
                                 />
-                                <CustomInput
-                                    type="password"
-                                    placeholder="Contraseña"
-                                    value={password}
-                                    onChangeText={setPassword}
-                                    label="Contraseña"
+
+                                <Controller
+                                    control={control}
+                                    name="phone"
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <CustomInput
+                                            type="number"
+                                            placeholder="Número de teléfono"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            label="Número de teléfono"
+                                            error={error?.message}
+                                        />
+                                    )}
                                 />
-                                <View className='flex-row w-full items-center pt-4'>
-                                    <CustomInput
-                                        type="checkbox"
-                                        label="Estoy de acuerdo con los"
-                                        checked={remember}
-                                        onCheckedChange={setRemember}
+
+                                <Controller
+                                    control={control}
+                                    name="password"
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <CustomInput
+                                            type="password"
+                                            placeholder="Contraseña"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            label="Contraseña"
+                                            error={error?.message}
+                                        />
+                                    )}
+                                />
+
+                                <View className="flex-row w-full items-center pt-4">
+                                    <Controller
+                                        control={control}
+                                        name="remember"
+                                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                            <View className='flex-col'>
+                                                <View className='flex-row'>
+                                                    <CustomInput
+                                                        type="checkbox"
+                                                        label="Estoy de acuerdo con los"
+                                                        checked={value}
+                                                        onCheckedChange={onChange}
+                                                    />
+                                                    <Text className="text-links-servilink ml-1">Términos</Text>
+                                                    <Text className="text-white/90 ml-1">y</Text>
+                                                    <Text className="text-links-servilink ml-1">condiciones</Text>
+                                                </View>
+                                                {error && (
+                                                    <Text className="text-red-500 text-sm">{error.message}</Text>
+                                                )}
+                                            </View>
+                                        )}
                                     />
-                                    <Text className='text-links-servilink ml-2'>Terminos</Text>
-                                    <Text className='text-white/90 ml-2'>y</Text>
-                                    <Text className='text-links-servilink ml-2'>condiciones</Text>
                                 </View>
 
                                 <CustomButton
-                                    className='mt-6'
+                                    className="mt-6"
                                     label="Registrar"
-                                    onPress={() => handleClick()}
+                                    onPress={handleSubmit(onSubmit)}
                                 />
 
-                                <View className='flex-row justify-center gap-2 w-full items-center pt-4'>
-                                    <Text className='text-white/90'>¿Ya tienes una cuenta?</Text>
-                                    <Link className='text-links-servilink' replace href="/auth/login">Inicia sesión</Link>
+                                <View className="flex-row justify-center gap-2 w-full items-center pt-4">
+                                    <Text className="text-white/90">¿Ya tienes una cuenta?</Text>
+                                    <Link className="text-links-servilink" replace href="/auth/login">
+                                        Inicia sesión
+                                    </Link>
                                 </View>
                             </View>
-
                         </View>
                     </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
-    )
+    );
 }

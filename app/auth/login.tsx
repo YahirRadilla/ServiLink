@@ -2,14 +2,20 @@ import { useAuth } from '@/features/auth/useAuth';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { GoogleLoginButton } from '@/shared/components/GoogleLoginButton';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Link, router, Stack } from 'expo-router';
 import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { Dimensions, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Yup from 'yup';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
 
-
+const schema = Yup.object({
+    email: Yup.string().email('Correo inválido').required('Campo requerido'),
+    password: Yup.string().min(6, 'Mínimo 6 caracteres').required('Campo requerido'),
+});
 
 
 export default function LoginScreen() {
@@ -19,12 +25,24 @@ export default function LoginScreen() {
     const [password, setPassword] = React.useState('');
     const [remember, setRemember] = React.useState(false);
 
-    const { login, isAuthenticated } = useAuth();
+    const { login } = useAuth();
 
-    const handleClick = async () => {
-        console.log(email, password);
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+    });
+
+    const handleClick = async (data: any) => {
+
         try {
-            await login(email, password);
+            await login(data.email, data.password);
             router.replace('/(app)/(tabs)');
         } catch (error) {
             console.log(error);
@@ -65,7 +83,7 @@ export default function LoginScreen() {
                     <View className='items-center'>
                         <View className="w-[95%] flex-col items-center gap-y-5 z-0 bg-primarybg-servilink p-6 rounded-xl shadow-md shadow-white">
 
-                            <GoogleLoginButton onPress={() => handleClick()} />
+                            <GoogleLoginButton onPress={() => { }} />
 
                             <View className="flex-row w-full items-center justify-between gap-x-2">
                                 <View className="h-[1px] w-20 bg-white/90" />
@@ -74,19 +92,35 @@ export default function LoginScreen() {
                             </View>
 
                             <View className="w-full">
-                                <CustomInput
-                                    type="email"
-                                    placeholder="Correo electrónico"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    label='Correo'
+
+                                <Controller
+                                    control={control}
+                                    name="email"
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <CustomInput
+                                            type="email"
+                                            placeholder="Correo electrónico"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            label="Correo"
+                                            error={error?.message}
+                                        />
+                                    )}
                                 />
-                                <CustomInput
-                                    type="password"
-                                    placeholder="Contraseña"
-                                    value={password}
-                                    onChangeText={setPassword}
-                                    label='Contraseña'
+
+                                <Controller
+                                    control={control}
+                                    name="password"
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                        <CustomInput
+                                            type="password"
+                                            placeholder="Contraseña"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            label="Contraseña"
+                                            error={error?.message}
+                                        />
+                                    )}
                                 />
                                 <View className='flex-row justify-between w-full items-center pt-4'>
                                     <CustomInput
@@ -102,7 +136,7 @@ export default function LoginScreen() {
                                 <CustomButton
                                     className='mt-6'
                                     label="Iniciar sesión"
-                                    onPress={() => handleClick()}
+                                    onPress={handleSubmit(handleClick)}
                                 />
 
                                 <View className='flex-row justify-center gap-2 w-full items-center pt-4'>
