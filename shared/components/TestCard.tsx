@@ -29,8 +29,7 @@ export function TestCard({
                 <View>
                     <Image source={{ uri: image }} className = "w-28 h-28 rounded-xl bg-black  " resizeMode="cover" />
                 </View>
-
-                <View className="flex-1 justify-end h-full">
+                <View className="flex-1 justify-end">
                         <View className="flex-row items-center gap-x-2 h-full ">
                             <Text className="text-white font-semibold text-2xl">{title}</Text>
                             <View className={`px-3 py-1.5 rounded-xl ${status === 'accepted' ? 'bg-active-status-servilink/40': status === 'pending' ? 'bg-pending-status-servilink/40': 'bg-finished-status-servilink/40'}`}>
