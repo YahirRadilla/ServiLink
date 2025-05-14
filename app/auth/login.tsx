@@ -1,12 +1,14 @@
+import { useAuth } from '@/features/auth/useAuth';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { GoogleLoginButton } from '@/shared/components/GoogleLoginButton';
-import { Link, Stack } from 'expo-router';
+import { Link, router, Stack } from 'expo-router';
 import React from 'react';
 import { Dimensions, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
+
 
 
 
@@ -17,8 +19,16 @@ export default function LoginScreen() {
     const [password, setPassword] = React.useState('');
     const [remember, setRemember] = React.useState(false);
 
-    const handleClick = () => {
-        console.log(email, password, remember);
+    const { login, isAuthenticated } = useAuth();
+
+    const handleClick = async () => {
+        console.log(email, password);
+        try {
+            await login(email, password);
+            router.replace('/(app)/(tabs)');
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -55,7 +65,7 @@ export default function LoginScreen() {
                     <View className='items-center'>
                         <View className="w-[95%] flex-col items-center gap-y-5 z-0 bg-primarybg-servilink p-6 rounded-xl shadow-md shadow-white">
 
-                            <GoogleLoginButton onPress={() => console.log('object')} />
+                            <GoogleLoginButton onPress={() => handleClick()} />
 
                             <View className="flex-row w-full items-center justify-between gap-x-2">
                                 <View className="h-[1px] w-20 bg-white/90" />

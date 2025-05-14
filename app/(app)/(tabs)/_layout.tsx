@@ -2,11 +2,12 @@ import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 
 import { HomeIcon, InboxIcon, NotiIcon, SearchIcon, UserIcon } from '@/components/icons/Icons';
+import { useAuth } from '@/features/auth/useAuth';
 
 export default function TabLayout() {
+  const { isAuthenticated } = useAuth();
 
-  const session = false;
-  return !session ? <Redirect href="/auth/login" /> :
+  return !isAuthenticated ? <Redirect href="/auth/login" /> :
     (
       <>
         <Tabs

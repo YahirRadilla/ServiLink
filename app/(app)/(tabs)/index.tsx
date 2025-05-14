@@ -1,22 +1,34 @@
 import { Screen } from '@/components/Screen';
-import { Link } from 'expo-router';
-import { StyleSheet, Text } from 'react-native';
+import { useUserStore } from '@/entities/users';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+// @ts-ignore
+import Logo from '../../../shared/svg/logo.svg';
 
 
 export default function Index() {
-    /*   const user = useUserStore((state) => state.user);
-    
-      useUserStore.getState().setUser(emptyUser);
-     */
+    const user = useUserStore((state) => state.user);
+    console.log(user);
+
     return (
         <Screen>
+            <ScrollView
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    paddingVertical: 24,
+                    paddingHorizontal: 12
+                }}
+                keyboardShouldPersistTaps="handled"
+            >
 
-            <Text className='text-red-700'>
-                Hola
-            </Text>
-            <Link className='text-red-600' href="/54">
-                Holas
-            </Link>
+                <View className='flex-row items-center justify-between'>
+                    <View>
+                        <Text className='text-white/90 font-bold ml-2 text-base'>Bienvenido</Text>
+                        <Text className='text-white text-2xl font-bold ml-2'>{user?.name}</Text>
+                    </View>
+                    <Logo />
+                </View>
+
+            </ScrollView>
         </Screen>
     );
 }

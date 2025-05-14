@@ -1,10 +1,12 @@
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
-import { Link, useNavigation } from 'expo-router';
+import { Link, router, useNavigation } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Dimensions, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { RegisterUserProps } from '@/features/auth/services';
+import { useAuth } from '@/features/auth/useAuth';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
 
@@ -19,6 +21,32 @@ export default function RegisterScreen() {
     const [birthDate, setBirthDate] = React.useState('');
     const [phone, setPhone] = React.useState('');
     const [remember, setRemember] = React.useState(false);
+
+    const registerData: RegisterUserProps = {
+        email,
+        password,
+        name,
+        lastname: lastName,
+        secondLastname: "",
+        phoneNumber: phone,
+        address: null,
+        profileStatus: "client",
+        imageProfile: "",
+        birthDate: null,
+        providerId: null
+    };
+
+    const { register } = useAuth();
+
+    const handleClick = async () => {
+        console.log(registerData);
+        try {
+            await register(registerData);
+            router.replace('/auth/login');
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
         navigation.setOptions({
@@ -118,7 +146,7 @@ export default function RegisterScreen() {
                                 <CustomButton
                                     className='mt-6'
                                     label="Registrar"
-                                    onPress={() => console.log('Registrando cuenta')}
+                                    onPress={() => handleClick()}
                                 />
 
                                 <View className='flex-row justify-center gap-2 w-full items-center pt-4'>
