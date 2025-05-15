@@ -5,18 +5,45 @@ node_modules/
 
 # Expo
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
 
-# Native
+# Native Android
+android/
+!android/app/src/main/res/values/strings.xml  # <- si modificas textos manualmente
+.gradle/
+build/
+*.apk
+*.keystore
+*.jks
+debug.keystore
+my-release-key.keystore
+
+# iOS (por si agregas en el futuro)
+ios/
+*.xcworkspace
+*.xcodeproj
+*.xcuserstate
+*.xcuserdata
+Pods/
+
+# Kotlin / Gradle
 .kotlin/
 *.orig.*
-*.jks
+gradlew
+gradlew.bat
+gradle/
+build.gradle
+settings.gradle
+
+# Certificates & keys
 *.p8
 *.p12
 *.key
 *.mobileprovision
+*.pem
 
 # Metro
 .metro-health-check*
@@ -28,12 +55,16 @@ yarn-error.*
 
 # macOS
 .DS_Store
-*.pem
 
 # local env files
+.env*
 .env*.local
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 
+# Examples
 app-example
+
+# EAS
+.easlbuild/

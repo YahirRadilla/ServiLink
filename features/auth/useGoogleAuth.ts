@@ -1,70 +1,107 @@
-import { TUser, useUserStore } from '@/entities/users';
+import { TProvider } from '@/entities/providers';
+import { TUser, TUserType, useUserStore } from '@/entities/users';
 import { auth, db } from '@/lib/firebaseConfig';
 import { mapFirestoreUserToTUser } from '@/mappers/firebaseAuthToUser';
-import { makeRedirectUri } from 'expo-auth-session';
-import * as Google from 'expo-auth-session/providers/google';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { useAuthStore } from './store';
 
-
-
-WebBrowser.maybeCompleteAuthSession();
 
 export const useGoogleLogin = () => {
     const { setUser } = useUserStore();
     const { setAuth, setLoading } = useAuthStore();
     const router = useRouter();
-    const redirectUri = makeRedirectUri({ useProxy: true });
 
-
-
-
-
-
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        clientId: '441884552116-nue6o6l02l9hdfkgqbjrr31t7ko9me63.apps.googleusercontent.com',
-        scopes: ['openid', 'email', 'profile'],
-        redirectUri: redirectUri
-    });
-    console.log('🔗 redirectUri:', redirectUri);
     useEffect(() => {
-        const handleGoogleResponse = async () => {
-            if (response?.type === 'success') {
-                try {
-                    setLoading(true);
-                    const { id_token } = response.params;
-                    const credential = GoogleAuthProvider.credential(id_token);
-                    const userCredential = await signInWithCredential(auth, credential);
+        GoogleSignin.configure({
+            webClientId: '441884552116-nue6o6l02l9hdfkgqbjrr31t7ko9me63.apps.googleusercontent.com',
+        });
+    }, []);
 
-                    const uid = userCredential.user.uid;
-                    const userSnap = await getDoc(doc(db, 'users', uid));
-                    if (!userSnap.exists()) throw new Error('Usuario no encontrado');
+    const loginWithGoogle = async () => {
+        try {
+            setLoading(true);
 
-                    const userData: TUser = mapFirestoreUserToTUser({
-                        id: userSnap.id,
-                        ...userSnap.data(),
-                    });
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            const { idToken } = await GoogleSignin.getTokens();
+            if (!idToken) throw new Error('No se recibió el idToken');
 
-                    setUser(userData);
-                    setAuth(true);
-                    router.replace('/(app)/(tabs)');
-                } catch (err) {
-                    console.error('Error con Google Sign In:', err);
-                } finally {
-                    setLoading(false);
-                }
+            const credential = GoogleAuthProvider.credential(idToken);
+            const userCredential = await signInWithCredential(auth, credential);
+
+            const uid = userCredential.user.uid;
+            const userRef = doc(db, 'users', uid);
+            const userSnap = await getDoc(userRef);
+
+            let userData: TUser;
+
+            if (!userSnap.exists()) {
+
+                const providerDoc = await addDoc(collection(db, 'providers'), {
+                    rfc: null,
+                    servicesOffered: null,
+                    status: false,
+                });
+
+                const providerSnap = await getDoc(providerDoc);
+
+                const providerData = {
+                    id: providerSnap.id,
+                    ...providerSnap.data(),
+                } as TProvider;
+
+                const userDoc = {
+                    name: userCredential.user.displayName ?? '',
+                    lastname: '',
+                    second_lastname: '',
+                    address: null,
+                    phone_number: userCredential.user.phoneNumber ?? null,
+                    email: userCredential.user.email ?? '',
+                    status: true,
+                    profile_status: 'client' as TUserType,
+                    image_profile: userCredential.user.photoURL ?? '',
+                    birth_date: null,
+                    provider: providerData,
+                };
+
+                await setDoc(userRef, userDoc);
+
+                userData = {
+                    id: uid,
+                    name: userDoc.name,
+                    lastname: userDoc.lastname,
+                    secondLastname: userDoc.second_lastname,
+                    address: userDoc.address,
+                    phoneNumber: userDoc.phone_number,
+                    email: userDoc.email,
+                    status: userDoc.status,
+                    profileStatus: userDoc.profile_status,
+                    imageProfile: userDoc.image_profile,
+                    birthDate: userDoc.birth_date,
+                    provider: userDoc.provider,
+                };
+            } else {
+                userData = mapFirestoreUserToTUser({
+                    id: userSnap.id,
+                    ...userSnap.data(),
+                });
             }
-        };
 
-        handleGoogleResponse();
-    }, [response]);
+            setUser(userData);
+            setAuth(true);
+            router.replace('/(app)/(tabs)');
+        } catch (error) {
+            console.error('Error en login con Google:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return {
-        promptAsync,
-        request,
+        loginWithGoogle,
     };
 };

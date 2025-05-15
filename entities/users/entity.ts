@@ -8,13 +8,13 @@ export type TUser = {
     name: string;
     lastname: string;
     secondLastname?: string;
-    address?: TAddress;
-    phoneNumber?: number;
-    email: string;
+    address?: TAddress | null;
+    phoneNumber?: string | null;
+    email: string | null;
     status: boolean;
     profileStatus: TUserType;
     imageProfile?: string;
-    birthDate: Date;
+    birthDate: Date | null;
     provider: TProvider;
 };
 
@@ -28,7 +28,7 @@ export const emptyUser: TUser = {
         zipCode: "",
         neighborhood: "",
     },
-    phoneNumber: 5,
+    phoneNumber: '',
     email: "",
     status: false,
     profileStatus: "client",

@@ -27,7 +27,7 @@ export default function LoginScreen() {
     const [remember, setRemember] = React.useState(false);
 
     const { login } = useAuth();
-    const { promptAsync } = useGoogleLogin();
+    const { loginWithGoogle } = useGoogleLogin();
 
 
     const {
@@ -88,7 +88,7 @@ export default function LoginScreen() {
                     <View className='items-center'>
                         <View className="w-[95%] flex-col items-center gap-y-5 z-0 bg-primarybg-servilink p-6 rounded-xl shadow-md shadow-white">
 
-                            <GoogleLoginButton onPress={() => promptAsync()} />
+                            <GoogleLoginButton onPress={() => loginWithGoogle()} />
 
                             <View className="flex-row w-full items-center justify-between gap-x-2">
                                 <View className="h-[1px] w-20 bg-white/90" />
