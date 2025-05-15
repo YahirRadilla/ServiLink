@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur"; // 👈 Importa BlurView
 import React from "react";
 import {
     FlatList,
@@ -34,11 +35,18 @@ export function FilterDropdown({
         <Ionicons name="chevron-down" size={16} color="#ccc" />
       </Pressable>
 
-      <Modal transparent visible={open} animationType="slide">
+      <Modal transparent visible={open} animationType="fade">
         <Pressable
           onPress={() => setOpen(false)}
-          className="flex-1 bg-black/60 justify-end"
+          className="flex-1 justify-end"
         >
+          {/* Fondo con efecto blur */}
+          <BlurView
+            intensity={60}
+            tint="dark"
+            className="absolute top-0 bottom-0 left-0 right-0"
+          />
+
           <Pressable
             onPress={() => {}}
             className="bg-[#12121a] rounded-t-3xl px-6 py-6 max-h-[60%]"

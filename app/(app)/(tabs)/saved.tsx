@@ -16,7 +16,7 @@ export default function Saved() {
         }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center justify-between mb-4">
           <View>
             <Text className="text-white/90 font-bold ml-2 text-base">
               28 Posts guardados
@@ -27,7 +27,7 @@ export default function Saved() {
           </View>
           <Logo />
         </View>
-        <View className="flex-row px-3 py-2">
+        <View className="flex-row px-3 py-2 mb-4">
           <FilterDropdown
             label="Colonia"
             options={["Los Olivos", "San Miguel", "Centro"]}
@@ -37,13 +37,13 @@ export default function Saved() {
           <FilterDropdown
             label="Servicio"
             options={["Plomería", "Carpintería", "Electricista"]}
-            selected="Plomería"
+            selected="Servicio"
             onSelect={() => {}}
           />
           <FilterDropdown
             label="Ordenar"
             options={["Más reciente", "Más antiguo"]}
-            selected="Plomería"
+            selected="Más reciente"
             onSelect={() => {}}
           />
         </View>
