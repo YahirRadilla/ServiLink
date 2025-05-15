@@ -15,7 +15,21 @@ export type TPost = {
     maxPrice: number
     provider: TProvider
     address: TAddress
+    service: string
+}
 
+export type TDraftPost = {
+    title: string
+    description: string
+    valoration: number
+    images: [string]
+    postType: TTypePost
+    status: boolean
+    minPrice: number
+    maxPrice: number
+    provider: TProvider
+    address: TAddress
+    service: string
 }
 
 export const emptyPost: TPost = {
@@ -30,9 +44,10 @@ export const emptyPost: TPost = {
     maxPrice: 0,
     provider: emptyProvider,
     address: {
-        streetAddress : '',
+        streetAddress: '',
         zipCode: '',
         neighborhood: '',
-    }
+    },
+    service: ''
 }
 
