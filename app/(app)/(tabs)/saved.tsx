@@ -9,6 +9,11 @@ import Logo from "../../../shared/svg/logo.svg";
 
 const filtersData = [
   {
+    label: "Ordenar por",
+    key: "ordenar",
+    options: ["Recientes", "Más Antigüos"],
+  },
+  {
     label: "Colonia",
     key: "colonia",
     options: [
@@ -51,11 +56,6 @@ const filtersData = [
       "Lavado de tinacos",
       "Reparación de electrodomésticos",
     ],
-  },
-  {
-    label: "Ordenar por",
-    key: "ordenar",
-    options: ["Recientes", "Más Antigüos"],
   },
 ];
 
