@@ -66,6 +66,17 @@ export default function Saved() {
     servicio: "",
     ordenar: "",
   });
+  const handleSelect = (key: string, value: string) => {
+    if (key === "reset") {
+      setSelectedFilters({
+        colonia: "",
+        servicio: "",
+        ordenar: "",
+      });
+    } else {
+      setSelectedFilters((prev) => ({ ...prev, [key]: value }));
+    }
+  };
   return (
     <Screen>
       <ScrollView
@@ -103,9 +114,7 @@ export default function Saved() {
             onClose={() => setFiltersVisible(false)}
             filters={filtersData}
             selected={selectedFilters}
-            onSelect={(key, value) =>
-              setSelectedFilters((prev) => ({ ...prev, [key]: value }))
-            }
+            onSelect={handleSelect}
             onApply={() => {
               setFiltersVisible(false);
             }}

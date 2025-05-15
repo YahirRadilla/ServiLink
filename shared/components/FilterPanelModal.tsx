@@ -37,7 +37,7 @@ export function FilterPanelModal({
             intensity={100}
             tint="dark"
             className="flex-1"
-            pointerEvents="none" // ⚠ Esto permite que el ScrollView reciba el toque
+            pointerEvents="none"
           />
         </Pressable>
 
@@ -88,15 +88,28 @@ export function FilterPanelModal({
             ))}
           </ScrollView>
 
-          <Pressable
-            onPress={onApply}
-            className="mt-4 bg-links-servilink py-3 rounded-xl"
-            android_ripple={{ color: "#ffffff30" }}
-          >
-            <Text className="text-white text-center font-bold">
-              Aplicar filtros
-            </Text>
-          </Pressable>
+          <View className="flex-row justify-between mt-4 gap-x-3">
+            <Pressable
+              onPress={() => {
+                onSelect("reset", "");
+              }}
+              android_ripple={{ color: "#ffffff30" }}
+              className="flex-1 border-finished-status-servilink py-3 rounded-xl border items-center"
+            >
+              <Text className="text-finished-status-servilink text-center font-bold">
+                Limpiar Filtros
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={onApply}
+              className="flex-1 bg-links-servilink py-3 rounded-xl items-center"
+              android_ripple={{ color: "#ffffff30" }}
+            >
+              <Text className="text-white text-center font-bold">
+                Aplicar filtros
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </Modal>
