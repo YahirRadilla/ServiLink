@@ -45,10 +45,10 @@ export function PostItemCard({
         <View className="relative w-full h-52">
           <Image
             source={{ uri: image }}
-            className="w-full h-52 bg-black/50 rounded-t-xl"
+            className="w-full h-52 bg-black/50 rounded-t-xl opacity-40"
             resizeMode="cover"
           />
-          <View className="absolute top-5 left-5 bg-gray-900 rounded-md px-2 py-1">
+          <View className="absolute top-5 left-5 bg-gray-900/80 rounded-md px-2 py-1">
             <Text className="text-white font-medium text-xs">{date}</Text>
           </View>
         </View>
