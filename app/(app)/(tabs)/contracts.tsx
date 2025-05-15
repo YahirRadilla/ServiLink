@@ -1,7 +1,7 @@
 import { Screen } from "@/components/Screen";
 import { useContractStore } from "@/entities/contracts";
 import { useContract } from "@/features/contracts/useContract";
-import { TestCard } from "@/shared/components/TestCard";
+import { ItemCard } from "@/shared/components/ItemCard";
 import { useEffect } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -27,7 +27,7 @@ export default function ContractsScreen() {
           </View>
         </View>
         <View>
-          <TestCard
+          <ItemCard
             onPress={() => console.log("HOPLA")}
             image=""
             title="Mesa"
@@ -37,7 +37,7 @@ export default function ContractsScreen() {
             price={1234}
             type="contract"
           />
-          <TestCard
+          <ItemCard
             onPress={() => console.log("HOPLA")}
             image=""
             title="Mesa"
@@ -47,7 +47,7 @@ export default function ContractsScreen() {
             price={1234}
             type="contract"
           />
-          <TestCard
+          <ItemCard
             onPress={() => console.log("HOPLA")}
             image=""
             title="Mesa"

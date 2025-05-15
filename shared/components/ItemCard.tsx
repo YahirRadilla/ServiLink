@@ -3,7 +3,7 @@ import { Image, Pressable, Text, View } from "react-native";
 type ProposalStatus = "accepted" | "pending" | "rejected";
 type ContractStatus = "active" | "pending" | "finished";
 
-type TestCardProps = {
+type ItemCardProps = {
   onPress: () => void;
   image: string;
   title: string;
@@ -73,7 +73,7 @@ const translateStatus = (
     return contractTranslations[status as ContractStatus] ?? status;
 };
 
-export function TestCard({
+export function ItemCard({
   onPress,
   image,
   title,
@@ -82,7 +82,7 @@ export function TestCard({
   date,
   price,
   type = "proposal",
-}: TestCardProps) {
+}: ItemCardProps) {
   const [bgColor, textColor] = getStatusStyle(status, type);
 
   return (
