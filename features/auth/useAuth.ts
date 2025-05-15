@@ -1,7 +1,7 @@
 import { useUserStore } from "@/entities/users";
 import { db } from "@/lib/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { loginUser, registerUser, RegisterUserProps } from "./services";
+import { loginUser, logoutUser, registerUser, RegisterUserProps } from "./services";
 import { useAuthStore } from "./store";
 
 export const useAuth = () => {
@@ -20,6 +20,20 @@ export const useAuth = () => {
             setLoading(false);
         }
     };
+
+
+    const signOut = async () => {
+        setLoading(true);
+        try {
+            await logoutUser();
+            setAuth(false);
+            logout();
+        } catch (error) {
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    }
     /* 
         const loginWithGoogle = async () => {
             setLoading(true);
@@ -54,5 +68,6 @@ export const useAuth = () => {
         login,
         isAuthenticated,
         register,
+        signOut
     };
 }

@@ -44,9 +44,13 @@ export const loginUser = async (
         const userSnap = await getDoc(doc(db, "users", uid));
         if (!userSnap.exists()) throw new Error("Usuario no encontrado en Firestore");
 
+        const providerSnap = await getDoc(userSnap.data().provider_id);
+
+
         const userData: TUser = mapFirestoreUserToTUser({
             id: userSnap.id,
-            ...userSnap.data()
+            ...userSnap.data(),
+            provider: providerSnap.data(),
         });
 
         return userData;
