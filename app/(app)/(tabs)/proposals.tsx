@@ -1,28 +1,28 @@
 import { Screen } from "@/components/Screen";
-import { useContractStore } from "@/entities/contracts";
-import { useContract } from "@/features/contracts/useContract";
+import { useProposalStore } from "@/entities/proposals";
+import { useProposal } from "@/features/proposals/useProposal";
 import { TestCard } from "@/shared/components/TestCard";
 import { useEffect } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ContractsScreen() {
-  const { loadContracts, loading } = useContract();
+  const { loadProposals, loading } = useProposal();
 
   useEffect(() => {
-    loadContracts();
+    loadProposals();
   }, []);
 
-  const contracts = useContractStore((state) => state.contracts);
+  const proposals = useProposalStore((state) => state.proposals);
   return (
     <Screen>
       <ScrollView>
         <View>
           <View className="py-6">
             <Text className="text-white/90 font-bold ml-2 text-base">
-              {contracts.length} Contratos
+              {proposals.length} Propuestas
             </Text>
             <Text className="text-white text-2xl font-bold ml-2">
-              Contratos
+              Propuestas
             </Text>
           </View>
         </View>
@@ -31,21 +31,21 @@ export default function ContractsScreen() {
             onPress={() => console.log("HOPLA")}
             image=""
             title="Mesa"
-            status="finished"
+            status="accepted"
             provider="Juan Rodriguez - Carpintería"
             date="2025/01/01"
             price={1234}
-            type="contract"
+            type="proposal"
           />
           <TestCard
             onPress={() => console.log("HOPLA")}
             image=""
             title="Mesa"
-            status="active"
+            status="rejected"
             provider="Juan Rodriguez - Carpintería"
             date="2025/01/01"
             price={1234}
-            type="contract"
+            type="proposal"
           />
           <TestCard
             onPress={() => console.log("HOPLA")}
@@ -55,12 +55,11 @@ export default function ContractsScreen() {
             provider="Juan Rodriguez - Carpintería"
             date="2025/01/01"
             price={1234}
-            type="contract"
+            type="proposal"
           />
         </View>
       </ScrollView>
     </Screen>
   );
 }
-
 const styles = StyleSheet.create({});
