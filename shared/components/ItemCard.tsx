@@ -54,23 +54,23 @@ const getStatusStyle = (
 };
 
 const translateStatus = (
-    status: ProposalStatus | ContractStatus,
-    type: 'proposal' | 'contract'
+  status: ProposalStatus | ContractStatus,
+  type: "proposal" | "contract"
 ): string => {
-    if(type === 'proposal'){
-        const translations: Record<ProposalStatus, string> = {
-            accepted: "Aceptada",
-            pending: "Pendiente",
-            rejected: "Rechazada",
-        };
-        return translations[status as ProposalStatus] ?? status;
-    }
-    const contractTranslations: Record<ContractStatus, string> = {
-        active: "Activo",
-        pending: "Pendiente",
-        finished: "Finalizado",
-    }
-    return contractTranslations[status as ContractStatus] ?? status;
+  if (type === "proposal") {
+    const translations: Record<ProposalStatus, string> = {
+      accepted: "Aceptada",
+      pending: "Pendiente",
+      rejected: "Rechazada",
+    };
+    return translations[status as ProposalStatus] ?? status;
+  }
+  const contractTranslations: Record<ContractStatus, string> = {
+    active: "Activo",
+    pending: "Pendiente",
+    finished: "Finalizado",
+  };
+  return contractTranslations[status as ContractStatus] ?? status;
 };
 
 export function ItemCard({
@@ -86,11 +86,13 @@ export function ItemCard({
   const [bgColor, textColor] = getStatusStyle(status, type);
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-    >
-      <View className="flex-row w-full rounded-xl p-3 gap-x-4 items-center h-28 mb-6">
+    <View className="rounded-xl overflow-hidden mb-6">
+      <Pressable
+        onPress={onPress}
+        android_ripple={{ color: "#ffffff10" }}
+        className="flex-row p-3 gap-x-4 items-center h-28 w-full"
+        style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+      >
         <View>
           <Image
             source={{ uri: image }}
@@ -123,7 +125,7 @@ export function ItemCard({
             ${price}
           </Text>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
