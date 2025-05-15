@@ -1,7 +1,7 @@
 import { Screen } from "@/components/Screen";
+import { FilterDropdown } from "@/shared/components/Filters";
 import { PostItemCard } from "@/shared/components/PostItemCard";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-
 // @ts-ignore
 import Logo from "../../../shared/svg/logo.svg";
 
@@ -27,16 +27,36 @@ export default function Saved() {
           </View>
           <Logo />
         </View>
+        <View className="flex-row px-3 py-2">
+          <FilterDropdown
+            label="Colonia"
+            options={["Los Olivos", "San Miguel", "Centro"]}
+            selected="Los Olivos"
+            onSelect={() => {}}
+          />
+          <FilterDropdown
+            label="Servicio"
+            options={["Plomería", "Carpintería", "Electricista"]}
+            selected="Plomería"
+            onSelect={() => {}}
+          />
+          <FilterDropdown
+            label="Ordenar"
+            options={["Más reciente", "Más antiguo"]}
+            selected="Plomería"
+            onSelect={() => {}}
+          />
+        </View>
 
         <PostItemCard
-                  onPress={() => console.log("HOPLA")}
-                  image={"https://picsum.photos/400/300"}
-                  title="Mesa"
-                  neighborhood="Los Olivos"
-                  provider="Juan Rodriguez - Plomería"
-                  date="2025/01/01"
-                  rate={4}
-                />
+          onPress={() => console.log("HOPLA")}
+          image={"https://picsum.photos/400/300"}
+          title="Mesa"
+          neighborhood="Los Olivos"
+          provider="Juan Rodriguez - Plomería"
+          date="2025/01/01"
+          rate={4}
+        />
       </ScrollView>
     </Screen>
   );
