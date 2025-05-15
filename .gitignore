@@ -16,9 +16,10 @@ android/
 .gradle/
 build/
 *.apk
-
+*.keystore
 *.jks
 debug.keystore
+my-release-key.keystore
 
 # iOS (por si agregas en el futuro)
 ios/
