@@ -20,6 +20,19 @@ export const useAuth = () => {
             setLoading(false);
         }
     };
+    /* 
+        const loginWithGoogle = async () => {
+            setLoading(true);
+            try {
+                const { user } = await loginWithGoogleWithPopup();
+                setUser(user);
+                setAuth(true);
+            } catch (error) {
+                throw error;
+            } finally {
+                setLoading(false);
+            }
+        }; */
 
     const register = async (data: RegisterUserProps) => {
         setLoading(true);
@@ -40,6 +53,6 @@ export const useAuth = () => {
     return {
         login,
         isAuthenticated,
-        register
+        register,
     };
 }

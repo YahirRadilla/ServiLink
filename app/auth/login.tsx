@@ -9,6 +9,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { Dimensions, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
+
+import { useGoogleLogin } from '@/features/auth/useGoogleAuth';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
 
@@ -21,11 +23,12 @@ const schema = Yup.object({
 export default function LoginScreen() {
     const { height } = Dimensions.get('window');
 
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
+
     const [remember, setRemember] = React.useState(false);
 
     const { login } = useAuth();
+    const { promptAsync } = useGoogleLogin();
+
 
     const {
         control,
@@ -48,6 +51,8 @@ export default function LoginScreen() {
             console.log(error);
         }
     }
+
+
 
     return (
 
@@ -83,7 +88,7 @@ export default function LoginScreen() {
                     <View className='items-center'>
                         <View className="w-[95%] flex-col items-center gap-y-5 z-0 bg-primarybg-servilink p-6 rounded-xl shadow-md shadow-white">
 
-                            <GoogleLoginButton onPress={() => { }} />
+                            <GoogleLoginButton onPress={() => promptAsync()} />
 
                             <View className="flex-row w-full items-center justify-between gap-x-2">
                                 <View className="h-[1px] w-20 bg-white/90" />

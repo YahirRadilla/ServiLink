@@ -2,12 +2,21 @@ import { TUser, TUserType } from "@/entities/users";
 import { auth, db } from "@/lib/firebaseConfig";
 import { mapFirestoreUserToTUser } from "@/mappers/firebaseAuthToUser";
 import { TAddress } from "@/shared/interfaces";
+import * as WebBrowser from 'expo-web-browser';
 import {
     createUserWithEmailAndPassword,
+    GoogleAuthProvider,
     signInWithEmailAndPassword,
     signOut
 } from "firebase/auth";
 import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+
+WebBrowser.maybeCompleteAuthSession();
+
+
+const provider = new GoogleAuthProvider();
+
+
 
 export type RegisterUserProps = {
     email: string;
@@ -97,13 +106,4 @@ export const logoutUser = async () => {
         throw error;
     }
 };
-/* 
-export const loginWithGoogle = async () => {
-  try {
-    const result = await signInWithPopup(auth, new auth.GoogleAuthProvider());
-    return result.user;
-  } catch (error) {
-    throw error;
-  }
-};
- */
+
