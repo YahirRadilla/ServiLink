@@ -6,7 +6,7 @@ type PostItemCardProps = {
   title: string;
   neighborhood: string;
   provider: string;
-  date: string;
+  service: string;
   rate: number;
 };
 
@@ -16,7 +16,7 @@ export function PostItemCard({
   title,
   neighborhood,
   provider,
-  date,
+  service,
   rate,
 }: PostItemCardProps) {
   const renderStars = () => {
@@ -49,9 +49,14 @@ export function PostItemCard({
             className="w-full h-52 bg-black/50 opacity-40"
             resizeMode="cover"
           />
-          <View className="absolute top-5 left-5 bg-gray-900/80 rounded-md px-2 py-1">
-            <Text className="text-white font-medium text-xs">{date}</Text>
-          </View>
+          <View className="absolute bottom-5 right-5 flex-row gap-x-2">
+            <View className="bg-gray-900/80 rounded-md px-2 py-1">
+              <Text className="text-white font-medium text-xs">{service}</Text>
+            </View>
+            <View className=" bg-gray-900/80 rounded-md px-2 py-1">
+              <Text className="text-white font-medium text-xs">{neighborhood}</Text>
+            </View>
+          </View>  
         </View>
 
         {/* Contenido */}
@@ -59,7 +64,7 @@ export function PostItemCard({
           <View className="flex-row items-center gap-x-2 p-0.5">
             <View className="w-5 h-5 bg-links-servilink rounded" />
             <Text className="font-semibold text-xl text-white">
-              {neighborhood}
+              {title}
             </Text>
           </View>
           <Text className="text-base text-white">{provider}</Text>

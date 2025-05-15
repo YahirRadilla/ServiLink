@@ -154,10 +154,10 @@ export default function Index() {
                         <PostItemCard
                             onPress={() => console.log("HOPLA")}
                             image={item.images[0]}
-                            title="Mesa"
+                            title={item.title}
                             neighborhood={item.address.neighborhood}
-                            provider={`Juan Rodriguez - ${item.service}`}
-                            date="2025/01/01"
+                            provider={`Juan Rodriguez`}
+                            service={item.service}
                             rate={item.valoration}
                         />
 
@@ -165,20 +165,20 @@ export default function Index() {
                         <PostItemCard
                             onPress={() => console.log("HOPLA")}
                             image={item.images[0]}
-                            title="Mesa"
+                            title={item.title}
                             neighborhood={item.address.neighborhood}
-                            provider={`Juan Rodriguez - ${item.service}`}
-                            date="2025/01/01"
+                            provider={`Juan Rodriguez`}
+                            service={item.service}
                             rate={item.valoration}
                         />
 
                         <PostItemCard
                             onPress={() => console.log("HOPLA")}
                             image={item.images[0]}
-                            title="Mesa"
+                            title={item.title}
                             neighborhood={item.address.neighborhood}
-                            provider={`Juan Rodriguez - ${item.service}`}
-                            date="2025/01/01"
+                            provider={`Juan Rodriguez`}
+                            service={item.service}
                             rate={item.valoration}
                         />
 

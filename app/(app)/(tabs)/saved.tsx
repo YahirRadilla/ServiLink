@@ -129,7 +129,7 @@ export default function Saved() {
           title="Mesa"
           neighborhood="Los Olivos"
           provider="Juan Rodriguez - Plomería"
-          date="2025/01/01"
+          service="Electricista"
           rate={4}
         />
       </ScrollView>
