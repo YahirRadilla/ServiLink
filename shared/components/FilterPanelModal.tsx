@@ -95,7 +95,7 @@ export function FilterPanelModal({
                   onSelect("reset", "");
                 }}
                 android_ripple={{ color: "#ffffff30" }}
-                className="w-full py-3 items-center flex-1 justify-center"
+                className="w-full py-3 items-center"
               >
                 <Text className="text-finished-status-servilink text-center font-bold">
                   Limpiar Filtros
