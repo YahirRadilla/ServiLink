@@ -3,13 +3,7 @@ import { FilterPanelModal } from "@/shared/components/FilterPanelModal";
 import { PostItemCard } from "@/shared/components/PostItemCard";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 // @ts-ignore
 import Logo from "../../../shared/svg/logo.svg";
 
@@ -18,44 +12,44 @@ const filtersData = [
     label: "Colonia",
     key: "colonia",
     options: [
-      "Centro", 
-      "El Esterito", 
-      "La Posada", 
-      "Loma Linda", 
-      "El Zacatal", 
-      "Los Olivos", 
-      "Colina del Sol", 
-      "Fidepaz", 
-      "Bellavista", 
-      "La Rinconada", 
-      "Puesta del Sol", 
-      "Misiones", 
-      "San Fernando", 
-      "Arcoiris", 
-      "Perlas del Golfo", 
-      "Indeco", 
-      "8 de Octubre", 
-      "El Pedregal"
+      "Centro",
+      "El Esterito",
+      "La Posada",
+      "Loma Linda",
+      "El Zacatal",
+      "Los Olivos",
+      "Colina del Sol",
+      "Fidepaz",
+      "Bellavista",
+      "La Rinconada",
+      "Puesta del Sol",
+      "Misiones",
+      "San Fernando",
+      "Arcoiris",
+      "Perlas del Golfo",
+      "Indeco",
+      "8 de Octubre",
+      "El Pedregal",
     ],
   },
   {
     label: "Servicio",
     key: "servicio",
     options: [
-      "Electricista", 
-      "Plomero", 
-      "Jardinería", 
-      "Carpintero", 
-      "Cerrajero", 
-      "Pintor", 
-      "Albañil", 
-      "Técnico en refrigeración", 
-      "Fumigador", 
-      "Fontanero", 
-      "Mecánico a domicilio", 
-      "Instalación de cámaras", 
-      "Lavado de tinacos", 
-      "Reparación de electrodomésticos"
+      "Electricista",
+      "Plomero",
+      "Jardinería",
+      "Carpintero",
+      "Cerrajero",
+      "Pintor",
+      "Albañil",
+      "Técnico en refrigeración",
+      "Fumigador",
+      "Fontanero",
+      "Mecánico a domicilio",
+      "Instalación de cámaras",
+      "Lavado de tinacos",
+      "Reparación de electrodomésticos",
     ],
   },
   {
@@ -94,13 +88,15 @@ export default function Saved() {
           <Logo />
         </View>
         <View className="flex-row py-2 mb-4">
-          <TouchableOpacity
+          <Pressable
             onPress={() => setFiltersVisible(true)}
+            android_ripple={{ color: "#ffffff10" }}
             className="flex-row items-center border border-links-servilink rounded-lg px-4 py-2"
+            style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
           >
             <Ionicons name="filter" size={16} color="#ccc" />
             <Text className="ml-2 text-white">Filtros</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           <FilterPanelModal
             visible={filtersVisible}
