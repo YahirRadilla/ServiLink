@@ -88,27 +88,32 @@ export function FilterPanelModal({
             ))}
           </ScrollView>
 
-          <View className="flex-row justify-between mt-4 gap-x-3">
-            <Pressable
-              onPress={() => {
-                onSelect("reset", "");
-              }}
-              android_ripple={{ color: "#ffffff30" }}
-              className="flex-1 border-finished-status-servilink py-3 rounded-xl border items-center"
-            >
-              <Text className="text-finished-status-servilink text-center font-bold">
-                Limpiar Filtros
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={onApply}
-              className="flex-1 bg-links-servilink py-3 rounded-xl items-center"
-              android_ripple={{ color: "#ffffff30" }}
-            >
-              <Text className="text-white text-center font-bold">
-                Aplicar filtros
-              </Text>
-            </Pressable>
+          <View className="flex-row justify-between gap-x-3">
+            <View className="flex-1 rounded-xl overflow-hidden border border-finished-status-servilink">
+              <Pressable
+                onPress={() => {
+                  onSelect("reset", "");
+                }}
+                android_ripple={{ color: "#ffffff30" }}
+                className="w-full py-3 items-center flex-1 justify-center"
+              >
+                <Text className="text-finished-status-servilink text-center font-bold">
+                  Limpiar Filtros
+                </Text>
+              </Pressable>
+            </View>
+
+            <View className="flex-1 rounded-xl overflow-hidden bg-links-servilink">
+              <Pressable
+                onPress={onApply}
+                android_ripple={{ color: "#ffffff30" }}
+                className="w-full items-center flex-1 justify-center"
+              >
+                <Text className="text-white text-center font-bold">
+                  Aplicar filtros
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </View>

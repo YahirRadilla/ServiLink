@@ -35,17 +35,18 @@ export function PostItemCard({
   };
 
   return (
-    <Pressable
-      onPress={onPress}
-      android_ripple={{ color: "#ffffff10" }}
-      className="mb-6 h-80 rounded-xl border border-links-servilink"
-      style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-    >
+    <View className="flex-1 rounded-xl mb-6 max-h-[40%] overflow-hidden border border-links-servilink">
+      <Pressable
+        onPress={onPress}
+        android_ripple={{ color: "#ffffff10" }}
+        className="h-80 "
+        style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+      >
         {/* Imagen */}
         <View className="relative w-full h-52">
           <Image
             source={{ uri: image }}
-            className="w-full h-52 bg-black/50 rounded-t-xl opacity-40"
+            className="w-full h-52 bg-black/50 opacity-40"
             resizeMode="cover"
           />
           <View className="absolute top-5 left-5 bg-gray-900/80 rounded-md px-2 py-1">
@@ -67,6 +68,7 @@ export function PostItemCard({
             <View className="w-5 h-5 bg-white/10 rounded" />
           </View>
         </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }

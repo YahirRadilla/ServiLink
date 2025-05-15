@@ -99,15 +99,17 @@ export default function Saved() {
           <Logo />
         </View>
         <View className="flex-row py-2 mb-4">
-          <Pressable
-            onPress={() => setFiltersVisible(true)}
-            android_ripple={{ color: "#ffffff10" }}
-            className="flex-row items-center border border-links-servilink rounded-lg px-4 py-2"
-            style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-          >
-            <Ionicons name="filter" size={16} color="#ccc" />
-            <Text className="ml-2 text-white">Filtros</Text>
-          </Pressable>
+          <View className ="overflow-hidden border border-links-servilink rounded-lg">
+              <Pressable
+              onPress={() => setFiltersVisible(true)}
+              android_ripple={{ color: "#ffffff10" }}
+              className="flex-row items-center  px-4 py-2"
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+            >
+              <Ionicons name="filter" size={16} color="#ccc" />
+              <Text className="ml-2 text-white">Filtros</Text>
+            </Pressable>
+          </View>
 
           <FilterPanelModal
             visible={filtersVisible}
