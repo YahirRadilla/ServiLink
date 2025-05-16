@@ -1,4 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image, Pressable, Text, View } from "react-native";
+import SaveButton from "./SavedButton";
 
 type PostItemCardProps = {
   onPress: () => void;
@@ -39,7 +41,7 @@ export function PostItemCard({
       <Pressable
         onPress={onPress}
         android_ripple={{ color: "#ffffff10" }}
-        className="h-80 "
+        className=""
         style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
       >
         {/* Imagen */}
@@ -53,24 +55,26 @@ export function PostItemCard({
             <View className="bg-gray-900/80 rounded-md px-2 py-1">
               <Text className="text-white font-medium text-xs">{service}</Text>
             </View>
-            <View className=" bg-gray-900/80 rounded-md px-2 py-1">
+            <View className="flex-row gap-x-1 bg-gray-900/80 rounded-md pr-2 py-1">
+              <Ionicons name="location-sharp" size={16} color="#3D5DC7" />
               <Text className="text-white font-medium text-xs">{neighborhood}</Text>
             </View>
-          </View>  
+          </View>
+
         </View>
 
         {/* Contenido */}
         <View className="px-4 py-3">
           <View className="flex-row items-center gap-x-2 p-0.5">
-            <View className="w-5 h-5 bg-links-servilink rounded" />
-            <Text className="font-semibold text-xl text-white">
+
+            <Text className="font-semibold text-lg text-white">
               {title}
             </Text>
           </View>
           <Text className="text-base text-white">{provider}</Text>
           <View className="flex-row justify-between items-center p-0.5">
             <View className="flex-row">{renderStars()}</View>
-            <View className="w-5 h-5 bg-white/10 rounded" />
+            <SaveButton />
           </View>
         </View>
       </Pressable>

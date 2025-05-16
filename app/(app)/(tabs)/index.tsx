@@ -101,6 +101,7 @@ export default function Index() {
                 contentContainerStyle={{
                     paddingVertical: 24,
                     paddingHorizontal: 12,
+                    paddingBottom: 120,
                 }}
                 ListHeaderComponent={
                     <>
@@ -150,39 +151,18 @@ export default function Index() {
                     </>
                 }
                 renderItem={({ item }) => (
-                    <>
-                        <PostItemCard
-                            onPress={() => console.log("HOPLA")}
-                            image={item.images[0]}
-                            title={item.title}
-                            neighborhood={item.address.neighborhood}
-                            provider={`Juan Rodriguez`}
-                            service={item.service}
-                            rate={item.valoration}
-                        />
+
+                    <PostItemCard
+                        onPress={() => console.log("Post id: ", item.id)}
+                        image={item.images[0]}
+                        title={item.title}
+                        neighborhood={item.address.neighborhood}
+                        provider={item.provider.name}
+                        service={item.service}
+                        rate={item.valoration}
+                    />
 
 
-                        <PostItemCard
-                            onPress={() => console.log("HOPLA")}
-                            image={item.images[0]}
-                            title={item.title}
-                            neighborhood={item.address.neighborhood}
-                            provider={`Juan Rodriguez`}
-                            service={item.service}
-                            rate={item.valoration}
-                        />
-
-                        <PostItemCard
-                            onPress={() => console.log("HOPLA")}
-                            image={item.images[0]}
-                            title={item.title}
-                            neighborhood={item.address.neighborhood}
-                            provider={`Juan Rodriguez`}
-                            service={item.service}
-                            rate={item.valoration}
-                        />
-
-                    </>
                 )}
                 ListEmptyComponent={
                     <Text className="text-white text-center mt-10">
