@@ -7,9 +7,10 @@ export type TNotification = {
     user: TUser
     userType: TUserType
     title: string
-    content?: string
+    content: string
     type: TNotificationType
     seen: boolean
+    date: string
 }
 
 export const emptyNotification: TNotification = {
@@ -20,4 +21,5 @@ export const emptyNotification: TNotification = {
     content: '',
     type: 'other',
     seen: false,
+    date: ''
 }
