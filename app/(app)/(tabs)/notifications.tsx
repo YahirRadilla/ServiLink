@@ -1,9 +1,9 @@
 import { Screen } from "@/components/Screen";
 import { useNotificationStore } from "@/entities/notifications";
+import { deleteNotification } from "@/features/notifications/service";
 import { useNotifications } from "@/features/notifications/useNotifications";
 import { SwipeToDeleteNotification } from "@/shared/components/SwipeToDeleteNotification";
 import { FlatList, StyleSheet, Text, View } from "react-native";
-
 // @ts-ignore
 import Logo from "../../../shared/svg/logo.svg";
 
@@ -13,9 +13,14 @@ export default function Notifications() {
   const setNotifications = useNotificationStore(
     (state) => state.setNotifications
   );
-  const handleDelete = (id: string) => {
-    const updated = notifications.filter((n) => n.id !== id);
-    setNotifications(updated); // ✅ elimina del store
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteNotification(id); 
+      const updated = notifications.filter((n) => n.id !== id);
+      setNotifications(updated);
+    } catch (error) {
+      console.error("Error eliminando la notificación:", error);
+    }
   };
   return (
     <Screen>
@@ -41,10 +46,7 @@ export default function Notifications() {
           </>
         }
         renderItem={({ item }) => (
-          <SwipeToDeleteNotification
-            item={item}
-            onDelete={handleDelete}
-          />
+          <SwipeToDeleteNotification item={item} onDelete={handleDelete} />
         )}
         ListEmptyComponent={
           <Text className="text-white text-center mt-10">

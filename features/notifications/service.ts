@@ -1,10 +1,11 @@
 import { TNotification } from "@/entities/notifications";
 import { db } from "@/lib/firebaseConfig";
 import {
-    notificationToEntity,
-    RawNotificationData,
+  notificationToEntity,
+  RawNotificationData,
 } from "@/mappers/notificationToEntity";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+
 
 export const listenToNotifications = (
   onUpdate: (notifications: TNotification[]) => void
@@ -47,4 +48,14 @@ export const listenToNotifications = (
   });
 
   return unsubscribe;
+};
+
+export const deleteNotification = async (id: string) => {
+  try {
+    const ref = doc(db, "notifications", id);
+    await deleteDoc(ref);
+  } catch (error) {
+    console.error(`Error eliminando notificación con ID ${id}:`, error);
+    throw error;
+  }
 };
