@@ -15,7 +15,7 @@ export function UserContact(provider: UserContactProps) {
             <View className="flex-row items-center">
                 <Image
                     source={{ uri: user.imageProfile }}
-                    className="w-10 h-10 rounded-full bg-white opacity-30 mr-3"
+                    className="w-10 h-10 rounded-full mr-3"
                     resizeMode="cover"
                     alt="Imagen de perfil"
                 />

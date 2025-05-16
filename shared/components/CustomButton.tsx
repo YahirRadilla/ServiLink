@@ -19,7 +19,7 @@ export function CustomButton({
 
     return (
         <Pressable
-            className={`w-full py-3 rounded-xl items-center ${baseStyles} ${className}`}
+            className={`px-4 py-3 rounded-xl items-center ${baseStyles} ${className}`}
             onPress={onPress}
             disabled={variant === 'disabled'}
             {...rest}

@@ -1,8 +1,9 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { usePostStore } from "@/entities/posts";
 import BackButton from "@/shared/components/BackButton";
-import CustomMap from "@/shared/components/CustomMap";
+import { CustomButton } from "@/shared/components/CustomButton";
 import { Gallery } from "@/shared/components/Galery";
+import MapScreen from "@/shared/components/MapScreen";
 import SaveButton from "@/shared/components/SavedButton";
 import { UserContact } from "@/shared/components/UserContact";
 import { Ionicons } from "@expo/vector-icons";
@@ -67,7 +68,7 @@ export default function Details() {
                                     size={20}
                                     color={"#FB9400"}
                                 />
-                                <Text className="text-sm text-white/60">{post?.valoration! % 2 === 0 ? `${post?.valoration}.0` : `${post?.valoration}`} (250 reviews)</Text>
+                                <Text className="text-sm text-white/60">{post?.valoration!.toString().includes(".") ? post?.valoration : post?.valoration + ".0"} (250 reviews)</Text>
                             </View>
                         </View>
                         <View>
@@ -80,11 +81,11 @@ export default function Details() {
 
                         <View>
                             <Text className="font-semibold text-lg text-white">Ubicación</Text>
-                            <View className="flex-row items-center gap-x-2 pt-2">
+                            <View className="flex-row items-center gap-x-2 mb-2">
                                 <Ionicons name="location-sharp" size={16} color="#3D5DC7" />
-                                <Text className=" text-sm text-white/60">{post?.address.streetAddress} / {post?.address.neighborhood}</Text>
+                                <Text className="text-sm text-white/60">{post?.address.streetAddress} / {post?.address.neighborhood}</Text>
                             </View>
-                            <CustomMap />
+                            <MapScreen address={post?.address.streetAddress + " " + post?.address.neighborhood + " " + post?.address.zipCode} />
                         </View>
 
                     </View>
@@ -93,7 +94,20 @@ export default function Details() {
             </ScrollView>
 
 
+            <View className="p-4 flex-row items-center justify-between bg-neutral800">
+                <View className="flex-row items-center gap-x-2">
+                    <Text className="text-lg text-white/60">
+                        Precios
+                    </Text>
+                    <Text className="text-base text-white/90">
+                        ${post?.minPrice} - {post?.maxPrice} MXN
+                    </Text>
+                </View>
 
+                <CustomButton label="Contratar" onPress={() => { }} />
+
+
+            </View>
 
         </SingleEntityScreen>
     )
