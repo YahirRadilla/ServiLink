@@ -43,6 +43,7 @@
     "react-hook-form": "^7.56.3",
     "react-native": "0.79.2",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-image-viewing": "^0.2.2",
     "react-native-paper": "^5.14.3",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
@@ -52,7 +53,8 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "yup": "^1.6.1",
-    "zustand": "^5.0.4"
+    "zustand": "^5.0.4",
+    "react-native-maps": "1.20.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

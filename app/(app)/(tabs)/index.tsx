@@ -5,6 +5,7 @@ import { usePosts } from "@/features/posts/usePosts";
 import { FilterPanelModal } from "@/shared/components/FilterPanelModal";
 import { PostItemCard } from "@/shared/components/PostItemCard";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
     FlatList,
@@ -21,6 +22,7 @@ export default function Index() {
     const user = useUserStore((state) => state.user);
     const { loading } = usePosts();
     const posts = usePostStore((state) => state.posts);
+    const router = useRouter();
 
     const filtersData = [
         {
@@ -93,6 +95,14 @@ export default function Index() {
         }
     };
 
+    const handleTouchPost = (id: string) => {
+        if (!id) return;
+        router.push({
+            pathname: "/post/[id]",
+            params: { id },
+        });
+    };
+
     return (
         <Screen>
             <FlatList
@@ -153,7 +163,7 @@ export default function Index() {
                 renderItem={({ item }) => (
 
                     <PostItemCard
-                        onPress={() => console.log("Post id: ", item.id)}
+                        onPress={() => handleTouchPost(item.id)}
                         image={item.images[0]}
                         title={item.title}
                         neighborhood={item.address.neighborhood}
