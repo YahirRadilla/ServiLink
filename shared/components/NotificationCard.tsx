@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 type NotificationCardProps = {
   onDelete?: () => void;
@@ -23,7 +23,6 @@ export function NotificationCard({
   content,
   date,
   seen,
-  showDelete = false,
 }: NotificationCardProps) {
   const mailIcon = getMailIcon(seen);
   return (
@@ -42,12 +41,9 @@ export function NotificationCard({
           </Text>
         </View>
         <View className="flex-row justify-between items-end">
-          <Text className="text-white/70 text-sm flex-1 pr-2" numberOfLines={3}>{content}</Text>
-          {showDelete && onDelete && (
-            <Pressable onPress={onDelete}>
-              <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-            </Pressable>
-          )}
+          <Text className="text-white/70 text-sm flex-1 pr-2" numberOfLines={3}>
+            {content}
+          </Text>
         </View>
       </View>
     </View>

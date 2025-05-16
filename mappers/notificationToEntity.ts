@@ -1,6 +1,5 @@
 import { TNotification } from "@/entities/notifications";
-import { db } from "@/lib/firebaseConfig";
-import { collection, getDoc, query, where } from "firebase/firestore";
+import { getDoc } from "firebase/firestore";
 
 export type RawNotificationData = {
   title: string;
@@ -15,11 +14,8 @@ export async function notificationToEntity(
   id: string,
   data: RawNotificationData
 ): Promise<TNotification> {
-  const userRef = await getDoc(data.user_id);
-  if (!userRef.exists()) throw new Error("Usuario no encontrado");
+    
 
-  const usersRef = collection(db, "users");
-  const qUser = query(usersRef, where("user_id", "==", data.user_id));
   const userSnap = await getDoc(data.user_id);
   if (!userSnap.exists()) throw new Error("Usuario no encontrado");
 
