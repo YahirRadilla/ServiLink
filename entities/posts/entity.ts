@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore";
 import { TAddress } from "../../shared/interfaces/index";
 import { TProvider } from "../providers/index";
 import { emptyUser, TUser } from "../users";
@@ -17,6 +18,7 @@ export type TPost = {
     provider: TUser
     address: TAddress
     service: string
+    createdAt: Timestamp
 }
 
 export type TDraftPost = {
@@ -49,6 +51,7 @@ export const emptyPost: TPost = {
         zipCode: '',
         neighborhood: '',
     },
-    service: ''
+    service: '',
+    createdAt: Timestamp.fromDate(new Date()),
 }
 

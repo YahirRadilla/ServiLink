@@ -1,3 +1,4 @@
+import { usePostStore } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
 import { db } from "@/lib/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -26,6 +27,8 @@ export const useAuth = () => {
         setLoading(true);
         try {
             await logoutUser();
+            usePostStore.getState().clearPosts();
+            usePostStore.getState().applyFilters({});
             setAuth(false);
             logout();
         } catch (error) {

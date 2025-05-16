@@ -1,6 +1,6 @@
 import { TPost } from "@/entities/posts";
 import { db } from "@/lib/firebaseConfig";
-import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, query, Timestamp, where } from "firebase/firestore";
 
 export type RawPostData = {
     title: string;
@@ -18,6 +18,7 @@ export type RawPostData = {
         zipcode: string;
     };
     service: string;
+    created_at: Timestamp;
 };
 
 export async function postToEntity(id: string, data: RawPostData): Promise<TPost> {
@@ -64,5 +65,6 @@ export async function postToEntity(id: string, data: RawPostData): Promise<TPost
             neighborhood: data.address.neighborhood,
         },
         service: data.service,
+        createdAt: data.created_at,
     };
 }

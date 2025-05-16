@@ -85,7 +85,7 @@ export default function Details() {
                                 <Ionicons name="location-sharp" size={16} color="#3D5DC7" />
                                 <Text className="text-sm text-white/60">{post?.address.streetAddress} / {post?.address.neighborhood}</Text>
                             </View>
-                            <MapScreen address={post?.address.streetAddress + " " + post?.address.neighborhood + " " + post?.address.zipCode} />
+                            <MapScreen address={"Calle: " + post?.address.streetAddress + ", colonia: " + post?.address.neighborhood + " codigo postal: " + post?.address.zipCode} />
                         </View>
 
                     </View>

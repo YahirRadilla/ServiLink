@@ -1,4 +1,5 @@
 import { Screen } from "@/components/Screen";
+import { filtersData } from "@/data/filters";
 import { usePostStore } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
@@ -21,60 +22,16 @@ import Logo from "../../../shared/svg/logo.svg";
 export default function Index() {
     const user = useUserStore((state) => state.user);
     const { loading } = usePosts();
-    const posts = usePostStore((state) => state.posts);
+    const posts = usePostStore((state) => state.filteredPosts);
+    const setFilters = usePostStore((state) => state.setFilters);
+    const applyFilters = usePostStore((state) => state.applyFilters);
+
+    console.log("Posts visibles:", posts);
+
+
     const router = useRouter();
 
-    const filtersData = [
-        {
-            label: "Ordenar por",
-            key: "ordenar",
-            options: ["Recientes", "Más Antigüos"],
-        },
-        {
-            label: "Colonia",
-            key: "colonia",
-            options: [
-                "Centro",
-                "El Esterito",
-                "La Posada",
-                "Loma Linda",
-                "El Zacatal",
-                "Los Olivos",
-                "Colina del Sol",
-                "Fidepaz",
-                "Bellavista",
-                "La Rinconada",
-                "Puesta del Sol",
-                "Misiones",
-                "San Fernando",
-                "Arcoiris",
-                "Perlas del Golfo",
-                "Indeco",
-                "8 de Octubre",
-                "El Pedregal",
-            ],
-        },
-        {
-            label: "Servicio",
-            key: "servicio",
-            options: [
-                "Electricista",
-                "Plomero",
-                "Jardinería",
-                "Carpintero",
-                "Cerrajero",
-                "Pintor",
-                "Albañil",
-                "Técnico en refrigeración",
-                "Fumigador",
-                "Fontanero",
-                "Mecánico a domicilio",
-                "Instalación de cámaras",
-                "Lavado de tinacos",
-                "Reparación de electrodomésticos",
-            ],
-        },
-    ];
+
 
     const [filtersVisible, setFiltersVisible] = React.useState(false);
     const [selectedFilters, setSelectedFilters] = React.useState({
@@ -152,8 +109,10 @@ export default function Index() {
                                 onClose={() => setFiltersVisible(false)}
                                 filters={filtersData}
                                 selected={selectedFilters}
-                                onSelect={handleSelect}
-                                onApply={() => {
+                                onApply={(newFilters) => {
+                                    setSelectedFilters(newFilters as { colonia: string; servicio: string; ordenar: string });
+                                    setFilters(newFilters);
+                                    applyFilters(newFilters);
                                     setFiltersVisible(false);
                                 }}
                             />
