@@ -33,6 +33,7 @@ export default function Index() {
 
 
 
+    const [searchTerm, setSearchTerm] = React.useState("");
     const [filtersVisible, setFiltersVisible] = React.useState(false);
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
@@ -89,7 +90,13 @@ export default function Index() {
                                 className="flex-1 text-white"
                                 placeholder="Buscar servicio"
                                 placeholderTextColor="#ccc"
+                                value={searchTerm}
+                                onChangeText={(text) => {
+                                    setSearchTerm(text);
+                                    applyFilters(selectedFilters, text);
+                                }}
                             />
+
                             <Ionicons name="search-outline" size={20} color="#ccc" />
                         </View>
 
@@ -110,9 +117,9 @@ export default function Index() {
                                 filters={filtersData}
                                 selected={selectedFilters}
                                 onApply={(newFilters) => {
-                                    setSelectedFilters(newFilters as { colonia: string; servicio: string; ordenar: string });
+                                    setSelectedFilters(newFilters as any);
                                     setFilters(newFilters);
-                                    applyFilters(newFilters);
+                                    applyFilters(newFilters, searchTerm);
                                     setFiltersVisible(false);
                                 }}
                             />
