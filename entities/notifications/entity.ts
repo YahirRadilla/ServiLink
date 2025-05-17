@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore'
 import { emptyUser, TUser, TUserType } from '../users/index'
 
 export type TNotificationType = 'message' | 'contract' | 'proposal' | 'review' | 'other'
@@ -10,7 +11,7 @@ export type TNotification = {
     content: string
     type: TNotificationType
     seen: boolean
-    date: string
+    createdAt: Timestamp
 }
 
 export const emptyNotification: TNotification = {
@@ -21,5 +22,5 @@ export const emptyNotification: TNotification = {
     content: '',
     type: 'other',
     seen: false,
-    date: ''
+    createdAt: Timestamp.now(),
 }

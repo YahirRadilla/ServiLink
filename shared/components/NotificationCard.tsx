@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Timestamp } from "firebase/firestore";
 import React from "react";
 import { Text, View } from "react-native";
 
@@ -6,7 +7,7 @@ type NotificationCardProps = {
   onDelete?: () => void;
   title: string;
   content: string;
-  date: string;
+  createdAt: Timestamp;
   seen: boolean;
   showDelete?: boolean;
 };
@@ -21,10 +22,11 @@ export function NotificationCard({
   onDelete,
   title,
   content,
-  date,
+  createdAt,
   seen,
 }: NotificationCardProps) {
   const mailIcon = getMailIcon(seen);
+  const dateObj = createdAt.toDate();
   return (
     <View className="flex-row p-4 mb-6 border-links-servilink border rounded-xl">
       <View>
@@ -34,9 +36,9 @@ export function NotificationCard({
             <Text className="text-white font-semibold text-base">{title}</Text>
           </View>
           <Text className="text-white/60 text-sm">
-            {new Date(date).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
+            {dateObj.toLocaleDateString([],{
+              hour: '2-digit',
+              minute: '2-digit',
             })}
           </Text>
         </View>

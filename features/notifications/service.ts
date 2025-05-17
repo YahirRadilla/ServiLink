@@ -4,15 +4,18 @@ import {
   notificationToEntity,
   RawNotificationData,
 } from "@/mappers/notificationToEntity";
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, query, where } from "firebase/firestore";
 
 
 export const listenToNotifications = (
+  userId: string,
   onUpdate: (notifications: TNotification[]) => void
 ) => {
   const notificationsRef = collection(db, "notifications");
+  const q = query(notificationsRef, where("user_id", "==", doc(db, "users", userId)))
 
-  const unsubscribe = onSnapshot(notificationsRef, async (snapshot) => {
+  console.log(notificationsRef);
+  const unsubscribe = onSnapshot(q, async (snapshot) => {
     try {
       if (snapshot.empty) {
         onUpdate([]);
@@ -44,6 +47,7 @@ export const listenToNotifications = (
 
       onUpdate(validNotifications);
     } catch (error) {
+      console.error("Error al escuchar las notificaciones:", error);
     }
   });
 

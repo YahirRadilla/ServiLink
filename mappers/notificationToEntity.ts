@@ -1,11 +1,11 @@
 import { TNotification } from "@/entities/notifications";
-import { getDoc } from "firebase/firestore";
+import { getDoc, Timestamp } from "firebase/firestore";
 
 export type RawNotificationData = {
   title: string;
   content?: string;
   type: TNotification["type"];
-  date: string;
+  created_at: Timestamp;
   seen?: boolean;
   user_id: any;
 };
@@ -29,6 +29,6 @@ export async function notificationToEntity(
     seen: data.seen ?? false,
     user: userData,
     userType: userData.profileStatus,
-    date: data.date,
+    createdAt: data.created_at,
   };
 }

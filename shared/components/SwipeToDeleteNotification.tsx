@@ -1,4 +1,5 @@
 // components/SwipeToDeleteNotification.tsx
+import { Timestamp } from "firebase/firestore";
 import React from "react";
 import { StyleSheet } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -15,7 +16,7 @@ type Props = {
     id: string;
     title: string;
     content: string;
-    date: string;
+    createdAt: Timestamp;
     seen: boolean;
   };
   onDelete: (id: string) => void;
@@ -47,7 +48,7 @@ export function SwipeToDeleteNotification({ item, onDelete }: Props) {
         <NotificationCard
           title={item.title}
           content={item.content}
-          date={item.date}
+          createdAt={item.createdAt}
           seen={item.seen}
         />
       </Animated.View>
