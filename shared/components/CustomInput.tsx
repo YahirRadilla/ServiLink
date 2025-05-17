@@ -64,7 +64,6 @@ export default function CustomInput({
     const handlePickImages = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
-            allowsEditing: true,
             allowsMultipleSelection: true,
             aspect: [4, 3],
             quality: 1,
@@ -166,7 +165,7 @@ export default function CustomInput({
         return (
             <View className="gap-y-2">
                 {label && <Text className="text-white/90 pt-4">{label}</Text>}
-                <Pressable onPress={handlePickImages} className="w-full h-48 rounded-xl border border-auth-border-servilink bg-white/5 items-center justify-center">
+                <Pressable onPress={handlePickImages} className={`w-full h-48 rounded-xl border border-auth-border-servilink ${error ? 'border-red-500' : 'border-auth-border-servilink'} bg-white/5 items-center justify-center`}>
                     <Ionicons name="images-outline" size={32} color="#ccc" />
                     <Text className="text-white/60 mt-2">Seleccionar imágenes</Text>
                 </Pressable>
@@ -186,7 +185,7 @@ export default function CustomInput({
         return (
             <View className="gap-y-2">
                 {label && <Text className="text-white/90 pt-4">{label}</Text>}
-                <Pressable onPress={openMap} className="w-full px-4 py-3 rounded-xl border border-auth-border-servilink flex-row justify-between items-center">
+                <Pressable onPress={openMap} className={`w-full px-4 py-3 rounded-xl border border-auth-border-servilink ${error ? 'border-red-500' : 'border-auth-border-servilink'} flex-row justify-between items-center`}>
                     <Text className="text-white/50">
                         {value?.latitude && value?.longitude
                             ? `${value.latitude.toFixed(5)}, ${value.longitude.toFixed(5)}`

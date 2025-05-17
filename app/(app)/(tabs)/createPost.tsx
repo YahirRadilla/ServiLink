@@ -16,8 +16,11 @@ const schema = Yup.object({
     neighborhood: Yup.string().required('Campo requerido'),
     streetAddress: Yup.string().required('Campo requerido'),
     service: Yup.string().required('Campo requerido'),
-    images: Yup.array().required('Campo requerido'),
-    location: Yup.object().required('Campo requerido'),
+    images: Yup.array().required('Campo requerido').min(1, 'Selecciona al menos una imagen'),
+    location: Yup.object({
+        latitude: Yup.number().required('Campo requerido'),
+        longitude: Yup.number().required('Campo requerido')
+    }).nullable().required('Campo requerido'),
     postType: Yup.string().required('Campo requerido'),
 });
 
@@ -28,6 +31,7 @@ export default function CreatePostScreen() {
         control,
         handleSubmit,
         formState: { errors },
+        watch,
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
@@ -35,7 +39,7 @@ export default function CreatePostScreen() {
             description: '',
             minPrice: '',
             maxPrice: '',
-            location: {},
+            location: null as any,
             images: [],
             neighborhood: '',
             streetAddress: '',
@@ -43,6 +47,7 @@ export default function CreatePostScreen() {
             postType: '',
         },
     });
+
 
     const onSubmit = async (data: any) => {
         console.log('Publicación enviada:', data);
@@ -183,10 +188,11 @@ export default function CreatePostScreen() {
                 <Controller
                     control={control}
                     name="location"
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    render={({ field: { value, onChange }, fieldState: { error } }) => (
                         <CustomInput
                             type="location"
                             label="Ubicación"
+                            placeholder="Selecciona la ubicación"
                             value={value}
                             onChangeText={onChange}
                             error={error?.message}
