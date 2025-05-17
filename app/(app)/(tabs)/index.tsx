@@ -64,7 +64,13 @@ export default function Index() {
                 data={posts}
                 onEndReached={hasMore ? loadMore : undefined}
                 onEndReachedThreshold={0.5}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item, index) => {
+                if (!item?.id) {
+                    console.warn("❌ Elemento sin ID:", item, "en posición:", index);
+                    return `fallback-${index}`;
+                }
+                return item.id;
+                }}
                 initialNumToRender={150}
                 contentContainerStyle={{
                     paddingVertical: 24,
