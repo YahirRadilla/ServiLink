@@ -46,11 +46,12 @@ export const loginUser = async (
 
         const providerSnap = await getDoc(userSnap.data().provider_id);
 
+        const providerData = { ...providerSnap.data() as Object, provider_id: providerSnap.id };
 
         const userData: TUser = mapFirestoreUserToTUser({
             id: userSnap.id,
             ...userSnap.data(),
-            provider: providerSnap.data(),
+            provider: providerData,
         });
 
         return userData;

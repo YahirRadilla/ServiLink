@@ -16,6 +16,8 @@ export type RawPostData = {
         neighborhood: string;
         street_address: string;
         zipcode: string;
+        latitude: number;
+        longitude: number;
     };
     service: string;
     created_at: Timestamp;
@@ -60,6 +62,8 @@ export async function postToEntity(id: string, data: RawPostData): Promise<TPost
         maxPrice: data.max_price,
         provider: userData as any,
         address: {
+            latitude: data.address.latitude,
+            longitude: data.address.longitude,
             streetAddress: data.address.street_address,
             zipCode: data.address.zipcode,
             neighborhood: data.address.neighborhood,

@@ -3,12 +3,12 @@ import { usePostStore } from "@/entities/posts";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Gallery } from "@/shared/components/Galery";
-import MapScreen from "@/shared/components/MapScreen";
 import SaveButton from "@/shared/components/SavedButton";
 import { UserContact } from "@/shared/components/UserContact";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Image, ScrollView, Text, View } from "react-native";
+import MapView, { MapMarker } from "react-native-maps";
 
 export default function Details() {
     const { id } = useLocalSearchParams();
@@ -85,20 +85,20 @@ export default function Details() {
                                 <Ionicons name="location-sharp" size={16} color="#3D5DC7" />
                                 <Text className="text-sm text-white/60">{post?.address.streetAddress} / {post?.address.neighborhood}</Text>
                             </View>
-                            <MapScreen address={"Calle: " + post?.address.streetAddress + ", colonia: " + post?.address.neighborhood + " codigo postal: " + post?.address.zipCode} />
-                            {/* <View className="mt-4 rounded-xl overflow-hidden h-48 w-full">
+                            {/* <MapScreen address={"Calle: " + post?.address.streetAddress + ", colonia: " + post?.address.neighborhood + " codigo postal: " + post?.address.zipCode} /> */}
+                            <View className="mt-4 rounded-xl overflow-hidden h-48 w-full">
                                 <MapView
                                     style={{ flex: 1 }}
                                     region={{
-                                        latitude: 24.15786698,
-                                        longitude: -110.310119426,
+                                        latitude: post?.address.latitude!,
+                                        longitude: post?.address.longitude!,
                                         latitudeDelta: 0.01,
                                         longitudeDelta: 0.01,
                                     }}
                                 >
-                                    <MapMarker coordinate={{ latitude: 24.15786698, longitude: -110.310119426 }} />
+                                    <MapMarker coordinate={{ latitude: post?.address.latitude as number, longitude: post?.address.longitude as number }} />
                                 </MapView>
-                            </View> */}
+                            </View>
 
 
                         </View>

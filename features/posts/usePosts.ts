@@ -1,5 +1,6 @@
 import { usePostStore } from "@/entities/posts";
-import { listenToPosts } from "@/features/posts/services";
+import { useUserStore } from "@/entities/users";
+import { createPost, listenToPosts } from "@/features/posts/services";
 import { useEffect, useState } from "react";
 
 export const usePosts = () => {
@@ -23,5 +24,24 @@ export const usePosts = () => {
         };
     }, []);
 
-    return { loading };
+
+    const createNewPost = async (post: any) => {
+        const user = useUserStore.getState().user;
+        console.log(user);
+        try {
+            setLoading(true);
+            const id = await createPost(post, (user?.provider as any).provider_id || "");
+            return 3;
+        } catch (error) {
+            console.error("Error al crear el post desde el hook:", error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    return { loading, createNewPost };
 };
+
+

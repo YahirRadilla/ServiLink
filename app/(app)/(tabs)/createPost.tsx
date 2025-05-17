@@ -1,4 +1,5 @@
 import { filtersData } from '@/data/filters';
+import { usePosts } from '@/features/posts/usePosts';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -21,12 +22,13 @@ const schema = Yup.object({
         latitude: Yup.number().required('Campo requerido'),
         longitude: Yup.number().required('Campo requerido')
     }).nullable().required('Campo requerido'),
+    zipCode: Yup.string().required('Campo requerido'),
     postType: Yup.string().required('Campo requerido'),
 });
 
 export default function CreatePostScreen() {
     const router = useRouter();
-
+    const { loading, createNewPost } = usePosts();
     const {
         control,
         handleSubmit,
@@ -39,6 +41,7 @@ export default function CreatePostScreen() {
             description: '',
             minPrice: '',
             maxPrice: '',
+            zipCode: '',
             location: null as any,
             images: [],
             neighborhood: '',
@@ -50,8 +53,8 @@ export default function CreatePostScreen() {
 
 
     const onSubmit = async (data: any) => {
+        createNewPost(data);
         console.log('Publicación enviada:', data);
-        router.back();
     };
 
     return (
@@ -143,6 +146,20 @@ export default function CreatePostScreen() {
                         <CustomInput
                             label="Calle"
                             placeholder="Ej: 5 de Mayo"
+                            value={value}
+                            onChangeText={onChange}
+                            error={error?.message}
+                        />
+                    )}
+                />
+
+                <Controller
+                    control={control}
+                    name="zipCode"
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <CustomInput
+                            label="Codigo Postal"
+                            placeholder="Ej: 23030"
                             value={value}
                             onChangeText={onChange}
                             error={error?.message}

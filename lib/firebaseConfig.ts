@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyCtH36JBTzCsWHwtRt4DiHnUBSHrWmd_90",
   authDomain: "servilink-68398.firebaseapp.com",
   databaseURL: "https://servilink-68398-default-rtdb.firebaseio.com",
