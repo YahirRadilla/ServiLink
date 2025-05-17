@@ -52,7 +52,7 @@ export const useGoogleLogin = () => {
                     id: providerSnap.id,
                     ...(providerSnap.data() as Omit<TProvider, 'id'>),
                 };
-                const providerRef = doc(db, 'providers', providerDocRef.id);
+
                 const userDoc = {
                     name: userCredential.user.displayName ?? '',
                     lastname: '',

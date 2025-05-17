@@ -1,4 +1,5 @@
 import { Screen } from "@/components/Screen";
+import { useUserStore } from "@/entities/users";
 import { useAuth } from "@/features/auth/useAuth";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { ProfileButtons } from "@/shared/components/ProfileButtons";
@@ -7,11 +8,8 @@ import { FlatList } from "react-native-gesture-handler";
 
 export default function Profile() {
   const { signOut } = useAuth();
+  const user = useUserStore((state) => state.user);
 
-  const user = {
-    name: "Jaime Fernandez",
-    image: "https://randomuser.me/api/portraits/men/25.jpg",
-  };
 
   return (
     <Screen>
@@ -32,38 +30,38 @@ export default function Profile() {
 
             <View className=" items-center mb-6 space-y-3">
               <Image
-                source={{ uri: user.image }}
+                source={{ uri: user?.imageProfile }}
                 className="w-28 h-28 rounded-full"
               />
-              <Text className="text-white font-bold text-xl">{user.name}</Text>
+              <Text className="text-white font-bold text-xl">{user?.name}</Text>
             </View>
 
             <ProfileButtons
               title="Tablero"
               icon="calendar-outline"
-              onPress={() => {}}
+              onPress={() => { }}
             />
             <ProfileButtons
               title="Pagos"
               icon="card-outline"
-              onPress={() => {}}
+              onPress={() => { }}
             />
             <View className="border-t border-white/10 my-4" />
 
             <ProfileButtons
               title="Editar Perfil"
               icon="person-outline"
-              onPress={() => {}}
+              onPress={() => { }}
             />
             <ProfileButtons
               title="Convertirse en proveedor"
               icon="briefcase-outline"
-              onPress={() => {}}
+              onPress={() => { }}
             />
             <ProfileButtons
               title="FAQs"
               icon="information-circle-outline"
-              onPress={() => {}}
+              onPress={() => { }}
             />
 
             <View className="border-t border-white/10 my-4" />
@@ -71,7 +69,7 @@ export default function Profile() {
             <ProfileButtons
               title="Eliminar Cuenta"
               icon="close-circle-outline"
-              onPress={() => {}}
+              onPress={() => { }}
               type="secondary"
               chevron={false}
             />
