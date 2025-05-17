@@ -6,10 +6,13 @@ import { ProfileButtons } from "@/shared/components/ProfileButtons";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
+// @ts-ignore
+import Avatar from "../../../shared/svg/avatar.svg";
+
 export default function Profile() {
   const { signOut } = useAuth();
   const user = useUserStore((state) => state.user);
-
+  const hasProfileImage = !!user?.imageProfile?.trim();
 
   return (
     <Screen>
@@ -29,10 +32,18 @@ export default function Profile() {
             </View>
 
             <View className=" items-center mb-6 space-y-3">
-              <Image
-                source={{ uri: user?.imageProfile }}
-                className="w-28 h-28 rounded-full"
-              />
+              {hasProfileImage ? (
+                <Image
+                  source={{ uri: user?.imageProfile || "" }}
+                  className="w-24 h-24 rounded-full border border-white/10"
+                />
+              ) : (
+                <Avatar
+                  width={96}
+                  height={96}
+                  style={{ borderRadius: 9999, borderWidth: 1, borderColor: "rgba(255,255,255,0.1)" }}
+                />
+              )}
               <Text className="text-white font-bold text-xl">{user?.name}</Text>
             </View>
 
