@@ -5,7 +5,7 @@ import CustomInput from '@/shared/components/CustomInput';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 
@@ -232,8 +232,8 @@ export default function CreatePostScreen() {
                         />
                     )}
                 />
-
-                <CustomButton label="Publicar" className="mt-6" onPress={handleSubmit(onSubmit)} />
+                <View className="mb-6" />
+                <CustomButton label="Publicar" onPress={handleSubmit(onSubmit)} />
             </ScrollView>
         </SafeAreaView>
     );
