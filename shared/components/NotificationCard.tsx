@@ -26,9 +26,9 @@ export function NotificationCard({
   seen,
 }: NotificationCardProps) {
   const mailIcon = getMailIcon(seen);
-  const dateObj = createdAt.toDate();
+  const dateObj = createdAt?.toDate?.() ?? new Date();
   return (
-    <View className="flex-row p-4 mb-6 border-links-servilink border rounded-xl">
+    <View className="flex-row p-4 border-links-servilink bg-primarybg-servilink border rounded-xl">
       <View>
         <View className="flex-row w-full  justify-between items-center mb-1">
           <View className="flex-row items-center gap-x-2">
@@ -36,9 +36,9 @@ export function NotificationCard({
             <Text className="text-white font-semibold text-base">{title}</Text>
           </View>
           <Text className="text-white/60 text-sm">
-            {dateObj.toLocaleDateString([],{
-              hour: '2-digit',
-              minute: '2-digit',
+            {dateObj.toLocaleString("es-MX", {
+              dateStyle: "short",
+              timeStyle: "short",
             })}
           </Text>
         </View>

@@ -1,6 +1,5 @@
-// components/SwipeToDeleteNotification.tsx
 import { Timestamp } from "firebase/firestore";
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -23,28 +22,60 @@ type Props = {
 };
 
 export function SwipeToDeleteNotification({ item, onDelete }: Props) {
-  const translateX = useSharedValue(0);
+  const opacity = useSharedValue(1);
+  const scale = useSharedValue(1);
+  const height = useSharedValue(100);
+
+  useEffect(() => {
+    opacity.value = 1;
+    scale.value = 1;
+    height.value = 100;
+  }, [item.id]);
 
   const gesture = Gesture.Pan()
-    .onUpdate((event) => {
-      translateX.value = event.translationX;
-    })
-    .onEnd(() => {
-      if (translateX.value < -100) {
-        translateX.value = withTiming(-500, { duration: 300 });
+  .onUpdate((event) => {
+    if (event.translationX < 0) {
+      const progress = Math.min(1, -event.translationX / 120);
+      opacity.value = 1 - progress;
+      scale.value = 1 - progress * 0.2;
+    }
+  })
+  .onEnd(() => {
+    if (opacity.value < 0.5) {
+      opacity.value = withTiming(0, { duration: 150 });
+      scale.value = withTiming(0.8, { duration: 150 });
+      height.value = withTiming(0, { duration: 200 }, () => {
         runOnJS(onDelete)(item.id);
-      } else {
-        translateX.value = withTiming(0);
-      }
-    });
+      });
+    } else {
+      opacity.value = withTiming(1);
+      scale.value = withTiming(1);
+    }
+  })
+  .activeOffsetX([-10, 10])
+  .failOffsetY([-10, 10]);
+
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+    height: height.value,
+    marginBottom: height.value > 0 ? 12 : 0,
   }));
 
   return (
     <GestureDetector gesture={gesture}>
-      <Animated.View style={[animatedStyle, styles.card]}>
+      <Animated.View
+        style={[animatedStyle, styles.card]}
+        className="relative rounded-xl overflow-hidden"
+      >
+        {/* Fondo rojo visible siempre */}
+        <Animated.View
+          style={{ backgroundColor: "#ef4444", zIndex: 0 }}
+          className="absolute inset-0 rounded-xl"
+        />
+
+        {/* Tarjeta que se desvanece y colapsa */}
         <NotificationCard
           title={item.title}
           content={item.content}
@@ -58,6 +89,6 @@ export function SwipeToDeleteNotification({ item, onDelete }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 12,
+    overflow: "hidden",
   },
 });
