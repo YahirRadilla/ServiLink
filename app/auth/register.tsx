@@ -187,7 +187,7 @@ export default function RegisterScreen() {
                                     )}
                                 />
 
-                                <View className="flex-row w-full items-center pt-4">
+                                <View className="flex-row w-full items-center pt-4 mb-6">
                                     <Controller
                                         control={control}
                                         name="remember"
@@ -213,7 +213,7 @@ export default function RegisterScreen() {
                                 </View>
 
                                 <CustomButton
-                                    className="mt-6"
+                                    className=""
                                     label="Registrar"
                                     onPress={handleSubmit(onSubmit)}
                                 />

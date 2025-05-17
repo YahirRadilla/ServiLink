@@ -126,7 +126,7 @@ export default function LoginScreen() {
                                         />
                                     )}
                                 />
-                                <View className='flex-row justify-between w-full items-center pt-4'>
+                                <View className='flex-row justify-between w-full items-center pt-4 mb-6'>
                                     <CustomInput
                                         type="checkbox"
                                         label="Recuerdame"
@@ -138,7 +138,7 @@ export default function LoginScreen() {
 
 
                                 <CustomButton
-                                    className='mt-6'
+                                    className=''
                                     label="Iniciar sesión"
                                     onPress={handleSubmit(handleClick)}
                                 />
