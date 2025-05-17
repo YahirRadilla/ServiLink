@@ -1,7 +1,6 @@
 import { useAuth } from '@/features/auth/useAuth';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
-import { GoogleLoginButton } from '@/shared/components/GoogleLoginButton';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Link, router, Stack } from 'expo-router';
 import React from 'react';
@@ -10,7 +9,7 @@ import { Dimensions, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 
-import { useGoogleLogin } from '@/features/auth/useGoogleAuth';
+//import { useGoogleLogin } from '@/features/auth/useGoogleAuth';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
 
@@ -27,7 +26,7 @@ export default function LoginScreen() {
     const [remember, setRemember] = React.useState(false);
 
     const { login } = useAuth();
-    const { loginWithGoogle } = useGoogleLogin();
+    //const { loginWithGoogle } = useGoogleLogin();
 
 
     const {
@@ -37,8 +36,8 @@ export default function LoginScreen() {
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            email: '',
-            password: '',
+            email: 'tester@gmail.com',
+            password: '123456',
         },
     });
 
@@ -88,7 +87,7 @@ export default function LoginScreen() {
                     <View className='items-center'>
                         <View className="w-[95%] flex-col items-center gap-y-5 z-0 bg-primarybg-servilink p-6 rounded-xl shadow-md shadow-white">
 
-                            <GoogleLoginButton onPress={() => loginWithGoogle()} />
+                            {/* <GoogleLoginButton onPress={() => loginWithGoogle()} /> */}
 
                             <View className="flex-row w-full items-center justify-between gap-x-2">
                                 <View className="h-[1px] w-20 bg-white/90" />

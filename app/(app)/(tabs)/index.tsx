@@ -41,17 +41,6 @@ export default function Index() {
         ordenar: "",
     });
 
-    const handleSelect = (key: string, value: string) => {
-        if (key === "reset") {
-            setSelectedFilters({
-                colonia: "",
-                servicio: "",
-                ordenar: "",
-            });
-        } else {
-            setSelectedFilters((prev) => ({ ...prev, [key]: value }));
-        }
-    };
 
     const handleTouchPost = (id: string) => {
         if (!id) return;

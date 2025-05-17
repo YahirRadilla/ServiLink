@@ -86,6 +86,21 @@ export default function Details() {
                                 <Text className="text-sm text-white/60">{post?.address.streetAddress} / {post?.address.neighborhood}</Text>
                             </View>
                             <MapScreen address={"Calle: " + post?.address.streetAddress + ", colonia: " + post?.address.neighborhood + " codigo postal: " + post?.address.zipCode} />
+                            {/* <View className="mt-4 rounded-xl overflow-hidden h-48 w-full">
+                                <MapView
+                                    style={{ flex: 1 }}
+                                    region={{
+                                        latitude: 24.15786698,
+                                        longitude: -110.310119426,
+                                        latitudeDelta: 0.01,
+                                        longitudeDelta: 0.01,
+                                    }}
+                                >
+                                    <MapMarker coordinate={{ latitude: 24.15786698, longitude: -110.310119426 }} />
+                                </MapView>
+                            </View> */}
+
+
                         </View>
 
                     </View>
