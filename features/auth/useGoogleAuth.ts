@@ -9,7 +9,6 @@ import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { useAuthStore } from './store';
 
-
 export const useGoogleLogin = () => {
     const { setUser } = useUserStore();
     const { setAuth, setLoading } = useAuthStore();
@@ -41,19 +40,19 @@ export const useGoogleLogin = () => {
 
             if (!userSnap.exists()) {
 
-                const providerDoc = await addDoc(collection(db, 'providers'), {
+                const providerDocRef = await addDoc(collection(db, 'providers'), {
                     rfc: null,
                     servicesOffered: null,
                     status: false,
                 });
 
-                const providerSnap = await getDoc(providerDoc);
+                const providerSnap = await getDoc(providerDocRef);
 
-                const providerData = {
+                const providerData: TProvider = {
                     id: providerSnap.id,
-                    ...providerSnap.data(),
-                } as TProvider;
-
+                    ...(providerSnap.data() as Omit<TProvider, 'id'>),
+                };
+                const providerRef = doc(db, 'providers', providerDocRef.id);
                 const userDoc = {
                     name: userCredential.user.displayName ?? '',
                     lastname: '',
@@ -65,10 +64,12 @@ export const useGoogleLogin = () => {
                     profile_status: 'client' as TUserType,
                     image_profile: userCredential.user.photoURL ?? '',
                     birth_date: null,
-                    provider: providerData,
+                    provider_id: doc(db, 'providers', providerDocRef.id),
                 };
-
+                console.log(userDoc);
                 await setDoc(userRef, userDoc);
+
+
 
                 userData = {
                     id: uid,
@@ -82,13 +83,28 @@ export const useGoogleLogin = () => {
                     profileStatus: userDoc.profile_status,
                     imageProfile: userDoc.image_profile,
                     birthDate: userDoc.birth_date,
-                    provider: userDoc.provider,
+                    provider: providerData,
                 };
             } else {
-                userData = mapFirestoreUserToTUser({
+
+                const rawUser = userSnap.data();
+                const providerRef = doc(db, 'providers', rawUser.provider);
+                const providerSnap = await getDoc(providerRef);
+
+                const providerData: TProvider = {
+                    id: providerSnap.id,
+                    ...(providerSnap.data() as Omit<TProvider, 'id'>),
+                };
+
+                const parsedUser = mapFirestoreUserToTUser({
                     id: userSnap.id,
-                    ...userSnap.data(),
+                    ...rawUser,
                 });
+
+                userData = {
+                    ...parsedUser,
+                    provider: providerData,
+                };
             }
 
             setUser(userData);
