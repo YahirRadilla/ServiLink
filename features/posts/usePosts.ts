@@ -31,7 +31,7 @@ export const usePosts = () => {
         try {
             setLoading(true);
             const id = await createPost(post, (user?.provider as any).provider_id || "");
-            return 3;
+            return id;
         } catch (error) {
             console.error("Error al crear el post desde el hook:", error);
             return null;
@@ -39,6 +39,9 @@ export const usePosts = () => {
             setLoading(false);
         }
     };
+
+
+
 
 
     return { loading, createNewPost };

@@ -55,6 +55,7 @@ export default function Index() {
             <FlatList
                 data={posts}
                 keyExtractor={(item) => item.id}
+                initialNumToRender={50}
                 contentContainerStyle={{
                     paddingVertical: 24,
                     paddingHorizontal: 12,
