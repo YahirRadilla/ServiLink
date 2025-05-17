@@ -47,51 +47,53 @@ export default function Profile() {
               <Text className="text-white font-bold text-xl">{user?.name}</Text>
             </View>
 
-            <ProfileButtons
-              title="Tablero"
-              icon="calendar-outline"
-              onPress={() => { }}
-            />
-            <ProfileButtons
-              title="Pagos"
-              icon="card-outline"
-              onPress={() => { }}
-            />
-            <View className="border-t border-white/10 my-4" />
+            <View className="rounded-xl overflow-hidden">
+              <ProfileButtons
+                title="Tablero"
+                icon="calendar-outline"
+                onPress={() => { }}
+                />
+              <ProfileButtons
+                title="Pagos"
+                icon="card-outline"
+                onPress={() => { }}
+                />
+              <View className="border-t border-white/10 my-4" />
 
-            <ProfileButtons
-              title="Editar Perfil"
-              icon="person-outline"
-              onPress={() => { }}
-            />
-            <ProfileButtons
-              title="Convertirse en proveedor"
-              icon="briefcase-outline"
-              onPress={() => { }}
-            />
-            <ProfileButtons
-              title="FAQs"
-              icon="information-circle-outline"
-              onPress={() => { }}
-            />
+              <ProfileButtons
+                title="Editar Perfil"
+                icon="person-outline"
+                onPress={() => { }}
+                />
+              <ProfileButtons
+                title="Convertirse en proveedor"
+                icon="briefcase-outline"
+                onPress={() => { }}
+                />
+              <ProfileButtons
+                title="FAQs"
+                icon="information-circle-outline"
+                onPress={() => { }}
+                />
 
-            <View className="border-t border-white/10 my-4" />
+              <View className="border-t border-white/10 my-4" />
 
-            <ProfileButtons
-              title="Eliminar Cuenta"
-              icon="close-circle-outline"
-              onPress={() => { }}
-              type="secondary"
-              chevron={false}
-            />
+              <ProfileButtons
+                title="Eliminar Cuenta"
+                icon="close-circle-outline"
+                onPress={() => { }}
+                type="secondary"
+                chevron={false}
+              />
 
-            <ProfileButtons
-              title="Cerrar Sesión"
-              icon="log-out-outline"
-              onPress={signOut}
-              type="secondary"
-              chevron={false}
-            />
+              <ProfileButtons
+                title="Cerrar Sesión"
+                icon="log-out-outline"
+                onPress={signOut}
+                type="secondary"
+                chevron={false}
+                />
+              </View>
           </View>
         }
         renderItem={() => <></>}
