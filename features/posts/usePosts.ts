@@ -1,6 +1,6 @@
 import { usePostStore } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
-import { createPost, listenToPosts } from "@/features/posts/services";
+import { createPost, getPostById, listenToPosts } from "@/features/posts/services";
 import { useEffect, useState } from "react";
 
 export const usePosts = () => {
@@ -24,6 +24,18 @@ export const usePosts = () => {
         };
     }, []);
 
+    const getPost = async (id: string) => {
+        try {
+            setLoading(true);
+            const post = await getPostById(id);
+            return post;
+        } catch (error) {
+            console.error("Error al obtener el post desde el hook:", error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const createNewPost = async (post: any) => {
         const user = useUserStore.getState().user;
@@ -44,7 +56,7 @@ export const usePosts = () => {
 
 
 
-    return { loading, createNewPost };
+    return { loading, createNewPost, getPost };
 };
 
 
