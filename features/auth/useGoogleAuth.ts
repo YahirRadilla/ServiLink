@@ -88,7 +88,8 @@ export const useGoogleLogin = () => {
             } else {
 
                 const rawUser = userSnap.data();
-                const providerRef = doc(db, 'providers', rawUser.provider);
+
+                const providerRef = rawUser.provider_id;
                 const providerSnap = await getDoc(providerRef);
 
                 const providerData: TProvider = {
@@ -105,6 +106,7 @@ export const useGoogleLogin = () => {
                     ...parsedUser,
                     provider: providerData,
                 };
+
             }
 
             setUser(userData);
