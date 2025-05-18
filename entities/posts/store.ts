@@ -26,8 +26,8 @@ export const usePostStore = create<PostState>((set, get) => ({
         let filtered = posts.filter((post) => {
             const matchesFilters = Object.entries(filters).every(([key, value]) => {
                 if (!value) return true;
-                if (key === "colonia") return post.address.neighborhood === value;
-                if (key === "servicio") return post.service === value;
+                if (key === "neighborhood") return post.address.neighborhood === value;
+                if (key === "service") return post.service === value;
                 return true;
             });
 
@@ -40,14 +40,14 @@ export const usePostStore = create<PostState>((set, get) => ({
             return matchesFilters && matchesSearch;
         });
 
-        const ordenar = filters.ordenar;
-        if (ordenar === "Recientes") {
+        const order = filters.order;
+        if (order === "Recientes") {
             filtered.sort(
                 (a, b) =>
                     (b.createdAt.toDate?.() ?? b.createdAt).getTime() -
                     (a.createdAt.toDate?.() ?? a.createdAt).getTime()
             );
-        } else if (ordenar === "Más Antigüos") {
+        } else if (order === "Más Antigüos") {
             filtered.sort(
                 (a, b) =>
                     (a.createdAt.toDate?.() ?? a.createdAt).getTime() -
@@ -61,9 +61,9 @@ export const usePostStore = create<PostState>((set, get) => ({
     clearPosts: () => set({ posts: [], filteredPosts: [] }, false),
     resetFilters: () => set({
         filters: {
-            colonia: "",
-            servicio: "",
-            ordenar: "",
+            neighborhood: "",
+            service: "",
+            order: "",
         },
         filteredPosts: get().posts,
     }),
