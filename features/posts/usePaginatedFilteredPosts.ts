@@ -34,20 +34,38 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
         if (loading || !hasMore) return;
         setLoading(true);
         const { posts: newPosts, last } = await fetchPostsPage(filters as any, lastDoc);
-        setPosts((prev) => [...prev, ...newPosts]);
+
+        setPosts((prev) => {
+            const all = [...prev, ...newPosts];
+            const unique = all.filter(
+                (post, index, self) =>
+                    self.findIndex((p) => p.id === post.id) === index
+            );
+            return unique;
+        });
+
         setLastDoc(last);
         setHasMore(!!last);
         setLoading(false);
     };
 
+
     const refresh = async () => {
         setIsRefreshing(true);
         const { posts: newPosts, last } = await fetchPostsPage(filters as any);
-        setPosts(newPosts);
+
+
+        const unique = newPosts.filter(
+            (post, index, self) =>
+                self.findIndex((p) => p.id === post.id) === index
+        );
+
+        setPosts(unique);
         setLastDoc(last);
         setHasMore(!!last);
         setIsRefreshing(false);
     };
+
 
     useEffect(() => {
         refresh();
