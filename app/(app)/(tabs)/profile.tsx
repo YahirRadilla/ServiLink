@@ -19,6 +19,10 @@ export default function Profile() {
     router.push("/questions");
   };
 
+    const handleTouchUpdateProfile = () => {
+    router.push("/profile/update");
+  };
+
   const handleTouchWorkspace = () => {
     router.push("/workspace/workspace");
   };
@@ -77,7 +81,7 @@ export default function Profile() {
               <ProfileButtons
                 title="Editar Perfil"
                 icon="person-outline"
-                onPress={() => { }}
+                onPress={handleTouchUpdateProfile}
               />
               <ProfileButtons
                 title="Convertirse en proveedor"
