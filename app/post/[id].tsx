@@ -92,9 +92,12 @@ export default function Details() {
                             </View>
                         </View>
 
-                        <UserContact provider={post.provider} />
-                        <Gallery images={post.images} />
-
+                        <View>
+                            <UserContact provider={post.provider} />
+                        </View>
+                        <View>
+                            <Gallery images={post.images} />
+                        </View>
                         <View>
                             <Text className="font-semibold text-lg text-white">Ubicación</Text>
                             <View className="flex-row items-center gap-x-2 mb-2">
@@ -127,7 +130,7 @@ export default function Details() {
                 </View>
             </ScrollView>
 
-            <View className="p-4 flex-row items-center justify-between bg-neutral800">
+            <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-between bg-black/80">
                 <View className="flex-row items-center gap-x-2">
                     <Text className="text-lg text-white/60">Precios</Text>
                     <Text className="text-base text-white/90">
