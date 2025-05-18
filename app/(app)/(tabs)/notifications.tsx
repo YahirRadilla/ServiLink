@@ -23,7 +23,6 @@ export default function Notifications() {
       <FlatList
         data={notifications}
         onEndReached={() => {
-          console.log("🚀 Reached end!");
           if (hasMore) loadMore();
         }}
         onEndReachedThreshold={0.5}

@@ -67,7 +67,7 @@ export function SwipeToDeleteNotification({ item, onDelete }: Props) {
     <GestureDetector gesture={gesture}>
       <Animated.View
         style={[animatedStyle, styles.card]}
-        className="relative rounded-xl overflow-hidden"
+        className="relative rounded-xl"
       >
         {/* Fondo rojo visible siempre */}
         <Animated.View

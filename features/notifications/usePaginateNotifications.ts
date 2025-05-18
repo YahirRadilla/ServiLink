@@ -39,7 +39,6 @@ export const usePaginatedNotifications = () => {
       merged.length === notifications.length ||
       !more
     ) {
-      console.log("🛑 No hay más notificaciones.");
       setHasMore(false);
       return;
     }

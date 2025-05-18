@@ -3,6 +3,7 @@ import { useUserStore } from "@/entities/users";
 import { useAuth } from "@/features/auth/useAuth";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { ProfileButtons } from "@/shared/components/ProfileButtons";
+import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
@@ -10,9 +11,16 @@ import { FlatList } from "react-native-gesture-handler";
 import Avatar from "../../../shared/svg/avatar.svg";
 
 export default function Profile() {
+
+  const router = useRouter();
+
+  const handleTouchQuestion = () => {
+    router.push("/questions");
+  };
   const { signOut } = useAuth();
   const user = useUserStore((state) => state.user);
   const hasProfileImage = !!user?.imageProfile?.trim();
+
 
   return (
     <Screen>
@@ -73,7 +81,7 @@ export default function Profile() {
               <ProfileButtons
                 title="FAQs"
                 icon="information-circle-outline"
-                onPress={() => { }}
+                onPress={handleTouchQuestion}
                 />
 
               <View className="border-t border-white/10 my-4" />
