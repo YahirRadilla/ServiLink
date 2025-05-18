@@ -1,3 +1,4 @@
+import SavedButton from "@/shared/components/SavedButton";
 import { Image, Pressable, Text, View } from "react-native";
 
 type ProposalStatus = "accepted" | "pending" | "rejected";
@@ -86,41 +87,38 @@ export function ItemCard({
   const [bgColor, textColor] = getStatusStyle(status, type);
 
   return (
-    <View className="rounded-xl overflow-hidden mb-6">
+    <View className="rounded-xl mb-6 overflow-hidden">
       <Pressable
         onPress={onPress}
         android_ripple={{ color: "#ffffff10" }}
-        className="flex-row p-3 gap-x-4 items-center h-28 w-full"
+        className="flex-row gap-x-2 items-center h-28 w-full justify-between"
         style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
       >
-        <View>
+        <View className="flex-row">
           <Image
             source={{ uri: image }}
-            className="w-28 h-28 rounded-xl bg-black  "
+            className="w-24 h-24 rounded-xl bg-black  mr-2"
             resizeMode="cover"
           />
-        </View>
-        <View className="flex-1 justify-end">
-          <View className="flex-row items-center gap-x-2 h-full ">
-            <Text className="text-white font-semibold text-2xl">{title}</Text>
-            <View className={`px-3 py-1.5 rounded-xl ${bgColor}`}>
-              <Text className={`text-xs font-bold uppercase ${textColor}`}>
-                {translateStatus(status, type)}
-              </Text>
+
+          <View className="flex-col justify-between">
+            <View className="flex-row items-center gap-x-2">
+              <Text className="text-white font-semibold text-2xl">{title}</Text>
+              <View className={`px-3 py-1.5 rounded-xl ${bgColor}`}>
+                <Text className={`text-xs font-bold uppercase ${textColor}`}>
+                  {translateStatus(status, type)}
+                </Text>
+              </View>
             </View>
-          </View>
-          <View className="flex-col">
-            <Text className="text-white/90 text-sm">{provider}</Text>
-            <Text className="text-white/90 text-xs">{date}</Text>
+            <View className="flex-col gap-3">
+              <Text className="text-white/90 text-sm">{provider}</Text>
+              <Text className="text-white/90 text-xs">{date}</Text>
+            </View>
           </View>
         </View>
 
-        <View className="h-full justify-between items-end">
-          <Image
-            source={{ uri: image }}
-            className="align- w-6 h-6 bg-black  "
-            resizeMode="cover"
-          />
+        <View className="h-full flex-col justify-around items-end">
+          <SavedButton />
           <Text className="text-links-servilink font-bold text-base">
             ${price}
           </Text>
