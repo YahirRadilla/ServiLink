@@ -146,7 +146,7 @@ export const createPost = async (post: any, providerId: string): Promise<string 
         }
 
         const newDoc = await addDoc(postRef, postToDatabase);
-        return null;
+        return newDoc.id;
     } catch (error) {
         console.error('Error al crear el post:', error);
         return null;

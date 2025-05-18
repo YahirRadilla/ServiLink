@@ -34,7 +34,7 @@ export const useProposalStore = create<ProposalState>((set, get) => ({
             return matchesFilters;
         });
 
-        const order = filters.order;
+        const order = filters.orden;
         if (order === "Recientes") {
             filtered.sort(
                 (a, b) =>
@@ -53,8 +53,8 @@ export const useProposalStore = create<ProposalState>((set, get) => ({
     },
     resetFilters: () => set({
         filters: {
-            neigborhood: "",
-            order: "",
+            colonia: "",
+            orden: "",
         },
         filteredProposals: get().proposals,
     }),

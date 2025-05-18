@@ -12,7 +12,7 @@ export type TProposal = {
     post: TPost
     priceOffer: number
     description: string
-    referenceImages?: [string]
+    referenceImages?: string[]
     acceptStatus: string
     paymentMethod: TPaymentMethod
     startDate: Timestamp
@@ -26,7 +26,7 @@ export type TDraftProposal = {
     post: TPost
     priceOffer: number
     description: string
-    referenceImages?: [string]
+    referenceImages?: string[]
     acceptStatus: string
     paymentMethod: TPaymentMethod
     startDate: Timestamp

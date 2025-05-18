@@ -1,4 +1,3 @@
-import SavedButton from "@/shared/components/SavedButton";
 import { Image, Pressable, Text, View } from "react-native";
 
 type ProposalStatus = "accepted" | "pending" | "rejected";
@@ -102,13 +101,9 @@ export function ItemCard({
           />
 
           <View className="flex-col justify-between">
-            <View className="flex-row items-center gap-x-2">
-              <Text className="text-white font-semibold text-2xl">{title}</Text>
-              <View className={`px-3 py-1.5 rounded-xl ${bgColor}`}>
-                <Text className={`text-xs font-bold uppercase ${textColor}`}>
-                  {translateStatus(status, type)}
-                </Text>
-              </View>
+            <View className="flex-row items-center justify-between gap-x-2">
+              <Text className="text-white font-semibold text-lg">{title}</Text>
+
             </View>
             <View className="flex-col gap-3">
               <Text className="text-white/90 text-sm">{provider}</Text>
@@ -117,8 +112,12 @@ export function ItemCard({
           </View>
         </View>
 
-        <View className="h-full flex-col justify-around items-end">
-          <SavedButton />
+        <View className="h-full flex-col justify-between items-end">
+          <View className={`px-3 py-1.5 rounded-xl ${bgColor}`}>
+            <Text className={`text-xs font-bold uppercase ${textColor}`}>
+              {translateStatus(status, type)}
+            </Text>
+          </View>
           <Text className="text-links-servilink font-bold text-base">
             ${price}
           </Text>
