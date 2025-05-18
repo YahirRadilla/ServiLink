@@ -23,7 +23,7 @@ export default function Details() {
             setPost(post);
         });
     }, []);
-
+    console.log(post);
     if (loading || !post) {
         return (
             <SingleEntityScreen>
@@ -71,7 +71,7 @@ export default function Details() {
                 </View>
 
                 <View className="p-4">
-                    <View className="flex-col gap-y-4">
+                    <View className="flex-col gap-y-4 mb-24">
                         <View>
                             <Text className="font-semibold text-lg text-white">Descripción</Text>
                             <Text className="text-sm text-white/60">{post.description}</Text>

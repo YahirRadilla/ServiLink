@@ -10,6 +10,7 @@ import { FlatList } from "react-native-gesture-handler";
 // @ts-ignore
 import Avatar from "../../../shared/svg/avatar.svg";
 
+
 export default function Profile() {
 
   const router = useRouter();
@@ -17,6 +18,11 @@ export default function Profile() {
   const handleTouchQuestion = () => {
     router.push("/questions");
   };
+
+  const handleTouchWorkspace = () => {
+    router.push("/workspace/workspace");
+  };
+
   const { signOut } = useAuth();
   const user = useUserStore((state) => state.user);
   const hasProfileImage = !!user?.imageProfile?.trim();
@@ -59,30 +65,30 @@ export default function Profile() {
               <ProfileButtons
                 title="Tablero"
                 icon="calendar-outline"
-                onPress={() => { }}
-                />
+                onPress={handleTouchWorkspace}
+              />
               <ProfileButtons
                 title="Pagos"
                 icon="card-outline"
                 onPress={() => { }}
-                />
+              />
               <View className="border-t border-white/10 my-4" />
 
               <ProfileButtons
                 title="Editar Perfil"
                 icon="person-outline"
                 onPress={() => { }}
-                />
+              />
               <ProfileButtons
                 title="Convertirse en proveedor"
                 icon="briefcase-outline"
                 onPress={() => { }}
-                />
+              />
               <ProfileButtons
                 title="FAQs"
                 icon="information-circle-outline"
                 onPress={handleTouchQuestion}
-                />
+              />
 
               <View className="border-t border-white/10 my-4" />
 
@@ -100,8 +106,8 @@ export default function Profile() {
                 onPress={signOut}
                 type="secondary"
                 chevron={false}
-                />
-              </View>
+              />
+            </View>
           </View>
         }
         renderItem={() => <></>}

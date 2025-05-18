@@ -28,6 +28,7 @@ export const filtersData = [
             "El Pedregal",
             "Victoria",
             "Camino Real",
+            "El Progreso"
         ],
     },
     {
