@@ -7,6 +7,55 @@ import * as Animatable from "react-native-animatable";
 // @ts-ignore
 import Logo from "../../../shared/svg/logo.svg";
 
+function groupNotificationsByDate(notifications: any[]) {
+  const grouped: Record<string, any[]> = {};
+
+  for (const noti of notifications) {
+    const date = noti.createdAt.toDate().toISOString().split("T")[0]; // e.g. "2025-05-17"
+    if (!grouped[date]) grouped[date] = [];
+    grouped[date].push(noti);
+  }
+
+  const sortedDates = Object.keys(grouped).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  );
+
+  const result = [];
+
+  for (const date of sortedDates) {
+    const rawDate = new Date(date).toLocaleDateString("es-MX", {
+      month: "long",
+      day: "numeric",
+    });
+    const formattedDate = rawDate
+      .replace(
+        /(\d{1,2}) de ([a-záéíóúñ])/i,
+        (_, day, firstLetter) => `${day} de ${firstLetter.toUpperCase()}`
+      )
+      .replace(
+        /(\d{1,2}) de ([A-Z])([a-záéíóúñ]+)/,
+        (_, day, firstLetter, restOfMonth) =>
+          `${day} de ${firstLetter}${restOfMonth}`
+      );
+
+    result.push({
+      id: `header-${date}`,
+      type: "header",
+      label: formattedDate,
+    });
+
+    for (const noti of grouped[date]) {
+      result.push({
+        ...noti,
+        type: "notification",
+        dateKey: date,
+      });
+    }
+  }
+
+  return result;
+}
+
 export default function Notifications() {
   const {
     notifications,
@@ -17,11 +66,12 @@ export default function Notifications() {
     hasMore,
     deleteOne,
   } = usePaginatedNotifications();
+  const groupedNotifications = groupNotificationsByDate(notifications);
+
   return (
-    
     <Screen>
       <FlatList
-        data={notifications}
+        data={groupedNotifications}
         onEndReached={() => {
           if (hasMore) loadMore();
         }}
@@ -29,12 +79,10 @@ export default function Notifications() {
         refreshing={isRefreshing}
         onRefresh={refresh}
         extraData={notifications}
-          initialNumToRender={10}
-  maxToRenderPerBatch={10}
-  windowSize={5}
-        keyExtractor={(item, index) =>
-          item?.id || `fallback-${index}`
-        }
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+        keyExtractor={(item, index) => item?.id || `fallback-${index}`}
         contentContainerStyle={{
           flexGrow: 1,
           paddingVertical: 24,
@@ -51,16 +99,21 @@ export default function Notifications() {
             <Logo />
           </View>
         }
-        renderItem={({ item, index }) => (
-          <Animatable.View
-            animation="fadeInUp"
-            duration={400}
-            delay={index * 100}
-            useNativeDriver
-          >
-            <SwipeToDeleteNotification item={item} onDelete={deleteOne} />
-          </Animatable.View>
-        )}
+        renderItem={({ item }) => {
+          if (item.type === "header") {
+            return (
+              <Text className="text-white/80 font-semibold text-lg mb-2 ml-1">
+                {item.label}
+              </Text>
+            );
+          }
+
+          return (
+            <Animatable.View>
+              <SwipeToDeleteNotification item={item} onDelete={deleteOne} />
+            </Animatable.View>
+          );
+        }}
         ListFooterComponent={
           hasMore && loading && notifications.length > 0 ? (
             <View className="w-full py-6 items-center justify-center">

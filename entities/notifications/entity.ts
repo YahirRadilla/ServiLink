@@ -1,7 +1,10 @@
-import { Timestamp } from 'firebase/firestore'
-import { emptyUser, TUser, TUserType } from '../users/index'
+import { Timestamp } from 'firebase/firestore';
+import { emptyUser, TUser, TUserType } from '../users/index';
 
 export type TNotificationType = 'message' | 'contract' | 'proposal' | 'review' | 'other'
+export type TGroupedNotification =
+  | ({ type: 'header'; id: string; label: string })
+  | (TNotification & { type: 'notification' });
  
 export type TNotification = {
     id: string

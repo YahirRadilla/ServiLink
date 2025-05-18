@@ -37,7 +37,6 @@ export function NotificationCard({
           </View>
           <Text className="text-white/60 text-sm">
             {dateObj.toLocaleString("es-MX", {
-              dateStyle: "short",
               timeStyle: "short",
             })}
           </Text>
