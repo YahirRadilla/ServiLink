@@ -1,31 +1,35 @@
-import { TPost, emptyPost } from '../posts/index'
-import { TProvider, emptyProvider } from '../providers/index'
-import { TUser, emptyUser } from '../users/index'
+import { TAddress } from '@/shared/interfaces'
+import { Timestamp } from 'firebase/firestore'
+import { TPost } from '../posts/index'
+import { TUser } from '../users/index'
 
 export type TPaymentMethod = 'effective' | 'card'
 
 export type TProposal = {
     id: string
     client: TUser
-    provider: TProvider
+    provider: TUser
     post: TPost
     priceOffer: number
     description: string
     referenceImages?: [string]
-    acceptStatus: boolean
+    acceptStatus: string
     paymentMethod: TPaymentMethod
-    startDate: Date
+    startDate: Timestamp
+    createdAt: Timestamp
+    address: TAddress
 }
 
-export const emptyProposal: TProposal = {
-    id: '',
-    client: emptyUser,
-    provider: emptyProvider,
-    post: emptyPost,
-    priceOffer: 0,
-    description: '',
-    referenceImages: [''],
-    acceptStatus: false,
-    paymentMethod: 'effective',
-    startDate: new Date(),
+export type TDraftProposal = {
+    client: TUser
+    provider: TUser
+    post: TPost
+    priceOffer: number
+    description: string
+    referenceImages?: [string]
+    acceptStatus: string
+    paymentMethod: TPaymentMethod
+    startDate: Timestamp
+    createdAt: Timestamp
+    address: TAddress
 }
