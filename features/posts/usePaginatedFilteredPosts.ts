@@ -4,9 +4,9 @@ import { TPost } from "@/entities/posts";
 import { fetchPostsPage } from "./services";
 
 type Filters = {
-    neighborhood?: string;
-    service?: string;
-    order?: string;
+    colonia?: string;
+    servicio?: string;
+    ordenar?: string;
     searchTerm?: string;
 };
 
@@ -69,7 +69,7 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
 
     useEffect(() => {
         refresh();
-    }, [filters.neighborhood, filters.service, filters.order]);
+    }, [filters.colonia, filters.servicio, filters.ordenar]);
 
     return { posts: filteredPosts, loadMore, loading, hasMore, refresh, isRefreshing };
 };

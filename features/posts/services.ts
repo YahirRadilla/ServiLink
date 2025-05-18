@@ -30,9 +30,9 @@ export const listenToPosts = (onUpdate: (posts: TPost[]) => void) => {
 const PAGE_SIZE = 5;
 
 type Filters = {
-    neighborhood?: string;
-    service?: string;
-    order?: "Recientes" | "Más Antigüos";
+    colonia?: string;
+    servicio?: string;
+    ordenar?: "Recientes" | "Más Antigüos";
 };
 
 export const fetchPostsPage = async (
@@ -45,16 +45,16 @@ export const fetchPostsPage = async (
         let constraints: any[] = [];
 
         // Filtros
-        if (filters.neighborhood) {
-            constraints.push(where("address.neighborhood", "==", filters.neighborhood));
+        if (filters.colonia) {
+            constraints.push(where("address.neighborhood", "==", filters.colonia));
         }
 
-        if (filters.service) {
-            constraints.push(where("service", "==", filters.service));
+        if (filters.servicio) {
+            constraints.push(where("service", "==", filters.servicio));
         }
 
         // Orden
-        if (filters.order === "Más Antigüos") {
+        if (filters.ordenar === "Más Antigüos") {
             constraints.push(orderBy("created_at", "asc"));
         } else {
             constraints.push(orderBy("created_at", "desc")); // default
