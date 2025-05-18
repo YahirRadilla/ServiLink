@@ -1,12 +1,13 @@
 import { Timestamp } from "firebase/firestore";
-import React, { useEffect } from "react";
-import { StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { LayoutChangeEvent, StyleSheet } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
+  useAnimatedRef,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
+  withTiming
 } from "react-native-reanimated";
 import { NotificationCard } from "./NotificationCard";
 
@@ -22,15 +23,29 @@ type Props = {
 };
 
 export function SwipeToDeleteNotification({ item, onDelete }: Props) {
+  const height = useSharedValue<number | null>(null);
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
-  const height = useSharedValue(100);
+  const [measured, setMeasured] = useState(false);
 
-  useEffect(() => {
-    opacity.value = 1;
-    scale.value = 1;
-    height.value = 100;
-  }, [item.id]);
+  const cardRef = useAnimatedRef<Animated.View>();
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    if(!measured) {
+      const layoutHeight = event.nativeEvent.layout.height;
+      height.value = layoutHeight;
+      setMeasured(true);
+    }
+  }
+
+/*   useEffect(() => {
+    runOnUI(() => {
+      const measured = measure(cardRef);
+      if (measured) {
+        height.value = measured.height;
+      }
+    })();
+  }, [item.id]); */
 
   const gesture = Gesture.Pan()
   .onUpdate((event) => {
@@ -56,24 +71,27 @@ export function SwipeToDeleteNotification({ item, onDelete }: Props) {
   .failOffsetY([-10, 10]);
 
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ scale: scale.value }],
-    height: height.value,
-    marginBottom: height.value > 0 ? 12 : 0,
-  }));
+  const animatedStyle = useAnimatedStyle(() => {
+    return{
+      opacity: opacity.value,
+      transform: [{ scale: scale.value }],
+      height: height.value ? "auto" : height.value,
+      marginBottom: height.value === 0 ? 12 : 0,
+    };
+  });
 
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View
+        onLayout={onLayout}
         style={[animatedStyle, styles.card]}
         className="relative rounded-xl"
       >
         {/* Fondo rojo visible siempre */}
-        <Animated.View
+{/*         <Animated.View
           style={{ backgroundColor: "#ef4444", zIndex: 0 }}
           className="absolute inset-0 rounded-xl"
-        />
+        /> */}
 
         {/* Tarjeta que se desvanece y colapsa */}
         <NotificationCard

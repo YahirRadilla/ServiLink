@@ -28,7 +28,7 @@ export function NotificationCard({
   const mailIcon = getMailIcon(seen);
   const dateObj = createdAt?.toDate?.() ?? new Date();
   return (
-    <View className="flex-row p-4 border-links-servilink bg-primarybg-servilink border rounded-xl">
+    <View className="flex-r p-4 border-links-servilink bg-primarybg-servilink border rounded-xl mb-6">
       <View>
         <View className="flex-row w-full  justify-between items-center mb-1">
           <View className="flex-row items-center gap-x-2">
