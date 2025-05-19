@@ -1,4 +1,5 @@
 import { Screen } from "@/components/Screen";
+import { useUserStore } from "@/entities/users";
 import { usePaginatedFilteredProposals } from "@/features/proposals/usePaginatedFilteredProposals";
 import BackButton from "@/shared/components/BackButton";
 import { ItemCard } from "@/shared/components/ItemCard";
@@ -9,12 +10,13 @@ import React from "react";
 import { FlatList, Text, View } from "react-native";
 
 export default function WorkSpaceScreen() {
+    const user = useUserStore((state) => state.user);
     const [activeTab, setActiveTab] = React.useState('proposals');
     const [filtersVisible, setFiltersVisible] = React.useState(false);
     const handleTabPress = (tab: string) => {
         setActiveTab(tab);
     };
-
+    console.log(user);
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
         servicio: "",
@@ -25,6 +27,8 @@ export default function WorkSpaceScreen() {
         ...selectedFilters
     });
 
+    const activeTabTitle = (activeTab === "proposals") ? "Propuestas" : (activeTab === "contracts") ? "Contratos" : "Publicaciones";
+
     return (
         <Screen>
             <Stack.Screen options={{ headerShown: false }} />
@@ -34,14 +38,14 @@ export default function WorkSpaceScreen() {
             </View>
 
             <FlatList
-                data={proposals}
+                data={activeTab === "proposals" ? proposals : []}
                 ListHeaderComponent={<View>
                     <View className="py-6">
                         <Text className="text-white/90 font-bold ml-2 text-base">
-                            {proposals.length} Propuestas
+                            {proposals.length} {activeTabTitle}
                         </Text>
                         <Text className="text-white text-2xl font-bold ml-2">
-                            Propuestas
+                            {activeTabTitle}
                         </Text>
                     </View>
                 </View>}
