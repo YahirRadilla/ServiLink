@@ -2,6 +2,7 @@ import {
     DocumentSnapshot,
     collection,
     doc,
+    getDoc,
     getDocs,
     limit,
     orderBy,
@@ -74,5 +75,23 @@ export const fetchProposalsPage = async (
     } catch (error) {
         console.error("🔥 Error al paginar proposals:", error);
         return { proposals: [], last: null };
+    }
+};
+
+
+export const getProposalById = async (id: string): Promise<TProposal | null> => {
+    try {
+        const proposalRef = doc(db, "proposals", id);
+        const proposalSnap = await getDoc(proposalRef);
+
+        if (!proposalSnap.exists()) return null;
+
+        const rawData = proposalSnap.data() as RawProposalData;
+        const proposal = await proposalToEntity(proposalSnap.id, rawData);
+
+        return proposal;
+    } catch (error) {
+        console.error("Error al obtener la propuesta:", error);
+        return null;
     }
 };

@@ -1,10 +1,12 @@
 import { usePaginatedFilteredProposals } from "@/features/proposals/usePaginatedFilteredProposals";
 import { ItemCard } from "@/shared/components/ItemCard";
+import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
 
 export const ProposalsTab = () => {
+    const router = useRouter();
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
         ordenar: "",
@@ -18,6 +20,14 @@ export const ProposalsTab = () => {
         refresh,
         isRefreshing,
     } = usePaginatedFilteredProposals(selectedFilters);
+
+    const handleTouchProposal = (id: string) => {
+        if (!id) return;
+        router.push({
+            pathname: "/proposal/[id]",
+            params: { id },
+        });
+    };
 
     return (
         <FlatList
@@ -35,7 +45,7 @@ export const ProposalsTab = () => {
             }
             renderItem={({ item }) => (
                 <ItemCard
-                    onPress={() => console.log("HOPLA")}
+                    onPress={() => { handleTouchProposal(item.id) }}
                     image={item.referenceImages?.[0] || item.post.images[0]}
                     title={item.post.title}
                     status={item.acceptStatus as any}

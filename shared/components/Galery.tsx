@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, View } from "react-native";
 import ImageViewing from "react-native-image-viewing";
 
 export function Gallery({ images }: { images: string[] }) {
@@ -10,7 +10,6 @@ export function Gallery({ images }: { images: string[] }) {
 
     return (
         <View>
-            <Text className="font-semibold text-lg text-white">Galería</Text>
             <View className="pt-2">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View className="flex-row items-center gap-x-2">

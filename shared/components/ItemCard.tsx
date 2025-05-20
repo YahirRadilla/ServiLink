@@ -1,7 +1,6 @@
 import { Image, Pressable, Text, View } from "react-native";
+import { StatusChip } from "./StatusChip";
 
-type ProposalStatus = "accepted" | "pending" | "rejected";
-type ContractStatus = "active" | "pending" | "finished";
 
 type ItemCardProps = {
   onPress: () => void;
@@ -14,64 +13,7 @@ type ItemCardProps = {
   type?: "contract" | "proposal";
 };
 
-const getStatusStyle = (
-  status: ProposalStatus | ContractStatus,
-  type: "proposal" | "contract" = "proposal"
-): [string, string] => {
-  const proposalMap: Record<ProposalStatus, [string, string]> = {
-    accepted: ["bg-active-status-servilink/40", "text-active-status-servilink"],
-    pending: [
-      "bg-pending-status-servilink/40",
-      "text-pending-status-servilink",
-    ],
-    rejected: [
-      "bg-finished-status-servilink/40",
-      "text-finished-status-servilink",
-    ],
-  };
 
-  const contractMap: Record<ContractStatus, [string, string]> = {
-    active: ["bg-active-status-servilink/40", "text-active-status-servilink"],
-    pending: [
-      "bg-pending-status-servilink/40",
-      "text-pending-status-servilink",
-    ],
-    finished: [
-      "bg-finished-status-servilink/40",
-      "text-finished-status-servilink",
-    ],
-  };
-
-  if (type === "proposal" && status in proposalMap) {
-    return proposalMap[status as ProposalStatus];
-  }
-
-  if (type === "contract" && status in contractMap) {
-    return contractMap[status as ContractStatus];
-  }
-
-  return ["bg-gray-500", "text-white"];
-};
-
-const translateStatus = (
-  status: ProposalStatus | ContractStatus,
-  type: "proposal" | "contract"
-): string => {
-  if (type === "proposal") {
-    const translations: Record<ProposalStatus, string> = {
-      accepted: "Aceptada",
-      pending: "Pendiente",
-      rejected: "Rechazada",
-    };
-    return translations[status as ProposalStatus] ?? status;
-  }
-  const contractTranslations: Record<ContractStatus, string> = {
-    active: "Activo",
-    pending: "Pendiente",
-    finished: "Finalizado",
-  };
-  return contractTranslations[status as ContractStatus] ?? status;
-};
 
 export function ItemCard({
   onPress,
@@ -83,7 +25,7 @@ export function ItemCard({
   price,
   type = "proposal",
 }: ItemCardProps) {
-  const [bgColor, textColor] = getStatusStyle(status, type);
+
 
   return (
     <View className="rounded-xl mb-6 overflow-hidden">
@@ -113,11 +55,7 @@ export function ItemCard({
         </View>
 
         <View className="h-full flex-col justify-between items-end">
-          <View className={`px-3 py-1.5 rounded-xl ${bgColor}`}>
-            <Text className={`text-xs font-bold uppercase ${textColor}`}>
-              {translateStatus(status, type)}
-            </Text>
-          </View>
+          <StatusChip status={status} type={type} />
           <Text className="text-links-servilink font-bold text-base">
             ${price}
           </Text>

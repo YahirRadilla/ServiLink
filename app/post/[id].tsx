@@ -96,6 +96,7 @@ export default function Details() {
                             <UserContact provider={post.provider} />
                         </View>
                         <View>
+                            <Text className="font-semibold text-lg text-white">Galería</Text>
                             <Gallery images={post.images} />
                         </View>
                         <View>
