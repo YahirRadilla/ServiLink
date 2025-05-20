@@ -25,12 +25,12 @@ export function PostItemCard({
     const stars = [];
     for (let i = 0; i < 5; i++) {
       stars.push(
-        <Text
+        <Ionicons
           key={i}
-          className={`text-xs ${i < rate ? "text-yellow-400" : "text-white/20"}`}
-        >
-          ⭐
-        </Text>
+          name={i < rate ? "star" : "star-outline"}
+          size={16}
+          color="#FB9400"
+        />
       );
     }
     return stars;
