@@ -7,7 +7,6 @@ import { FlatList, Text, View } from "react-native";
 export const ProposalsTab = () => {
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
-        servicio: "",
         ordenar: "",
     });
 
@@ -18,7 +17,7 @@ export const ProposalsTab = () => {
         hasMore,
         refresh,
         isRefreshing,
-    } = usePaginatedFilteredProposals({ ...selectedFilters });
+    } = usePaginatedFilteredProposals(selectedFilters);
 
     return (
         <FlatList
@@ -40,7 +39,7 @@ export const ProposalsTab = () => {
                     image={item.referenceImages?.[0] || item.post.images[0]}
                     title={item.post.title}
                     status={item.acceptStatus as any}
-                    provider={`${item.provider.name} - ${item.post.service}`}
+                    provider={`${item.client.name} - ${item.post.service}`}
                     date={item.createdAt.toDate().toLocaleDateString()}
                     price={item.priceOffer}
                     type="proposal"

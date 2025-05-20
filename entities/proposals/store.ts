@@ -10,6 +10,8 @@ type ProposalState = {
     applyFilters: (filters: any) => void;
     clearProposals: () => void;
     resetFilters: () => void;
+    appendProposals: (newProposals: TProposal[]) => void;
+
 }
 
 export const useProposalStore = create<ProposalState>((set, get) => ({
@@ -58,4 +60,15 @@ export const useProposalStore = create<ProposalState>((set, get) => ({
         },
         filteredProposals: get().proposals,
     }),
+
+    appendProposals: (newProposals) =>
+        set((state) => ({
+            proposals: [
+                ...state.proposals,
+                ...newProposals.filter(
+                    (p) => !state.proposals.some((existing) => existing.id === p.id)
+                ),
+            ],
+        })),
+
 }))

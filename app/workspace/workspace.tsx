@@ -4,7 +4,7 @@ import BackButton from "@/shared/components/BackButton";
 import { Stack } from "expo-router";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
-import { SceneMap, TabBar, TabView } from "react-native-tab-view";
+import { TabBar, TabView } from "react-native-tab-view";
 import { ProposalsTab } from "./tabs/proposals";
 
 
@@ -20,17 +20,29 @@ export default function WorkSpaceScreen() {
     const layout = Dimensions.get("window");
 
     const [index, setIndex] = React.useState(0);
-    const [routes] = React.useState([
+
+
+    const routes = [
         { key: "proposals", title: "Propuestas" },
         { key: "contracts", title: "Contratos" },
-        { key: "posts", title: "Publicaciones" },
-    ]);
+        ...(user?.profileStatus !== "client"
+            ? [{ key: "posts", title: "Publicaciones" }]
+            : []),
+    ];
 
-    const renderScene = SceneMap({
-        proposals: ProposalsTab,
-        contracts: () => <EmptyTab label="Contratos" />,
-        posts: () => <EmptyTab label="Posts" />,
-    });
+
+    const renderScene = ({ route }: { route: { key: string } }) => {
+        switch (route.key) {
+            case "proposals":
+                return <ProposalsTab />;
+            case "contracts":
+                return <EmptyTab label="Contratos" />;
+            case "posts":
+                return <EmptyTab label="Posts" />;
+            default:
+                return null;
+        }
+    };
 
     return (
         <Screen>

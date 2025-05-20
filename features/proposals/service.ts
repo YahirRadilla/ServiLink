@@ -1,16 +1,19 @@
-import { TProposal } from '@/entities/proposals/entity';
-import { db } from "@/lib/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
-
-import { RawProposalData, proposalToEntity } from "@/mappers/proposalToEntity";
 import {
     DocumentSnapshot,
+    collection,
+    doc,
+    getDocs,
     limit,
     orderBy,
     query,
     startAfter,
     where
 } from "firebase/firestore";
+
+import { TProposal } from "@/entities/proposals";
+import { TUser } from "@/entities/users";
+import { db } from "@/lib/firebaseConfig";
+import { RawProposalData, proposalToEntity } from "@/mappers/proposalToEntity";
 
 const PAGE_SIZE = 5;
 
@@ -21,12 +24,22 @@ type ProposalFilters = {
 
 export const fetchProposalsPage = async (
     filters: ProposalFilters,
+    user: TUser,
     lastVisible?: DocumentSnapshot
 ): Promise<{ proposals: TProposal[]; last: DocumentSnapshot | null }> => {
     try {
         const proposalsRef = collection(db, "proposals");
 
-        let constraints: any[] = [];
+        const constraints: any[] = [];
+
+        // 🔐 Filtrar por referencia a client_id o provider_id
+        const userRef = doc(db, "users", user.id);
+
+        if (user.profileStatus === "client") {
+            constraints.push(where("client_id", "==", userRef));
+        } else if (user.profileStatus === "provider") {
+            constraints.push(where("provider_id", "==", userRef));
+        }
 
         // Filtro por colonia
         if (filters.colonia) {
@@ -63,19 +76,3 @@ export const fetchProposalsPage = async (
         return { proposals: [], last: null };
     }
 };
-
-
-export const fetchProposals = async (): Promise<TProposal[]> => {
-    const proposalsRef = collection(db, "proposals");
-    const proposalsSnap = await getDocs(proposalsRef);
-    const proposals: TProposal[] = [];
-
-    proposalsSnap.forEach((doc) => {
-        proposals.push({
-            ...(doc.data() as TProposal),
-            id: doc.id,
-        });
-    });
-    return proposals;
-};
-
