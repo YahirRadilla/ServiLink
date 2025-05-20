@@ -27,6 +27,10 @@ export default function Profile() {
     router.push("/workspace/workspace");
   };
 
+    const handleBeProvider = () => {
+    router.push("/provider/create");
+  };
+
   const { signOut } = useAuth();
   const user = useUserStore((state) => state.user);
   const hasProfileImage = !!user?.imageProfile?.trim();
@@ -86,7 +90,7 @@ export default function Profile() {
               <ProfileButtons
                 title="Convertirse en proveedor"
                 icon="briefcase-outline"
-                onPress={() => { }}
+                onPress={handleBeProvider}
               />
               <ProfileButtons
                 title="FAQs"
