@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 
 type ProposalStatus = "accepted" | "pending" | "rejected";
 type ContractStatus = "active" | "pending" | "finished";
-type StatusType = ProposalStatus | ContractStatus;
+export type StatusType = ProposalStatus | ContractStatus;
 
 type StatusChipProps = {
     status: StatusType;

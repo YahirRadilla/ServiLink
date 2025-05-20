@@ -1,7 +1,6 @@
 import { getPostByRef } from "@/entities/posts";
 import { TProposal } from "@/entities/proposals";
 import { getUserByRef } from "@/entities/users";
-import { TAddress } from "@/shared/interfaces";
 import { Timestamp } from "firebase/firestore";
 
 export type RawProposalData = {
@@ -15,7 +14,13 @@ export type RawProposalData = {
     pay_method: "card" | "effective";
     start_date: Timestamp;
     created_at: Timestamp;
-    address: TAddress;
+    address: {
+        street_address: string
+        zipCode: string
+        neighborhood: string
+        latitude?: number | null | undefined
+        longitude?: number | null | undefined
+    };
 };
 
 export const proposalToEntity = async (
@@ -40,6 +45,9 @@ export const proposalToEntity = async (
         paymentMethod: data.pay_method,
         startDate: data.start_date,
         createdAt: data.created_at,
-        address: data.address,
+        address: {
+            ...data.address,
+            streetAddress: data.address.street_address,
+        },
     };
 };
