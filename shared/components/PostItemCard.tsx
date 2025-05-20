@@ -37,7 +37,7 @@ export function PostItemCard({
   };
 
   return (
-    <View className="flex-1 rounded-xl mb-6 overflow-hidden border border-links-servilink">
+    <View className="rounded-xl mb-6 overflow-hidden border border-links-servilink">
       <Pressable
         onPress={onPress}
         android_ripple={{ color: "#ffffff10" }}

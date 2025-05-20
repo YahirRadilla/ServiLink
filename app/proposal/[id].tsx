@@ -52,7 +52,7 @@ export default function ProposalDetails() {
             <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
                 <BackButton />
             </View>
-            <ScrollView className="p-1 pt-14">
+            <ScrollView className="p-1 pt-14" showsVerticalScrollIndicator={false}>
                 <View className="w-full rounded-b-3xl overflow-hidden">
                     <View className="absolute z-10 bottom-5 left-5">
                         <Text className="font-semibold text-lg text-white">{proposal.post.title}</Text>
@@ -128,7 +128,12 @@ export default function ProposalDetails() {
                             </View>
                         </View>
                         <View className="border-b border-gray-300/10" />
-                        <View className="mb-4">
+
+                        <OfferTimeline />
+
+                        <View className="border-b border-gray-300/10" />
+
+                        <View className="mb-8 pb-16">
                             <Text className="font-semibold text-lg text-white pb-2">Publicación</Text>
                             <PostItemCard
                                 onPress={() => handleTouchPost(proposal.post.id)}
@@ -141,9 +146,6 @@ export default function ProposalDetails() {
                             />
                         </View>
 
-                        <View className="border-b border-gray-300/10" />
-
-                        <OfferTimeline />
                     </View>
                 </View>
             </ScrollView>
