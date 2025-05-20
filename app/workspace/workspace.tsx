@@ -16,7 +16,6 @@ export default function WorkSpaceScreen() {
     const handleTabPress = (tab: string) => {
         setActiveTab(tab);
     };
-    console.log(user);
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
         servicio: "",
@@ -26,6 +25,7 @@ export default function WorkSpaceScreen() {
     const { proposals, loadMore, loading, hasMore, refresh, isRefreshing } = usePaginatedFilteredProposals({
         ...selectedFilters
     });
+    console.log(proposals[0]);
 
     const activeTabTitle = (activeTab === "proposals") ? "Propuestas" : (activeTab === "contracts") ? "Contratos" : "Publicaciones";
 
@@ -39,6 +39,7 @@ export default function WorkSpaceScreen() {
 
             <FlatList
                 data={activeTab === "proposals" ? proposals : []}
+                onEndReached={hasMore ? loadMore : undefined}
                 ListHeaderComponent={<View>
                     <View className="py-6">
                         <Text className="text-white/90 font-bold ml-2 text-base">
@@ -62,7 +63,6 @@ export default function WorkSpaceScreen() {
                     />
                 )}
                 keyExtractor={(item) => item.id}
-                onEndReached={loadMore}
                 onEndReachedThreshold={0.1}
                 refreshing={isRefreshing}
                 onRefresh={refresh}
