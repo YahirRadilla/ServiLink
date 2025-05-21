@@ -114,7 +114,7 @@ export default function Details() {
                             <View className="flex-row items-center gap-x-2">
                                 <Ionicons name="star" size={20} color="#FB9400" />
                                 <Text className="text-sm text-white/60">
-                                    {averageRating.toFixed(1)} ({reviews.length} reviews)
+                                    {averageRating.toFixed(1)} ({reviews.length} Reseñas)
                                 </Text>
                             </View>
                         </View>
@@ -165,6 +165,8 @@ export default function Details() {
                             </View>
                             <Pressable
                                 onPress={() => setModalVisible(true)}
+                                android_ripple={{ color: "#ffffff10" }}
+                                style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
                                 className="px-4 py-2 rounded-xl bg-links-servilink/20"
                             >
                                 <Text className="text-links-servilink font-semibold text-sm">Ver todas</Text>
@@ -186,7 +188,7 @@ export default function Details() {
                 visible={isModalVisible}
                 onPress={() => console.log("modal interno")}
                 onClose={() => setModalVisible(false)}
-                reviews={reviews}
+                postId={post.id}
             />
             {
                 user?.profileStatus === "client" && (

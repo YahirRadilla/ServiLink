@@ -14,7 +14,7 @@ import {
   where,
 } from "firebase/firestore";
 
-const REVIEWS_PAGE_SIZE = 6;
+const REVIEWS_PAGE_SIZE = 3;
 
 export const getPaginatedReviewsByPostId = async (
   postId: string,
