@@ -50,10 +50,10 @@ export function ReviewsModal({ visible, onClose, onPress, reviews }: ReviewsModa
           handleIndicatorStyle={{ backgroundColor: "white" }}
           backdropComponent={renderBackdrop}
           animationConfigs={{
-            damping: 15,      // Menor = más rebote
-            mass: 0.8,        // Menor = más rápido
-            stiffness: 150,   // Menor = más suave
-            overshootClamping: false, // Permite el rebote
+            damping: 15,      
+            mass: 0.8,        
+            stiffness: 150,   
+            overshootClamping: false,
             restDisplacementThreshold: 0.01,
             restSpeedThreshold: 0.01,
           }}
@@ -62,8 +62,8 @@ export function ReviewsModal({ visible, onClose, onPress, reviews }: ReviewsModa
             data={reviews}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{
-              paddingHorizontal: 24,
-              paddingBottom: 100,
+              paddingHorizontal: 18,
+              paddingBottom: 20,
             }}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
@@ -82,6 +82,7 @@ export function ReviewsModal({ visible, onClose, onPress, reviews }: ReviewsModa
               </View>
             }
             renderItem={({ item }) => <ReviewCard review={item} />}
+            ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
           />
         </BottomSheet>
       )}

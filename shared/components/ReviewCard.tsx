@@ -1,9 +1,10 @@
 import { TReview } from "@/entities/reviews";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
+  Animated,
   Image,
-  LayoutAnimation,
+  LayoutChangeEvent,
   Platform,
   Text,
   TouchableOpacity,
@@ -22,11 +23,10 @@ type ReviewCardProps = {
 
 export function ReviewCard({ review }: ReviewCardProps) {
   const [expanded, setExpanded] = useState(false);
-
-  const toggleExpanded = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpanded((prev) => !prev);
-  };
+  const [measured, setMeasured] = useState(false);
+  const [collapsedHeight, setCollapsedHeight] = useState(0);
+  const [expandedHeight, setExpandedHeight] = useState(0);
+  const animation = useRef(new Animated.Value(0)).current;
 
   const dateObj = review.createdAt?.toDate?.() ?? new Date();
 
@@ -40,6 +40,56 @@ export function ReviewCard({ review }: ReviewCardProps) {
       />
     ));
   };
+
+  // Medir altura colapsada
+  const onCollapsedLayout = (e: LayoutChangeEvent) => {
+    if (!collapsedHeight) setCollapsedHeight(e.nativeEvent.layout.height);
+  };
+
+  // Medir altura expandida
+  const onExpandedLayout = (e: LayoutChangeEvent) => {
+    if (!expandedHeight) setExpandedHeight(e.nativeEvent.layout.height);
+  };
+
+  // Animar expansión/colapso
+  const toggleExpanded = () => {
+    Animated.timing(animation, {
+      toValue: expanded ? 0 : 1,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
+    setExpanded((prev) => !prev);
+  };
+
+  // Altura animada
+  const height = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [collapsedHeight || 0, expandedHeight || 0],
+  });
+
+  // Medición inicial invisible
+  if (!measured && review.textContent && review.textContent.length > 150) {
+    return (
+      <View style={{ opacity: 0, position: "absolute" }}>
+        <Text
+          className="text-white text-base leading-6"
+          numberOfLines={4}
+          onLayout={onCollapsedLayout}
+        >
+          {review.textContent}
+        </Text>
+        <Text
+          className="text-white text-base leading-6"
+          onLayout={e => {
+            onExpandedLayout(e);
+            setMeasured(true);
+          }}
+        >
+          {review.textContent}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="gap-y-2 border border-links-servilink p-4 mb-4 rounded-xl">
@@ -59,9 +109,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
       </View>
 
       {/* Metadata */}
-      <View className="flex-row items-center gap-x-2">
+      <View className="flex-row flex-wrap items-center gap-x-2">
         {renderStars()}
-        <Text className="text-white">-</Text>
+        <Text className="text-white/60 text-xs">-</Text>
         <Text className="text-white/60 text-xs">
           {dateObj.toLocaleDateString("es-MX", {
             year: "numeric",
@@ -69,22 +119,29 @@ export function ReviewCard({ review }: ReviewCardProps) {
             day: "numeric",
           })}
         </Text>
-        <Text className="text-white">-</Text>
-        <Text className="text-white/60 text-xs">{review.client.name} {review.client.lastname}</Text>
-        <Text className="text-white">-</Text>
+        <Text className="text-white/60 text-xs">-</Text>
+        <Text className="text-white/60 text-xs flex-shrink">
+          {review.postId.provider.name} {review.postId.provider.lastName}
+        </Text>
+        <Text className="text-white/60 text-xs">-</Text>
         <Text className="text-white/60 text-xs">{review.postId.service}</Text>
       </View>
 
-      {/* Texto con expansión */}
-      <Text
-        className="text-white text-base leading-6"
-        numberOfLines={expanded ? undefined : 4}
-      >
-        {review.textContent}
-      </Text>
+      {/* Texto con expansión animada */}
+      {review.textContent && review.textContent.length > 150 ? (
+        <Animated.View style={{ height, overflow: "hidden" }}>
+          <Text className="text-white text-base leading-6">
+            {review.textContent}
+          </Text>
+        </Animated.View>
+      ) : (
+        <Text className="text-white text-base leading-6">
+          {review.textContent}
+        </Text>
+      )}
 
       {review.textContent && review.textContent.length > 150 && (
-        <TouchableOpacity onPress={toggleExpanded}>
+        <TouchableOpacity onPress={toggleExpanded} activeOpacity={0.7}>
           <Text className="text-links-servilink font-semibold mt-1">
             {expanded ? "Ver menos" : "Ver más"}
           </Text>
