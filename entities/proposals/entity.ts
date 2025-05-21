@@ -10,7 +10,11 @@ export type TProposal = {
     client: TUser
     provider: TUser
     post: TPost
-    priceOffer: number
+    offers: {
+        time: Timestamp;
+        price: number;
+        active: boolean;
+    }[];
     description: string
     referenceImages?: string[]
     acceptStatus: string
@@ -24,7 +28,11 @@ export type TDraftProposal = {
     client: TUser
     provider: TUser
     post: TPost
-    priceOffer: number
+    offers: {
+        time: Timestamp;
+        price: number;
+        active: boolean;
+    }[];
     description: string
     referenceImages?: string[]
     acceptStatus: string

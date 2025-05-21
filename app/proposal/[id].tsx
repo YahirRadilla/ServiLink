@@ -129,7 +129,7 @@ export default function ProposalDetails() {
                         </View>
                         <View className="border-b border-gray-300/10" />
 
-                        <OfferTimeline />
+                        <OfferTimeline offers={proposal.offers} />
 
                         <View className="border-b border-gray-300/10" />
 

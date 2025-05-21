@@ -33,6 +33,7 @@ export const ProposalsTab = () => {
         <FlatList
             data={proposals}
             onEndReached={hasMore ? loadMore : undefined}
+            showsVerticalScrollIndicator={false}
             ListHeaderComponent={
                 <View className="py-6">
                     <Text className="text-white/90 font-bold ml-2 text-base">
@@ -51,7 +52,7 @@ export const ProposalsTab = () => {
                     status={item.acceptStatus as any}
                     provider={`${item.client.name} - ${item.post.service}`}
                     date={item.createdAt.toDate().toLocaleDateString()}
-                    price={item.priceOffer}
+                    price={item.offers[item.offers.length - 1].price}
                     type="proposal"
                 />
             )}

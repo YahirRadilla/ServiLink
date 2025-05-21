@@ -7,7 +7,11 @@ export type RawProposalData = {
     client_id: any;
     provider_id: any;
     post_id: any;
-    price_offer: number;
+    offers: {
+        time: Timestamp;
+        price: number;
+        active: boolean;
+    }[];
     description: string;
     reference_image?: string[];
     accept_status: string;
@@ -38,7 +42,7 @@ export const proposalToEntity = async (
         client,
         provider,
         post,
-        priceOffer: data.price_offer,
+        offers: data.offers,
         description: data.description,
         referenceImages: data.reference_image ?? [],
         acceptStatus: data.accept_status,
