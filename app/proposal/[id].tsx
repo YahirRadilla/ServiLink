@@ -49,24 +49,24 @@ export default function ProposalDetails() {
     return (
         <SingleEntityScreen>
             <Stack.Screen options={{ headerShown: false }} />
-            <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
-                <BackButton />
-            </View>
-            <ScrollView className="p-1 pt-14" showsVerticalScrollIndicator={false}>
-                <View className="w-full rounded-b-3xl overflow-hidden">
-                    <View className="absolute z-10 bottom-5 left-5">
-                        <Text className="font-semibold text-lg text-white">{proposal.post.title}</Text>
-                        <Text className="text-sm text-white/60">{proposal.post.service}</Text>
+            <View className="flex-row items-center justify-between w-full p-4">
+                <View className="flex-row items-center justify-between">
+                    <View className="bg-black/50 p-2 rounded-full mr-2">
+                        <BackButton />
                     </View>
+                    <Text className="font-semibold text-xl text-white">{proposal.post.title}</Text>
                 </View>
+
+                <StatusChip type="proposal" status={proposal.acceptStatus as StatusType} />
+
+            </View>
+            <ScrollView className="p-1 pt-4" showsVerticalScrollIndicator={false}>
+
 
                 <View className="p-4">
                     <View className="flex-col gap-y-4 mb-24">
 
-                        <View className="flex-row items-center justify-between">
-                            <Text className="font-semibold text-xl text-white">{proposal.post.title}</Text>
-                            <StatusChip type="proposal" status={proposal.acceptStatus as StatusType} />
-                        </View>
+
 
                         <View>
                             <Text className="font-semibold text-lg text-white">Descripción</Text>
@@ -81,8 +81,8 @@ export default function ProposalDetails() {
                                     <Text className="text-xs text-white/60 pl-2">{proposal.startDate.toDate().toLocaleDateString("es-MX")}</Text>
                                 </View>
                                 <View className="flex-row items-center mb-2">
-                                    <Ionicons name={proposal.paymentMethod as string === "Efective" ? "cash-outline" : "card-outline"} size={20} color="#ccc" />
-                                    <Text className="text-xs text-white/60 pl-2">{proposal.paymentMethod as string === "Efective" ? "Efectivo" : "Tarjeta"}</Text>
+                                    <Ionicons name={proposal.paymentMethod as string === "efective" ? "cash-outline" : "card-outline"} size={20} color="#ccc" />
+                                    <Text className="text-xs text-white/60 pl-2">{proposal.paymentMethod as string === "efective" ? "Efectivo" : "Tarjeta"}</Text>
                                 </View>
                             </View>
                         </View>
