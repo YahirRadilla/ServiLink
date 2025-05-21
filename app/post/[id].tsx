@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import MapView, { Marker as MapMarker } from "react-native-maps";
 
 export default function Details() {
@@ -163,26 +163,31 @@ export default function Details() {
                                     {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
                                 </Text>
                             </View>
-                            <View>
-                                <ReviewsModal
-                                    visible={isModalVisible}
-                                    onPress={() => console.log("modal interno")}
-                                    onClose={() => setModalVisible(false)}
-                                />
-                                <Text onPress={() => setModalVisible(true)} className="text-links-servilink font-semibold">Ver más</Text>
-                            </View>
+                            <Pressable
+                                onPress={() => setModalVisible(true)}
+                                className="px-4 py-2 rounded-xl bg-links-servilink/20"
+                            >
+                                <Text className="text-links-servilink font-semibold text-sm">Ver todas</Text>
+                            </Pressable>
+
                         </View>
 
                         <View className="mb-0.5" />
                         <View>
                             {featuredReview && (
-                            <ReviewCard review={featuredReview} />
+                                <ReviewCard review={featuredReview} />
                             )}
                         </View>
 
                     </View>
                 </View>
             </ScrollView>
+            <ReviewsModal
+                visible={isModalVisible}
+                onPress={() => console.log("modal interno")}
+                onClose={() => setModalVisible(false)}
+                reviews={reviews}
+            />
             {
                 user?.profileStatus === "client" && (
                     <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-between bg-black/80">

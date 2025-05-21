@@ -6,7 +6,7 @@ import ImageViewing from "react-native-image-viewing";
 export function Gallery({ images, size }: { images: string[], size?: number }) {
     const [visible, setIsVisible] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
-    console.log(images);
+    /* console.log(images); */
     const displayedImages = images.map((uri) => ({ uri })) || [];
 
     return (

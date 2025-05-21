@@ -1,171 +1,89 @@
+import { TReview } from "@/entities/reviews";
 import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
-import { useEffect } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-  ScrollView,
-} from "react-native-gesture-handler";
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+} from "@gorhom/bottom-sheet";
+import { useEffect, useMemo, useRef } from "react";
+import { Pressable, Text, View } from "react-native";
+import { ReviewCard } from "./ReviewCard";
 
 type ReviewsModalProps = {
   visible: boolean;
   onClose: () => void;
   onPress: () => void;
+  reviews: TReview[];
 };
 
-export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
-  const translateY = useSharedValue(0);
-  const backdropOpacity = useSharedValue(0);
-  const TOP_POSITION = 0;
-  const MID_POSITION = 300;
-  const OFFSCREEN_POSITION = 1000;
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateY: translateY.value }],
-    };
-  });
-
-  const backdropStyle = useAnimatedStyle(() => {
-    return {
-      opacity: backdropOpacity.value,
-    };
-  });
-
-  const handleCloseWithAnimation = () => {
-    translateY.value = withSpring(OFFSCREEN_POSITION, {
-      damping: 18,
-      stiffness: 180,
-    });
-    backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
-      runOnJS(onClose)();
-    });
-  };
-
-  const startY = useSharedValue(0);
-
-  const panGesture = Gesture.Pan()
-    .onStart(() => {
-      startY.value = translateY.value;
-    })
-    .onUpdate((event) => {
-      translateY.value = Math.max(
-        TOP_POSITION,
-        startY.value + event.translationY
-      );
-    })
-    .onEnd((event) => {
-      const y = translateY.value;
-
-      if (Math.abs(event.translationY) < 10) return;
-
-      if (y > MID_POSITION + 100) {
-        translateY.value = withSpring(OFFSCREEN_POSITION, {
-          damping: 18,
-          stiffness: 180,
-        });
-        backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
-          runOnJS(onClose)();
-        });
-      } else if (y > MID_POSITION / 2) {
-        translateY.value = withSpring(MID_POSITION, {
-          damping: 18,
-          stiffness: 180,
-        });
-      } else {
-        translateY.value = withSpring(TOP_POSITION, {
-          damping: 18,
-          stiffness: 180,
-        });
-      }
-    });
-  const composedGesture = Gesture.Exclusive(panGesture);
+export function ReviewsModal({ visible, onClose, onPress, reviews }: ReviewsModalProps) {
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["60%", "100%"], []);
 
   useEffect(() => {
     if (visible) {
-      translateY.value = withSpring(MID_POSITION, {
-        damping: 18,
-        stiffness: 180,
-      });
-      backdropOpacity.value = withSpring(1);
+      bottomSheetRef.current?.expand();
     } else {
-      translateY.value = withSpring(OFFSCREEN_POSITION, {
-        damping: 18,
-        stiffness: 180,
-      });
-      backdropOpacity.value = withSpring(0);
+      bottomSheetRef.current?.close();
     }
   }, [visible]);
+
+  const renderBackdrop = (props: any) => (
+    <BottomSheetBackdrop
+      {...props}
+      disappearsOnIndex={-1}
+      appearsOnIndex={0}
+      pressBehavior="close"
+      opacity={0.6}
+    />
+  );
 
   return (
     <>
       {visible && (
-        <Modal transparent animationType="none">
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <Pressable
-              onPress={handleCloseWithAnimation}
-              style={{
-                flex: 1,
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <Animated.View
-                style={[{ ...StyleSheet.absoluteFillObject }, backdropStyle]}
-              >
-                <BlurView intensity={80} tint="dark" style={{ flex: 1 }} />
-              </Animated.View>
-            </Pressable>
-            <GestureDetector gesture={composedGesture}>
-              <Animated.View
-                style={[{ flex: 1, backgroundColor: "#161622" }, animatedStyle]}
-              >
-                <View className="items-center mt-3 mb-4">
-                  <View className="w-12 h-1.5 bg-white/40 rounded-full" />
-                </View>
-
-                <View className="flex-row justify-between items-center px-6 mb-4">
-                  <Text className="text-white">Todas las reseñas</Text>
-                  <Pressable onPress={handleCloseWithAnimation}>
-                    <Ionicons name="close" size={22} color="#fff" />
-                  </Pressable>
-                </View>
-
-                <View className="px-6 mb-4">
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={1}
+          snapPoints={snapPoints}
+          onClose={onClose}
+          enablePanDownToClose
+          backgroundStyle={{ backgroundColor: "#161622" }}
+          handleIndicatorStyle={{ backgroundColor: "white" }}
+          backdropComponent={renderBackdrop}
+          animationConfigs={{
+            damping: 15,      // Menor = más rebote
+            mass: 0.8,        // Menor = más rápido
+            stiffness: 150,   // Menor = más suave
+            overshootClamping: false, // Permite el rebote
+            restDisplacementThreshold: 0.01,
+            restSpeedThreshold: 0.01,
+          }}
+        >
+          <BottomSheetFlatList
+            data={reviews}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{
+              paddingHorizontal: 24,
+              paddingBottom: 100,
+            }}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <View className="flex-row justify-between items-center px-2 mb-4 mt-4">
+                <View>
                   <Text className="text-white/90 font-bold text-base">
-                    12 Reseñas
+                    {reviews.length} Reseñas
                   </Text>
                   <Text className="text-white text-2xl font-bold">
-                    Mesa - Carpintería
+                    {reviews[0]?.postId?.title}
                   </Text>
                 </View>
-
-                <ScrollView
-                  contentContainerStyle={{
-                    paddingHorizontal: 24,
-                    paddingBottom: 350,
-                  }}
-                  showsVerticalScrollIndicator={false}
-                  keyboardShouldPersistTaps="handled"
-                >
-                  <View className="border border-links-servilink p-4 mb-4 rounded-xl">
-                    {/* <ReviewCard /> */}
-                  </View>
-                </ScrollView>
-              </Animated.View>
-            </GestureDetector>
-          </GestureHandlerRootView>
-        </Modal>
+                <Pressable onPress={onClose}>
+                  <Ionicons name="close" size={22} color="#fff" />
+                </Pressable>
+              </View>
+            }
+            renderItem={({ item }) => <ReviewCard review={item} />}
+          />
+        </BottomSheet>
       )}
     </>
   );
