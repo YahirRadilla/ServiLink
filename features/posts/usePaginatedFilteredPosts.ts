@@ -1,6 +1,5 @@
+import { usePostStore } from "@/entities/posts/store";
 import { useEffect, useState } from "react";
-
-import { TPost } from "@/entities/posts";
 import { fetchPostsPage } from "./services";
 
 type Filters = {
@@ -11,14 +10,19 @@ type Filters = {
 };
 
 export const usePaginatedFilteredPosts = (filters: Filters) => {
-    const [posts, setPosts] = useState<TPost[]>([]);
+    const {
+        posts,
+        setPosts,
+        applyFilters,
+        filters: activeFilters,
+    } = usePostStore();
+
     const [lastDoc, setLastDoc] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const search = filters.searchTerm?.toLowerCase();
-
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    const search = filters.searchTerm?.toLowerCase();
 
     const filteredPosts = !search
         ? posts
@@ -35,25 +39,21 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
         setLoading(true);
         const { posts: newPosts, last } = await fetchPostsPage(filters as any, lastDoc);
 
-        setPosts((prev) => {
-            const all = [...prev, ...newPosts];
-            const unique = all.filter(
-                (post, index, self) =>
-                    self.findIndex((p) => p.id === post.id) === index
-            );
-            return unique;
-        });
+        const all = [...posts, ...newPosts];
+        const unique = all.filter(
+            (post, index, self) => self.findIndex((p) => p.id === post.id) === index
+        );
 
+        setPosts(unique);
+        applyFilters(filters, filters.searchTerm);
         setLastDoc(last);
         setHasMore(!!last);
         setLoading(false);
     };
 
-
     const refresh = async () => {
         setIsRefreshing(true);
         const { posts: newPosts, last } = await fetchPostsPage(filters as any);
-
 
         const unique = newPosts.filter(
             (post, index, self) =>
@@ -61,15 +61,22 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
         );
 
         setPosts(unique);
+        applyFilters(filters, filters.searchTerm);
         setLastDoc(last);
         setHasMore(!!last);
         setIsRefreshing(false);
     };
 
-
     useEffect(() => {
         refresh();
     }, [filters.colonia, filters.servicio, filters.ordenar]);
 
-    return { posts: filteredPosts, loadMore, loading, hasMore, refresh, isRefreshing };
+    return {
+        posts: filteredPosts,
+        loadMore,
+        loading,
+        hasMore,
+        refresh,
+        isRefreshing,
+    };
 };
