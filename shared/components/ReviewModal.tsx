@@ -29,28 +29,28 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
   const TOP_POSITION = 0;
   const MID_POSITION = 300;
   const OFFSCREEN_POSITION = 1000;
-
+  
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateY: translateY.value }],
     };
   });
-
+  
   const backdropStyle = useAnimatedStyle(() => {
     return {
       opacity: backdropOpacity.value,
     };
   });
-
+  
   const handleCloseWithAnimation = () => {
     translateY.value = withSpring(OFFSCREEN_POSITION, { damping: 18, stiffness: 180});
     backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
       runOnJS(onClose)();
     });
   };
-
+  
   const startY = useSharedValue(0);
-
+  
   const panGesture = Gesture.Pan()
   .onStart(() => {
     startY.value = translateY.value;
@@ -60,9 +60,9 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
   })
   .onEnd((event) => {
     const y = translateY.value;
-
+    
     if (Math.abs(event.translationY) < 10) return;
-
+    
     if (y > MID_POSITION + 100) {
       translateY.value = withSpring(OFFSCREEN_POSITION, { damping: 18, stiffness: 180 });
       backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
@@ -74,7 +74,8 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
       translateY.value = withSpring(TOP_POSITION, { damping: 18, stiffness: 180 });
     }
   });
-
+  const composedGesture = Gesture.Exclusive(panGesture);
+  
   useEffect(() => {
     if (visible) {
       translateY.value = withSpring(MID_POSITION, { damping: 18, stiffness: 180});
@@ -105,7 +106,7 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
                 <BlurView intensity={80} tint="dark" style={{ flex: 1 }} />
               </Animated.View>
             </Pressable>
-            <GestureDetector  gesture={panGesture}>
+            <GestureDetector  gesture={composedGesture}>
               <Animated.View
                 style={[{ flex: 1, backgroundColor: "#161622" }, animatedStyle]}
               >
