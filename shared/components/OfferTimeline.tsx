@@ -116,7 +116,7 @@ function OfferItem({ item, index, isLast }: OfferItemProps) {
                     {timeString}
                 </Text>
                 <Text className={`text-sm ${item.active ? "font-bold text-white" : "text-white/70"}`}>
-                    {item.price}
+                    ${item.price} MXN
                 </Text>
             </View>
         </View>
