@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Image, Pressable, ScrollView, View } from "react-native";
 import ImageViewing from "react-native-image-viewing";
 
-export function Gallery({ images }: { images: string[] }) {
+export function Gallery({ images, size }: { images: string[], size?: number }) {
     const [visible, setIsVisible] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     console.log(images);
@@ -23,7 +23,8 @@ export function Gallery({ images }: { images: string[] }) {
                             >
                                 <Image
                                     source={{ uri: image }}
-                                    className="w-32 h-32 rounded-xl bg-black"
+                                    /* className="w-32 h-32 rounded-xl bg-black" */
+                                    className={`w-${size??32} h-${size??32} rounded-xl bg-black`}
                                     resizeMode="cover"
                                 />
                             </Pressable>

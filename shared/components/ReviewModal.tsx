@@ -3,18 +3,18 @@ import { BlurView } from "expo-blur";
 import { useEffect } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import {
-    GestureHandlerRootView,
-    PanGestureHandler,
-    PanGestureHandlerGestureEvent,
-    ScrollView,
+  GestureHandlerRootView,
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+  ScrollView,
 } from "react-native-gesture-handler";
 import Animated, {
-    runOnJS,
-    useAnimatedGestureHandler,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
+  runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { ReviewCard } from "./ReviewCard";
 
@@ -44,7 +44,7 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
   });
 
   const handleCloseWithAnimation = () => {
-    translateY.value = withSpring(OFFSCREEN_POSITION);
+    translateY.value = withSpring(OFFSCREEN_POSITION, { damping: 18, stiffness: 180});
     backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
       runOnJS(onClose)();
     });
@@ -65,27 +65,27 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
     onEnd: (event) => {
       const y = translateY.value;
 
-      if (Math.abs(event.translationY) < 20) return;
+      if (Math.abs(event.translationY) < 10) return;
 
       if (y > MID_POSITION + 100) {
-        translateY.value = withSpring(OFFSCREEN_POSITION);
+        translateY.value = withSpring(OFFSCREEN_POSITION, { damping: 18, stiffness: 180});
         backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
           runOnJS(onClose)();
         });
       } else if (y > MID_POSITION / 2) {
-        translateY.value = withSpring(MID_POSITION);
+        translateY.value = withSpring(MID_POSITION, { damping: 18, stiffness: 180});
       } else {
-        translateY.value = withSpring(TOP_POSITION);
+        translateY.value = withSpring(TOP_POSITION, { damping: 18, stiffness: 180});
       }
     },
   });
 
   useEffect(() => {
     if (visible) {
-      translateY.value = withSpring(MID_POSITION);
+      translateY.value = withSpring(MID_POSITION, { damping: 18, stiffness: 180});
       backdropOpacity.value = withSpring(1);
     } else {
-      translateY.value = withSpring(OFFSCREEN_POSITION);
+      translateY.value = withSpring(OFFSCREEN_POSITION, { damping: 18, stiffness: 180});
       backdropOpacity.value = withSpring(0);
     }
   }, [visible]);
@@ -137,12 +137,12 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
                 <ScrollView
                   contentContainerStyle={{
                     paddingHorizontal: 24,
-                    paddingBottom: 100,
+                    paddingBottom: 350,
                   }}
                   showsVerticalScrollIndicator={false}
                   keyboardShouldPersistTaps="handled"
                 >
-                  {[...Array(10)].map((_, i) => (
+                  {[...Array(5)].map((_, i) => (
                     <View
                       key={i}
                       className="border border-links-servilink p-4 mb-4 rounded-xl"

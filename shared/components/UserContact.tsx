@@ -11,7 +11,6 @@ export function UserContact(provider: UserContactProps) {
     const { provider: user } = provider
     return (
         <View className="flex-row items-center gap-x-4 justify-between">
-
             <View className="flex-row items-center">
                 <Image
                     source={{ uri: user.imageProfile || "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01" }}
