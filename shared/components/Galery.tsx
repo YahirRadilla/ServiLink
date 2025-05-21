@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Image, Pressable, ScrollView, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import ImageViewing from "react-native-image-viewing";
 
 export function Gallery({ images, size }: { images: string[], size?: number }) {
