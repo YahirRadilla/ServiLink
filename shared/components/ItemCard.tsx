@@ -28,11 +28,11 @@ export function ItemCard({
 
 
   return (
-    <View className="rounded-xl mb-6 overflow-hidden">
+    <View className="rounded-xl mb-6 overflow-hidden ">
       <Pressable
         onPress={onPress}
         android_ripple={{ color: "#ffffff10" }}
-        className="flex-row gap-x-2 items-center h-28 w-full justify-between"
+        className="rounded-xl flex-row  gap-x-2 items-center h-28 w-full justify-between"
         style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
       >
         <View className="flex-row">
@@ -42,19 +42,21 @@ export function ItemCard({
             resizeMode="cover"
           />
 
-          <View className="flex-col justify-between">
-            <View className="flex-row items-center justify-between gap-x-2">
-              <Text className="text-white font-semibold text-lg">{title}</Text>
-
-            </View>
-            <View className="flex-col gap-3">
-              <Text className="text-white/90 text-sm">{provider}</Text>
-              <Text className="text-white/90 text-xs">{date}</Text>
-            </View>
+          <View className="flex-col justify-between max-w-[35vw]">
+            <Text
+              className="text-white font-semibold text-lg"
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {title}
+            </Text>
+            <Text className="text-white/90 text-xs">{provider}</Text>
+            <Text className="text-white/90 text-xs">{date}</Text>
           </View>
+
         </View>
 
-        <View className="h-full flex-col justify-between items-end">
+        <View className="h-full flex-col justify-between items-end pr-2 pt-2">
           <StatusChip status={status} type={type} />
           <Text className="text-links-servilink font-bold text-base">
             ${price}
