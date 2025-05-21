@@ -1,5 +1,6 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { TPost } from "@/entities/posts";
+import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
@@ -18,6 +19,7 @@ export default function Details() {
     const { id } = useLocalSearchParams();
     const { getPost, loading } = usePosts();
     const [post, setPost] = useState<TPost | null>(null);
+    const user = useUserStore((state) => state.user);
 
     const handleTouchReview = (id: string) => {
         router.push({
@@ -25,7 +27,7 @@ export default function Details() {
             params: { id },
         });
     }
-    
+
 
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -150,27 +152,31 @@ export default function Details() {
                             <View>
                                 <ReviewsModal
                                     visible={isModalVisible}
-                                    onPress={( ) => console.log("modal interno")}
+                                    onPress={() => console.log("modal interno")}
                                     onClose={() => setModalVisible(false)}
                                 />
-                                <Text  onPress={() => setModalVisible(true)} className="text-links-servilink bg-">Ver más</Text>
+                                <Text onPress={() => setModalVisible(true)} className="text-links-servilink bg-">Ver más</Text>
                             </View>
                         </View>
 
                     </View>
                 </View>
             </ScrollView>
+            {
+                user?.profileStatus === "client" && (
+                    <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-between bg-black/80">
+                        <View className="flex-row items-center gap-x-2">
+                            <Text className="text-lg text-white/60">Precios</Text>
+                            <Text className="text-base text-white/90">
+                                ${post.minPrice} - {post.maxPrice} MXN
+                            </Text>
+                        </View>
 
-            <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-between bg-black/80">
-                <View className="flex-row items-center gap-x-2">
-                    <Text className="text-lg text-white/60">Precios</Text>
-                    <Text className="text-base text-white/90">
-                        ${post.minPrice} - {post.maxPrice} MXN
-                    </Text>
-                </View>
+                        <CustomButton label="Contratar" onPress={() => { }} />
+                    </View>
 
-                <CustomButton label="Contratar" onPress={() => { }} />
-            </View>
+                )
+            }
         </SingleEntityScreen>
     );
 }
