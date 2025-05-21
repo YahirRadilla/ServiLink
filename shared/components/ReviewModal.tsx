@@ -3,18 +3,17 @@ import { BlurView } from "expo-blur";
 import { useEffect } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import {
+  Gesture,
+  GestureDetector,
   GestureHandlerRootView,
-  PanGestureHandler,
-  PanGestureHandlerGestureEvent,
-  ScrollView,
+  ScrollView
 } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
-  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
+  withTiming
 } from "react-native-reanimated";
 import { ReviewCard } from "./ReviewCard";
 
@@ -49,35 +48,31 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
       runOnJS(onClose)();
     });
   };
-  const gestureHandler = useAnimatedGestureHandler<
-    PanGestureHandlerGestureEvent,
-    { startY: number }
-  >({
-    onStart: (_, ctx) => {
-      ctx.startY = translateY.value;
-    },
-    onActive: (event, ctx) => {
-      translateY.value = Math.max(
-        TOP_POSITION,
-        ctx.startY + event.translationY
-      );
-    },
-    onEnd: (event) => {
-      const y = translateY.value;
 
-      if (Math.abs(event.translationY) < 10) return;
+  const startY = useSharedValue(0);
 
-      if (y > MID_POSITION + 100) {
-        translateY.value = withSpring(OFFSCREEN_POSITION, { damping: 18, stiffness: 180});
-        backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
-          runOnJS(onClose)();
-        });
-      } else if (y > MID_POSITION / 2) {
-        translateY.value = withSpring(MID_POSITION, { damping: 18, stiffness: 180});
-      } else {
-        translateY.value = withSpring(TOP_POSITION, { damping: 18, stiffness: 180});
-      }
-    },
+  const panGesture = Gesture.Pan()
+  .onStart(() => {
+    startY.value = translateY.value;
+  })
+  .onUpdate((event) => {
+    translateY.value = Math.max(TOP_POSITION, startY.value + event.translationY);
+  })
+  .onEnd((event) => {
+    const y = translateY.value;
+
+    if (Math.abs(event.translationY) < 10) return;
+
+    if (y > MID_POSITION + 100) {
+      translateY.value = withSpring(OFFSCREEN_POSITION, { damping: 18, stiffness: 180 });
+      backdropOpacity.value = withTiming(0, { duration: 250 }, () => {
+        runOnJS(onClose)();
+      });
+    } else if (y > MID_POSITION / 2) {
+      translateY.value = withSpring(MID_POSITION, { damping: 18, stiffness: 180 });
+    } else {
+      translateY.value = withSpring(TOP_POSITION, { damping: 18, stiffness: 180 });
+    }
   });
 
   useEffect(() => {
@@ -110,7 +105,7 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
                 <BlurView intensity={80} tint="dark" style={{ flex: 1 }} />
               </Animated.View>
             </Pressable>
-            <PanGestureHandler onGestureEvent={gestureHandler}>
+            <GestureDetector  gesture={panGesture}>
               <Animated.View
                 style={[{ flex: 1, backgroundColor: "#161622" }, animatedStyle]}
               >
@@ -152,7 +147,7 @@ export function ReviewsModal({ visible, onClose, onPress }: ReviewsModalProps) {
                   ))}
                 </ScrollView>
               </Animated.View>
-            </PanGestureHandler>
+            </GestureDetector >
           </GestureHandlerRootView>
         </Modal>
       )}
