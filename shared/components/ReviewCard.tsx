@@ -1,109 +1,102 @@
+import { TReview } from "@/entities/reviews";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Image, Text, View } from "react-native";
+import {
+  Image,
+  LayoutAnimation,
+  Platform,
+  Text,
+  TouchableOpacity,
+  UIManager,
+  View,
+} from "react-native";
 import { Gallery } from "./Galery";
 
-const user = {
-  name: "Juan Perez",
-  imageProfile:
-    "https://plus.unsplash.com/premium_photo-1664299749481-ac8dc8b49754?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  referenceImages: [
-    "https://images.pexels.com/photos/1472999/pexels-photo-1472999.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    "https://images.pexels.com/photos/416160/pexels-photo-416160.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    "https://images.pexels.com/photos/3687957/pexels-photo-3687957.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    "https://images.pexels.com/photos/1770918/pexels-photo-1770918.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    "https://images.pexels.com/photos/982300/pexels-photo-982300.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  ],
-  textContent: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sapiente ipsam quam officia, est delectus debitis reprehenderit maxime omnis cumque repellendus accusamus dolores facilis, natus, quae fugit tempora quo odit. Maxime. Provident sapiente laudantium reprehenderit sunt veritatis repudiandae quam, officiis cumque aut unde dolorem dignissimos sequi illum id ex doloribus aperiam commodi omnis minima fugit. Labore ducimus enim nulla dolore suscipit. ",
-  date: "2025-5-020T12:00:00Z",
-  post: {
-    id: "1",
-    name: "Yahir Radilla",
-    service: "Plomería",
-    rating: 1,
-  },
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+type ReviewCardProps = {
+  review: TReview;
 };
 
-export function ReviewCard({}: {}) {
+export function ReviewCard({ review }: ReviewCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const toggleExpanded = () => setExpanded((prev) => !prev);
+
+  const toggleExpanded = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpanded((prev) => !prev);
+  };
+
+  const dateObj = review.createdAt?.toDate?.() ?? new Date();
 
   const renderStars = () => {
-    const stars = [];
-    /* get the rating from the post */
-    const rating = user.post.rating;
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <Ionicons
-          key={i}
-          name={i < rating ? "star" : "star-outline"}
-          size={16}
-          color="#FB9400"
-        />
-      );
-    }
-    return stars;
+    return Array.from({ length: 5 }).map((_, i) => (
+      <Ionicons
+        key={i}
+        name={i < review.valoration ? "star" : "star-outline"}
+        size={16}
+        color="#FB9400"
+      />
+    ));
   };
+
   return (
-    <View className="gap-y-2">
-      <View className="">
-        <View className="flex-row items-center">
-          <Image
-            source={{
-              uri:
-                user.imageProfile ||
-                "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
-            }}
-            className="w-10 h-10 rounded-full mr-3"
-            resizeMode="cover"
-            alt="Imagen de perfil"
-          />
-          <View>
-            <Text className="font-semibold text-lg text-white">
-              {user?.name}
-            </Text>
-          </View>
-        </View>
+    <View className="gap-y-2 border border-links-servilink p-4 mb-4 rounded-xl">
+      {/* Header */}
+      <View className="flex-row items-center">
+        <Image
+          source={{
+            uri: review.client.imageProfile ||
+              "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
+          }}
+          className="w-10 h-10 rounded-full mr-3"
+          resizeMode="cover"
+        />
+        <Text className="font-semibold text-lg text-white">
+          {review.client.name}
+        </Text>
       </View>
 
-      <View className="flex-row items-center justify-between mb-2">
-        <View className="flex-row justify-between items-center p-0.5">
-          <View className="flex-row">{renderStars()}</View>
-        </View>
-        <View>
-          <Text className="text-white">-</Text>
-        </View>
-        <View>
-          <Text className="text-white/60 text-xs">
-            {new Date(user.date).toLocaleDateString("es-MX", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
+      {/* Metadata */}
+      <View className="flex-row items-center gap-x-2">
+        {renderStars()}
+        <Text className="text-white">-</Text>
+        <Text className="text-white/60 text-xs">
+          {dateObj.toLocaleDateString("es-MX", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
+        </Text>
+        <Text className="text-white">-</Text>
+        <Text className="text-white/60 text-xs">{review.client.name} {review.client.lastname}</Text>
+        <Text className="text-white">-</Text>
+        <Text className="text-white/60 text-xs">{review.postId.service}</Text>
+      </View>
+
+      {/* Texto con expansión */}
+      <Text
+        className="text-white text-base leading-6"
+        numberOfLines={expanded ? undefined : 4}
+      >
+        {review.textContent}
+      </Text>
+
+      {review.textContent && review.textContent.length > 150 && (
+        <TouchableOpacity onPress={toggleExpanded}>
+          <Text className="text-links-servilink font-semibold mt-1">
+            {expanded ? "Ver menos" : "Ver más"}
           </Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Galería */}
+      {review.images && review.images.length > 0 && (
+        <View className="mt-2">
+          <Gallery images={review.images} size={24} />
         </View>
-        <View>
-          <Text className="text-white">-</Text>
-        </View>
-        <View>
-          <Text className="text-white/60 text-xs">{user.post.name}</Text>
-        </View>
-        <View>
-          <Text className="text-white">-</Text>
-        </View>
-        <View>
-          <Text className="text-white/60 text-xs">{user.post.service}</Text>
-        </View>
-      </View>
-      <View>
-        <Text className="text-white text-base" numberOfLines = {expanded ? undefined : 4}>{user.textContent}</Text>
-        {user.textContent.length > 150 && (
-            <Text onPress={toggleExpanded} className="text-links-servilink font-semibold"> {expanded ? "Ver menos":"Ver más"}</Text>
-        )}
-      </View>
-      <View>
-        <Gallery images={user.referenceImages} size={24} />
-      </View>
+      )}
     </View>
   );
 }

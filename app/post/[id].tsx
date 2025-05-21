@@ -1,10 +1,15 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { TPost } from "@/entities/posts";
+import { useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
+import { getAverageReviewRating } from "@/features/proposals/service";
+import { getFeaturedReviewByPostId } from "@/features/reviews/service";
+import { useLiveReviewsByPostId } from "@/features/reviews/useReviews";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Gallery } from "@/shared/components/Galery";
+import { ReviewCard } from "@/shared/components/ReviewCard";
 import { ReviewsModal } from "@/shared/components/ReviewModal";
 import SaveButton from "@/shared/components/SavedButton";
 import { UserContact } from "@/shared/components/UserContact";
@@ -20,6 +25,11 @@ export default function Details() {
     const { getPost, loading } = usePosts();
     const [post, setPost] = useState<TPost | null>(null);
     const user = useUserStore((state) => state.user);
+    const featuredReview = useReviewStore((state) => state.featuredReview);
+    const setFeaturedReview = useReviewStore.getState().setFeaturedReview;
+    const [averageRating, setAverageRating] = useState<number>(0);
+    const { reviews } = useLiveReviewsByPostId(id as string);
+    const totalReviews = reviews.length;
 
     const handleTouchReview = (id: string) => {
         router.push({
@@ -27,14 +37,18 @@ export default function Details() {
             params: { id },
         });
     }
-
-
     const [isModalVisible, setModalVisible] = useState(false);
-
     useEffect(() => {
         getPost(id as string).then((post) => {
             setPost(post);
         });
+        getFeaturedReviewByPostId(id as string).then((review) => {
+            setFeaturedReview(review);
+        })
+        getAverageReviewRating(id as string).then(setAverageRating);
+        return () => {
+            useReviewStore.getState().clearFeaturedReview();
+        };
     }, []);
     console.log(post);
     if (loading || !post) {
@@ -100,7 +114,7 @@ export default function Details() {
                             <View className="flex-row items-center gap-x-2">
                                 <Ionicons name="star" size={20} color="#FB9400" />
                                 <Text className="text-sm text-white/60">
-                                    {post.valoration.toString().includes(".") ? post.valoration : `${post.valoration}.0`} (250 reviews)
+                                    {averageRating.toFixed(1)} ({reviews.length} reviews)
                                 </Text>
                             </View>
                         </View>
@@ -146,7 +160,7 @@ export default function Details() {
                             <View className="flex-row items-center gap-x-2">
                                 <Ionicons name="star" size={20} color="#FB9400" />
                                 <Text className="text-sm text-white/60">
-                                    {post.valoration.toString().includes(".") ? post.valoration : `${post.valoration}.0`} (250 reviews)
+                                    {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
                                 </Text>
                             </View>
                             <View>
@@ -155,8 +169,15 @@ export default function Details() {
                                     onPress={() => console.log("modal interno")}
                                     onClose={() => setModalVisible(false)}
                                 />
-                                <Text onPress={() => setModalVisible(true)} className="text-links-servilink bg-">Ver más</Text>
+                                <Text onPress={() => setModalVisible(true)} className="text-links-servilink font-semibold">Ver más</Text>
                             </View>
+                        </View>
+
+                        <View className="mb-0.5" />
+                        <View>
+                            {featuredReview && (
+                            <ReviewCard review={featuredReview} />
+                            )}
                         </View>
 
                     </View>

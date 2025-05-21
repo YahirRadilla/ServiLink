@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore'
 import { emptyPost, TPost } from '../posts'
 import { emptyUser, TUser } from '../users/index'
 
@@ -8,6 +9,7 @@ export type TReview = {
     valoration: number
     textContent?: string
     images?: [string]
+    createdAt: Timestamp
 }
 
 export const emptyReview: TReview = {
@@ -17,4 +19,5 @@ export const emptyReview: TReview = {
     valoration: 0,
     textContent: '',
     images: [''],
+    createdAt: Timestamp.now(),
 }
