@@ -25,7 +25,7 @@ export const ContractsTab = () => {
     const handleTouchProposal = (id: string) => {
         if (!id) return;
         router.push({
-            pathname: "/proposal/[id]",
+            pathname: "/contract/[id]",
             params: { id },
         });
     };
@@ -47,7 +47,7 @@ export const ContractsTab = () => {
             }
             renderItem={({ item }) => (
                 <ItemCard
-                    onPress={() => { console.log("click"); }}
+                    onPress={() => { handleTouchProposal(item.id) }}
                     image={item.referenceImages?.[0] || item.post.images[0]}
                     title={item.post.title}
                     status={item.progressStatus as any}

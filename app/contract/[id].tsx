@@ -1,6 +1,6 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { useUserStore } from "@/entities/users";
-import { useProposalById } from "@/features/proposals/useProposal";
+import { useContractById } from "@/features/contracts/useContractById";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Gallery } from "@/shared/components/Galery";
@@ -14,9 +14,10 @@ import LottieView from "lottie-react-native";
 import { ScrollView, Text, View } from "react-native";
 import MapView, { MapMarker } from "react-native-maps";
 
-export default function ProposalDetails() {
+export default function ContractDetails() {
     const { id } = useLocalSearchParams();
-    const { proposal, loading } = useProposalById(id as string || null);
+    const { contract, loading, error, refetch } = useContractById(id as string);
+
     const user = useUserStore((state) => state.user);
     const router = useRouter();
     const handleTouchPost = (id: string) => {
@@ -27,7 +28,7 @@ export default function ProposalDetails() {
         });
     };
 
-    if (loading || !proposal) {
+    if (loading || !contract) {
         return (
             <SingleEntityScreen>
                 <Stack.Screen options={{ headerShown: false }} />
@@ -39,7 +40,7 @@ export default function ProposalDetails() {
                         style={{ width: 120, height: 120 }}
                     />
                     <Text className="text-white/60 mt-4 text-base">
-                        Cargando Propuesta...
+                        Cargando Contrato...
                     </Text>
                 </View>
             </SingleEntityScreen>
@@ -55,10 +56,10 @@ export default function ProposalDetails() {
                     <View className="bg-black/50 p-2 rounded-full mr-2">
                         <BackButton />
                     </View>
-                    <Text numberOfLines={2} style={{ maxWidth: "60%" }} ellipsizeMode="tail" className="font-semibold text-lg text-white">{proposal.post.title}</Text>
+                    <Text numberOfLines={2} style={{ maxWidth: "60%" }} ellipsizeMode="tail" className="font-semibold text-lg text-white">{contract.post.title}</Text>
                 </View>
 
-                <StatusChip type="proposal" status={proposal.acceptStatus as StatusType} />
+                <StatusChip type="contract" status={contract.progressStatus as StatusType} />
 
             </View>
             <ScrollView className="p-1 pt-4" showsVerticalScrollIndicator={false}>
@@ -71,7 +72,7 @@ export default function ProposalDetails() {
 
                         <View>
                             <Text className="font-semibold text-lg text-white">Descripción</Text>
-                            <Text className="text-sm text-white/60">{proposal.description}</Text>
+                            <Text className="text-sm text-white/60">{contract.description}</Text>
                         </View>
                         <View className="border-b border-gray-300/10" />
                         <View>
@@ -79,23 +80,23 @@ export default function ProposalDetails() {
                             <View className="flex-row gap-x-5 pt-2">
                                 <View className="flex-row items-center mb-2">
                                     <Ionicons name="calendar-outline" size={20} color="#ccc" />
-                                    <Text className="text-xs text-white/60 pl-2">{proposal.startDate.toDate().toLocaleDateString("es-MX")}</Text>
+                                    <Text className="text-xs text-white/60 pl-2">{contract.startDate.toDate().toLocaleDateString("es-MX")}</Text>
                                 </View>
                                 <View className="flex-row items-center mb-2">
-                                    <Ionicons name={proposal.paymentMethod as string === "effective" ? "cash-outline" : "card-outline"} size={20} color="#ccc" />
-                                    <Text className="text-xs text-white/60 pl-2">{proposal.paymentMethod as string === "effective" ? "Efectivo" : "Tarjeta"}</Text>
+                                    <Ionicons name={contract.paymentMethod as string === "effective" ? "cash-outline" : "card-outline"} size={20} color="#ccc" />
+                                    <Text className="text-xs text-white/60 pl-2">{contract.paymentMethod as string === "effective" ? "Efectivo" : "Tarjeta"}</Text>
                                 </View>
                             </View>
                         </View>
                         <View className="border-b border-gray-300/10" />
                         <View>
-                            <UserContact provider={proposal.client} />
+                            <UserContact provider={contract.client} />
                         </View>
                         <View className="border-b border-gray-300/10" />
 
                         <View>
                             <Text className="font-semibold text-lg text-white">Imagenes de referencia</Text>
-                            <Gallery images={proposal.referenceImages as string[]} />
+                            <Gallery images={contract.referenceImages as string[]} />
                         </View>
 
                         <View className="border-b border-gray-300/10" />
@@ -105,7 +106,7 @@ export default function ProposalDetails() {
                             <View className="flex-row items-center gap-x-2">
                                 <Ionicons name="location-sharp" size={16} color="#3D5DC7" />
                                 <Text className="text-sm text-white/60">
-                                    {proposal.address.streetAddress} / {proposal.address.neighborhood}
+                                    {contract.address.streetAddress} / {contract.address.neighborhood}
                                 </Text>
                             </View>
 
@@ -113,16 +114,16 @@ export default function ProposalDetails() {
                                 <MapView
                                     style={{ flex: 1 }}
                                     region={{
-                                        latitude: proposal.address.latitude as number,
-                                        longitude: proposal.address.longitude as number,
+                                        latitude: contract.address.latitude as number,
+                                        longitude: contract.address.longitude as number,
                                         latitudeDelta: 0.01,
                                         longitudeDelta: 0.01,
                                     }}
                                 >
                                     <MapMarker
                                         coordinate={{
-                                            latitude: proposal.address.latitude as number,
-                                            longitude: proposal.address.longitude as number,
+                                            latitude: contract.address.latitude as number,
+                                            longitude: contract.address.longitude as number,
                                         }}
                                     />
                                 </MapView>
@@ -130,20 +131,20 @@ export default function ProposalDetails() {
                         </View>
                         <View className="border-b border-gray-300/10" />
 
-                        <OfferTimeline offers={proposal.offers} />
+                        <OfferTimeline offers={contract.offers} />
 
                         <View className="border-b border-gray-300/10" />
 
                         <View className="mb-8 pb-16">
                             <Text className="font-semibold text-lg text-white pb-2">Publicación</Text>
                             <PostItemCard
-                                onPress={() => handleTouchPost(proposal.post.id)}
-                                image={proposal.post.images[0]}
-                                title={proposal.post.title}
-                                neighborhood={proposal.post.address.neighborhood}
-                                provider={proposal.post.provider.name}
-                                service={proposal.post.service}
-                                rate={proposal.post.valoration}
+                                onPress={() => handleTouchPost(contract.post.id)}
+                                image={contract.post.images[0]}
+                                title={contract.post.title}
+                                neighborhood={contract.post.address.neighborhood}
+                                provider={contract.post.provider.name}
+                                service={contract.post.service}
+                                rate={contract.post.valoration}
                             />
                         </View>
 
@@ -151,11 +152,11 @@ export default function ProposalDetails() {
                 </View>
             </ScrollView>
 
-            {proposal.acceptStatus === "pending" &&
+            {contract.progressStatus === "pending" &&
 
                 <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-center bg-black/80">
                     {
-                        ((proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "provider") || (!proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "client")) && (
+                        ((contract.offers[contract.offers.length - 1].isClient && user?.profileStatus === "provider") || (!contract.offers[contract.offers.length - 1].isClient && user?.profileStatus === "client")) && (
                             <View className="flex-1 mr-2">
                                 <CustomButton
                                     label="Contraofertar"
