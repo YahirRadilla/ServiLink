@@ -37,7 +37,7 @@ export const PostsTab = () => {
     return (
 
         <View>
-            <FloatingActionButton />
+            <FloatingActionButton onPress={handlePressFloating} />
             <FlatList
                 data={posts}
                 onEndReached={hasMore ? loadMore : undefined}
