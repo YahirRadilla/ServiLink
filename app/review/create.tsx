@@ -12,13 +12,17 @@ import { Image, Pressable, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Yup from "yup";
 
+type CreateReviewScreenProps = {
+  postId: string;
+}
+
 const reviewSchema = Yup.object({
   rating: Yup.number().min(1, "Selecciona al menos una estrella").required(),
   opinion: Yup.string().optional(),
   images: Yup.array().optional(),
 });
 
-export default function CreateReviewScreen() {
+export default function CreateReviewScreen({ postId }: CreateReviewScreenProps) {
   const [rating, setRating] = useState(0);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const {

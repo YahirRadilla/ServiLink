@@ -1,9 +1,10 @@
 import { filtersData } from '@/data/filters';
 import { usePosts } from '@/features/posts/usePosts';
+import BackButton from '@/shared/components/BackButton';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -59,6 +60,15 @@ export default function CreatePostScreen() {
 
     return (
         <SafeAreaView className="flex-1 bg-primarybg-servilink">
+            <Stack.Screen options={{ headerShown: false }} />
+            <View className="flex-row items-center gap-x-4 p-4">
+                <View className="bg-black/50 p-2 rounded-full">
+                    <BackButton />
+                </View>
+                <Text className="text-white/90 font-bold ml-2 text-base">
+                    Crear publicación
+                </Text>
+            </View>
             <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 120 }}>
                 <Text className="text-white text-2xl font-bold text-center mb-6">Crear publicación</Text>
 

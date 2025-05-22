@@ -6,7 +6,7 @@ type FloatingActionButtonProps = {
 };
 
 export function FloatingActionButton({ onPress }: FloatingActionButtonProps) {
-  return(
+  return (
     <View style={styles.container}>
       <Pressable onPress={onPress} style={({ pressed }) => [
         styles.button,

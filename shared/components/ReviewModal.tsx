@@ -36,10 +36,11 @@ export function ReviewsModal({
   const totalReviews = useReviewStore((state) => state.totalReviews);
 
   useEffect(() => {
-    if (visible) {
-      bottomSheetRef.current?.expand();
-    } else {
-      bottomSheetRef.current?.close();
+    if (!visible) {
+      getTotalReviewsCountByPostId(postId)
+        .then((total) => {
+          useReviewStore.setState({ totalReviews: total });
+        });
     }
   }, [visible]);
 
@@ -65,20 +66,7 @@ export function ReviewsModal({
   };
 
   const handleAnimatedClose = () => {
-    bottomSheetRef.current?.close();
-
-    useEffect(() => {
-      getTotalReviewsCountByPostId(postId)
-        .then((total) => {
-          useReviewStore.setState({ totalReviews: total });
-        })
-        .catch((error) => {
-          console.error("Error fetching total reviews:", error);
-        });
-      return () => {
-        useReviewStore.getState().setTotalReviews(0);
-      }
-    })
+    bottomSheetRef.current?.close(); // Si necesitas cerrar desde el padre
   };
 
   const renderBackdrop = (props: any) => (
