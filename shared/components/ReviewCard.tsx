@@ -141,8 +141,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
       )}
 
       {review.textContent && review.textContent.length > 150 && (
-        <TouchableOpacity onPress={toggleExpanded} activeOpacity={0.7}>
-          <Text className="text-links-servilink font-semibold mt-1">
+        <TouchableOpacity onPress={toggleExpanded} activeOpacity={0.7} className="flex-row-reverse">
+          <Text className="text-links-servilink font-semibold mr-1 mt-1">
             {expanded ? "Ver menos" : "Ver más"}
           </Text>
         </TouchableOpacity>
