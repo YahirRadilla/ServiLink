@@ -6,6 +6,7 @@ import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
 import { ContractsTab } from "./tabs/contracts";
+import { PostsTab } from "./tabs/posts";
 import { ProposalsTab } from "./tabs/proposals";
 
 
@@ -39,7 +40,7 @@ export default function WorkSpaceScreen() {
             case "contracts":
                 return <ContractsTab />;
             case "posts":
-                return <EmptyTab label="Posts" />;
+                return <PostsTab />;
             default:
                 return null;
         }

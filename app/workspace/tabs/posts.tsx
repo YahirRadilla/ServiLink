@@ -37,10 +37,10 @@ export const PostsTab = () => {
             ListHeaderComponent={
                 <View className="py-6">
                     <Text className="text-white/90 font-bold ml-2 text-base">
-                        {posts.length} Propuestas
+                        {posts.length} Publicaciones
                     </Text>
                     <Text className="text-white text-2xl font-bold ml-2">
-                        Propuestas
+                        Publicaciones
                     </Text>
                 </View>
             }
@@ -76,7 +76,7 @@ export const PostsTab = () => {
                             style={{ width: 80, height: 80 }}
                         />
                     </View>
-                ) : null
+                ) : <Text>No hay publicaciones</Text>
             }
         />
     );

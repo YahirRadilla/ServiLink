@@ -155,13 +155,24 @@ export const createPost = async (post: any, providerId: string): Promise<string 
 
 
 export const getPostsByProviderRef = async (
-    providerId: string
-): Promise<TPost[]> => {
+    providerId: string,
+    lastVisible?: DocumentSnapshot
+): Promise<{ posts: TPost[]; last: DocumentSnapshot | null }> => {
     try {
         const postsRef = collection(db, "posts");
         const providerRef = doc(db, "providers", providerId);
 
-        const q = query(postsRef, where("provider_id", "==", providerRef));
+        const constraints: any[] = [
+            where("provider_id", "==", providerRef),
+            orderBy("created_at", "desc"),
+            limit(PAGE_SIZE),
+        ];
+
+        if (lastVisible) {
+            constraints.push(startAfter(lastVisible));
+        }
+
+        const q = query(postsRef, ...constraints);
         const snapshot = await getDocs(q);
 
         const postPromises = snapshot.docs.map((doc) =>
@@ -169,9 +180,11 @@ export const getPostsByProviderRef = async (
         );
 
         const posts = await Promise.all(postPromises);
-        return posts;
+        const last = snapshot.docs[snapshot.docs.length - 1] ?? null;
+
+        return { posts, last };
     } catch (error) {
         console.error("Error al obtener posts por providerId:", error);
-        return [];
+        return { posts: [], last: null };
     }
 };

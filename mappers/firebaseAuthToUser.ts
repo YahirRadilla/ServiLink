@@ -1,3 +1,4 @@
+import { emptyProvider } from "@/entities/providers";
 import { TUser } from "@/entities/users";
 
 export const mapFirestoreUserToTUser = (doc: any): TUser => {
@@ -13,6 +14,14 @@ export const mapFirestoreUserToTUser = (doc: any): TUser => {
         profileStatus: doc.profile_status,
         imageProfile: doc.image_profile || "",
         birthDate: doc.birth_date,
-        provider: doc.provider,
+        provider:
+            doc.profile_status === "provider" && doc.provider
+                ? {
+                    id: doc.provider_id?.id ?? "",
+                    rfc: doc.provider.rfc,
+                    servicesOffered: doc.provider.servicesOffered,
+                    status: doc.provider.status,
+                }
+                : emptyProvider,
     };
 };
