@@ -14,6 +14,7 @@ export type TProposal = {
         time: Timestamp;
         price: number;
         active: boolean;
+        isClient: boolean
     }[];
     description: string
     referenceImages?: string[]
@@ -32,6 +33,7 @@ export type TDraftProposal = {
         time: Timestamp;
         price: number;
         active: boolean;
+        isClient: boolean
     }[];
     description: string
     referenceImages?: string[]

@@ -1,20 +1,20 @@
-import { useProposalStore } from "@/entities/proposals/store";
+import { useContractStore } from "@/entities/contracts/store";
 import { TUser, useUserStore } from "@/entities/users";
 import { useEffect, useState } from "react";
-import { fetchProposalsPage } from "./service";
+import { fetchContractsPage } from "./service";
 
 type Filters = {
     ordenar?: string;
 };
 
-export const usePaginatedFilteredProposals = (filters: Filters) => {
+export const usePaginatedFilteredContracts = (filters: Filters) => {
     const {
-        proposals,
-        setProposals,
-        appendProposals,
+        contracts,
+        setContracts,
+        appendContracts,
         applyFilters,
         resetFilters,
-    } = useProposalStore();
+    } = useContractStore();
 
     const [lastDoc, setLastDoc] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -27,9 +27,13 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
         if (loading || !hasMore) return;
         setLoading(true);
 
-        const { proposals: newProposals, last } = await fetchProposalsPage(filters as any, user as TUser, lastDoc);
+        const { contracts: newContracts, last } = await fetchContractsPage(
+            filters as any,
+            user as TUser,
+            lastDoc
+        );
 
-        appendProposals(newProposals);
+        appendContracts(newContracts);
         setLastDoc(last);
         setHasMore(!!last);
         setLoading(false);
@@ -39,9 +43,12 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
     const refresh = async () => {
         setIsRefreshing(true);
 
-        const { proposals: newProposals, last } = await fetchProposalsPage(filters as any, user as TUser);
+        const { contracts: newContracts, last } = await fetchContractsPage(
+            filters as any,
+            user as TUser
+        );
 
-        setProposals(newProposals);
+        setContracts(newContracts);
         setLastDoc(last);
         setHasMore(!!last);
         setIsRefreshing(false);
@@ -53,7 +60,7 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
     }, [filters.ordenar]);
 
     return {
-        proposals,
+        contracts,
         loadMore,
         loading,
         hasMore,

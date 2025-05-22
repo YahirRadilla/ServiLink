@@ -19,7 +19,6 @@ import { RawProposalData, proposalToEntity } from "@/mappers/proposalToEntity";
 const PAGE_SIZE = 5;
 
 type ProposalFilters = {
-    colonia?: string;
     ordenar?: "Recientes" | "Más Antigüos";
 };
 
@@ -40,11 +39,6 @@ export const fetchProposalsPage = async (
             constraints.push(where("client_id", "==", userRef));
         } else if (user.profileStatus === "provider") {
             constraints.push(where("provider_id", "==", userRef));
-        }
-
-        // Filtro por colonia
-        if (filters.colonia) {
-            constraints.push(where("address.neighborhood", "==", filters.colonia));
         }
 
         // Orden por fecha
@@ -97,20 +91,20 @@ export const getProposalById = async (id: string): Promise<TProposal | null> => 
 };
 
 export const getAverageReviewRating = async (postId: string): Promise<number> => {
-  try {
-    const reviewsRef = collection(db, "reviews");
-    const q = query(reviewsRef, where("post_id", "==", doc(db, "posts", postId)));
-    const snapshot = await getDocs(q);
+    try {
+        const reviewsRef = collection(db, "reviews");
+        const q = query(reviewsRef, where("post_id", "==", doc(db, "posts", postId)));
+        const snapshot = await getDocs(q);
 
-    const reviews = snapshot.docs.map(doc => doc.data());
-    const total = reviews.length;
+        const reviews = snapshot.docs.map(doc => doc.data());
+        const total = reviews.length;
 
-    if (total === 0) return 0;
+        if (total === 0) return 0;
 
-    const sum = reviews.reduce((acc, review) => acc + review.valoration, 0);
-    return sum / total;
-  } catch (error) {
-    console.error("Error al calcular promedio de valoraciones:", error);
-    return 0;
-  }
+        const sum = reviews.reduce((acc, review) => acc + review.valoration, 0);
+        return sum / total;
+    } catch (error) {
+        console.error("Error al calcular promedio de valoraciones:", error);
+        return 0;
+    }
 };

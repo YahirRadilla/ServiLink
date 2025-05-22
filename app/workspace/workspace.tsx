@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
+import { ContractsTab } from "./tabs/contracts";
 import { ProposalsTab } from "./tabs/proposals";
 
 
@@ -36,7 +37,7 @@ export default function WorkSpaceScreen() {
             case "proposals":
                 return <ProposalsTab />;
             case "contracts":
-                return <EmptyTab label="Contratos" />;
+                return <ContractsTab />;
             case "posts":
                 return <EmptyTab label="Posts" />;
             default:

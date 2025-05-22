@@ -1,4 +1,5 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
+import { useUserStore } from "@/entities/users";
 import { useProposalById } from "@/features/proposals/useProposal";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
@@ -16,7 +17,7 @@ import MapView, { MapMarker } from "react-native-maps";
 export default function ProposalDetails() {
     const { id } = useLocalSearchParams();
     const { proposal, loading } = useProposalById(id as string || null);
-
+    const user = useUserStore((state) => state.user);
     const router = useRouter();
     const handleTouchPost = (id: string) => {
         if (!id) return;
@@ -25,7 +26,6 @@ export default function ProposalDetails() {
             params: { id },
         });
     };
-
 
     if (loading || !proposal) {
         return (
@@ -45,6 +45,7 @@ export default function ProposalDetails() {
             </SingleEntityScreen>
         );
     }
+
 
     return (
         <SingleEntityScreen>
@@ -81,8 +82,8 @@ export default function ProposalDetails() {
                                     <Text className="text-xs text-white/60 pl-2">{proposal.startDate.toDate().toLocaleDateString("es-MX")}</Text>
                                 </View>
                                 <View className="flex-row items-center mb-2">
-                                    <Ionicons name={proposal.paymentMethod as string === "efective" ? "cash-outline" : "card-outline"} size={20} color="#ccc" />
-                                    <Text className="text-xs text-white/60 pl-2">{proposal.paymentMethod as string === "efective" ? "Efectivo" : "Tarjeta"}</Text>
+                                    <Ionicons name={proposal.paymentMethod as string === "effective" ? "cash-outline" : "card-outline"} size={20} color="#ccc" />
+                                    <Text className="text-xs text-white/60 pl-2">{proposal.paymentMethod as string === "effective" ? "Efectivo" : "Tarjeta"}</Text>
                                 </View>
                             </View>
                         </View>
@@ -153,13 +154,18 @@ export default function ProposalDetails() {
             {proposal.acceptStatus === "pending" &&
 
                 <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-center bg-black/80">
-                    <View className="flex-1 mr-2">
-                        <CustomButton
-                            label="Contraofertar"
-                            className="bg-transparent border border-links-servilink rounded-xl"
-                            onPress={() => { }}
-                        />
-                    </View>
+                    {
+                        ((proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "provider") || (!proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "client")) && (
+                            <View className="flex-1 mr-2">
+                                <CustomButton
+                                    label="Contraofertar"
+                                    className="bg-transparent border border-links-servilink rounded-xl"
+                                    onPress={() => { }}
+                                />
+                            </View>
+                        )
+                    }
+
                     <View className="flex-1">
                         <CustomButton
                             label="Cancelar"
