@@ -5,7 +5,7 @@ import { emptyUser, TUser } from '../users/index'
 export type TReview = {
     id: string
     client: TUser
-    postId: TPost
+    post: TPost
     valoration: number
     textContent?: string
     images?: [string]
@@ -15,7 +15,7 @@ export type TReview = {
 export const emptyReview: TReview = {
     id: '',
     client: emptyUser,
-    postId: emptyPost,
+    post: emptyPost,
     valoration: 0,
     textContent: '',
     images: [''],

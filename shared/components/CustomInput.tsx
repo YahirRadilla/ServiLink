@@ -165,8 +165,8 @@ export default function CustomInput({
         return (
             <View className="gap-y-2">
                 {label && <Text className="text-white/90 pt-4">{label}</Text>}
-                <Pressable onPress={handlePickImages} className={`w-full h-48 rounded-xl border border-auth-border-servilink ${error ? 'border-red-500' : 'border-auth-border-servilink'} bg-white/5 items-center justify-center`}>
-                    <Ionicons name="images-outline" size={32} color="#ccc" />
+                <Pressable onPress={handlePickImages} className={`w-full h-48 rounded-xl border border-auth-border-servilink ${error ? 'border-red-500' : 'border-auth-border-servilink'} items-center justify-center`}>
+                    <Ionicons name="cloud-upload-outline" size={32} color="#3D5DC7" />
                     <Text className="text-white/60 mt-2">Seleccionar imágenes</Text>
                 </Pressable>
                 {Array.isArray(value) && value.length > 0 && (

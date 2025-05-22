@@ -91,3 +91,18 @@ export const listenToReviewsByPostId = (
 
   return unsubscribe;
 };
+
+export const getTotalReviewsCountByPostId = async (postId: string): Promise<number> => {
+  try {
+    const q = query(
+      collection(db, "reviews"),
+      where("post_id", "==", doc(db, "posts", postId))
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+  } catch (error) {
+    console.error("🔥 Error al obtener el conteo de reseñas:", error);
+    return 0;
+  }
+};

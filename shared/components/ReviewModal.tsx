@@ -1,3 +1,5 @@
+import { useReviewStore } from "@/entities/reviews";
+import { getTotalReviewsCountByPostId } from "@/features/reviews/service";
 import { usePaginatedReviewsByPostId } from "@/features/reviews/usePaginatedFilteredPosts";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
@@ -8,6 +10,7 @@ import LottieView from "lottie-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 import * as Animatable from "react-native-animatable";
+import { FloatingActionButton } from "./FloatingActionButton";
 import { ReviewCard } from "./ReviewCard";
 
 type ReviewsModalProps = {
@@ -29,6 +32,7 @@ export function ReviewsModal({
     usePaginatedReviewsByPostId(postId);
   const [showLottie, setShowLottie] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const totalReviews = useReviewStore((state) => state.totalReviews);
 
   useEffect(() => {
     if (visible) {
@@ -61,6 +65,19 @@ export function ReviewsModal({
 
 const handleAnimatedClose = () => {
   bottomSheetRef.current?.close();
+
+  useEffect(() => {
+    getTotalReviewsCountByPostId(postId)
+      .then((total) => {
+        useReviewStore.setState({ totalReviews: total });
+      })
+      .catch((error) => {
+        console.error("Error fetching total reviews:", error);
+      });
+    return () => {
+      useReviewStore.getState().setTotalReviews(0);
+    }
+  })
 };
 
   const renderBackdrop = (props: any) => (
@@ -77,23 +94,24 @@ const handleAnimatedClose = () => {
     <>
       {visible && (
         <BottomSheet
-          ref={bottomSheetRef}
-          index={1}
-          snapPoints={snapPoints}
-          onClose={onClose}
-          enablePanDownToClose
-          backgroundStyle={{ backgroundColor: "#161622" }}
-          handleIndicatorStyle={{ backgroundColor: "white" }}
-          backdropComponent={renderBackdrop}
-          animationConfigs={{
-            damping: 15,
-            mass: 0.8,
-            stiffness: 150,
-            overshootClamping: false,
-            restDisplacementThreshold: 0.01,
-            restSpeedThreshold: 0.01,
-          }}
+        ref={bottomSheetRef}
+        index={1}
+        snapPoints={snapPoints}
+        onClose={onClose}
+        enablePanDownToClose
+        backgroundStyle={{ backgroundColor: "#161622" }}
+        handleIndicatorStyle={{ backgroundColor: "white" }}
+        backdropComponent={renderBackdrop}
+        animationConfigs={{
+          damping: 15,
+          mass: 0.8,
+          stiffness: 150,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        }}
         >
+        <FloatingActionButton/>
           <BottomSheetFlatList
             data={reviews}
             keyExtractor={(item) => item.id}
@@ -110,20 +128,20 @@ const handleAnimatedClose = () => {
               <View className="flex-row justify-between items-center px-2 mb-4 mt-4">
                 <View>
                   <Text className="text-white/90 font-bold text-base">
-                    {reviews.length} Reseñas
+                    {totalReviews} Reseñas
                   </Text>
                   <Text className="text-white text-2xl font-bold">
-                    {reviews[0]?.postId?.title}
+                    {reviews[0]?.post?.title}
                   </Text>
                 </View>
                 <View className="flex-row items-center gap-x-3">
                   <Pressable onPress={handleRefresh} className={"bg-black/20 p-2 rounded-full"}>
                     {showLottie ? (
                       <LottieView
-                        source={require("../../assets/animations/refresh.json")}
-                        autoPlay
-                        loop
-                        style={{ width: 20, height: 20 }}
+                      source={require("../../assets/animations/refresh.json")}
+                      autoPlay
+                      loop
+                      style={{ width: 20, height: 20 }}
                       />
                     ) : (
                       <Animated.View style={{ opacity: fadeAnim }}>
@@ -139,10 +157,10 @@ const handleAnimatedClose = () => {
             }
             renderItem={({ item, index }) => (
               <Animatable.View
-                animation="zoomIn"
-                duration={300}
-                delay={index * 100}
-                useNativeDriver
+              animation="zoomIn"
+              duration={300}
+              delay={index * 100}
+              useNativeDriver
               >
                 <ReviewCard review={item} />
               </Animatable.View>
@@ -156,7 +174,7 @@ const handleAnimatedClose = () => {
                     autoPlay
                     loop
                     style={{ width: 100, height: 100 }}
-                  />
+                    />
                 </View>
               ) : null
             }
@@ -168,7 +186,7 @@ const handleAnimatedClose = () => {
                     autoPlay
                     loop
                     style={{ width: 100, height: 100 }}
-                  />
+                    />
                   <Text className="text-white/60 mt-4 text-base">
                     Cargando reseñas...
                   </Text>
@@ -179,7 +197,7 @@ const handleAnimatedClose = () => {
                 </Text>
               )
             }
-          />
+            />
         </BottomSheet>
       )}
     </>

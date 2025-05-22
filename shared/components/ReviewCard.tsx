@@ -121,10 +121,10 @@ export function ReviewCard({ review }: ReviewCardProps) {
         </Text>
         <Text className="text-white/60 text-xs">-</Text>
         <Text className="text-white/60 text-xs flex-shrink">
-          {review.postId.provider.name} {review.postId.provider.lastName}
+          {review.post.provider.name} {review.post.provider.lastname}
         </Text>
         <Text className="text-white/60 text-xs">-</Text>
-        <Text className="text-white/60 text-xs">{review.postId.service}</Text>
+        <Text className="text-white/60 text-xs">{review.post.service}</Text>
       </View>
 
       {/* Texto con expansión animada */}

@@ -4,7 +4,7 @@ import { useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
 import { getAverageReviewRating } from "@/features/proposals/service";
-import { getFeaturedReviewByPostId } from "@/features/reviews/service";
+import { getFeaturedReviewByPostId, getTotalReviewsCountByPostId } from "@/features/reviews/service";
 import { useLiveReviewsByPostId } from "@/features/reviews/useReviews";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
@@ -14,7 +14,7 @@ import { ReviewsModal } from "@/shared/components/ReviewModal";
 import SaveButton from "@/shared/components/SavedButton";
 import { UserContact } from "@/shared/components/UserContact";
 import { Ionicons } from "@expo/vector-icons";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
@@ -29,14 +29,8 @@ export default function Details() {
     const setFeaturedReview = useReviewStore.getState().setFeaturedReview;
     const [averageRating, setAverageRating] = useState<number>(0);
     const { reviews } = useLiveReviewsByPostId(id as string);
-    const totalReviews = reviews.length;
+    const totalReviews = useReviewStore((state) => state.totalReviews);
 
-    const handleTouchReview = (id: string) => {
-        router.push({
-            pathname: "/review/[id]",
-            params: { id },
-        });
-    }
     const [isModalVisible, setModalVisible] = useState(false);
     useEffect(() => {
         getPost(id as string).then((post) => {
@@ -46,11 +40,14 @@ export default function Details() {
             setFeaturedReview(review);
         })
         getAverageReviewRating(id as string).then(setAverageRating);
+        
+        getTotalReviewsCountByPostId(id as string).then((total) => {
+            useReviewStore.getState().setTotalReviews(total);
+        })
         return () => {
             useReviewStore.getState().clearFeaturedReview();
         };
     }, []);
-    console.log(post);
     if (loading || !post) {
         return (
             <SingleEntityScreen>
@@ -114,7 +111,7 @@ export default function Details() {
                             <View className="flex-row items-center gap-x-2">
                                 <Ionicons name="star" size={20} color="#FB9400" />
                                 <Text className="text-sm text-white/60">
-                                    {averageRating.toFixed(1)} ({reviews.length} Reseñas)
+                                    {averageRating.toFixed(1)} ({totalReviews} Reseñas)
                                 </Text>
                             </View>
                         </View>

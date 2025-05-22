@@ -35,7 +35,7 @@ export async function postToEntity(id: string, data: RawPostData): Promise<TPost
     const userData = {
         id: userSnap.docs[0].id,
         name: userSnap.docs[0].data().name,
-        lastName: userSnap.docs[0].data().lastname,
+        lastname: userSnap.docs[0].data().lastname,
         secondLastName: userSnap.docs[0].data().second_lastname,
         phoneNumber: userSnap.docs[0].data().phone_number,
         address: userSnap.docs[0].data().address,

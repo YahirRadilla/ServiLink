@@ -11,11 +11,13 @@ type ReviewState = {
     setFeaturedReview: (review: TReview | null) => void;
     clearFeaturedReview: () => void;
     totalReviews: number;
+    setTotalReviews: (total: number) => void;
 }
 
 export const useReviewStore = create<ReviewState>((set) => ({
     reviews: [],
     featuredReview: null,
+    totalReviews: 0,
 
     setReviews: (reviews: TReview[]) => set({ reviews }),
 
@@ -30,5 +32,5 @@ export const useReviewStore = create<ReviewState>((set) => ({
     
     clearFeaturedReview: () => set({ featuredReview: null }),
 
-    totalReviews: 0,
+    setTotalReviews: (total) => set({ totalReviews: total })
 }));

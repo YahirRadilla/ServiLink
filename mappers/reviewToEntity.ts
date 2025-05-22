@@ -25,7 +25,7 @@ export const reviewToEntity = async (
   return {
     id: docSnap.id,
     client,
-    postId: post,
+    post: post,
     valoration: data.valoration,
     textContent: data.textContent || "",
     images: data.images || [],
