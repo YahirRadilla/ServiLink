@@ -65,11 +65,11 @@ export default function Index() {
                 onEndReached={hasMore ? loadMore : undefined}
                 onEndReachedThreshold={0.5}
                 keyExtractor={(item, index) => {
-                if (!item?.id) {
-                    console.warn("❌ Elemento sin ID:", item, "en posición:", index);
-                    return `fallback-${index}`;
-                }
-                return item.id;
+                    if (!item?.id) {
+                        console.warn("Elemento sin ID:", item, "en posición:", index);
+                        return `fallback-${index}`;
+                    }
+                    return item.id;
                 }}
                 initialNumToRender={150}
                 contentContainerStyle={{
@@ -107,7 +107,7 @@ export default function Index() {
                             <Ionicons name="search-outline" size={20} color="#ccc" />
                         </View>
 
-                        <View className="flex-row mb-4">
+                        <View className="flex-row mb-4 justify-end">
                             <Pressable
                                 onPress={() => setFiltersVisible(true)}
                                 android_ripple={{ color: "#ffffff10" }}
