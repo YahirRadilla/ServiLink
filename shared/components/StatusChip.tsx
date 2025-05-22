@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 
 type ProposalStatus = "accepted" | "pending" | "rejected";
-type ContractStatus = "active" | "pending" | "finished";
+type ContractStatus = "active" | "pending" | "finished" | "cancelled";
 export type StatusType = ProposalStatus | ContractStatus;
 
 type StatusChipProps = {
@@ -35,6 +35,10 @@ const getStatusStyle = (
             "bg-finished-status-servilink/40",
             "text-finished-status-servilink",
         ],
+        cancelled: [
+            "bg-[#3F3F3F]/60",
+            "text-[#9F9F9F]",
+        ],
     };
 
     if (type === "proposal" && status in proposalMap) {
@@ -64,6 +68,7 @@ const translateStatus = (
         active: "Activo",
         pending: "Pendiente",
         finished: "Finalizado",
+        cancelled: "Cancelado",
     };
     return contractTranslations[status as ContractStatus] ?? status;
 };

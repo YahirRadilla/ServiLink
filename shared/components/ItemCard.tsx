@@ -6,7 +6,7 @@ type ItemCardProps = {
   onPress: () => void;
   image: string;
   title: string;
-  status: "accepted" | "pending" | "rejected" | "active" | "finished";
+  status: "accepted" | "pending" | "rejected" | "active" | "finished" | "cancelled";
   provider: string;
   date: string;
   price: number;
