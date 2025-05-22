@@ -76,7 +76,7 @@ export const PostsTab = () => {
                             style={{ width: 80, height: 80 }}
                         />
                     </View>
-                ) : <Text>No hay publicaciones</Text>
+                ) : null
             }
         />
     );
