@@ -152,3 +152,26 @@ export const createPost = async (post: any, providerId: string): Promise<string 
         return null;
     }
 };
+
+
+export const getPostsByProviderRef = async (
+    providerId: string
+): Promise<TPost[]> => {
+    try {
+        const postsRef = collection(db, "posts");
+        const providerRef = doc(db, "providers", providerId);
+
+        const q = query(postsRef, where("provider_id", "==", providerRef));
+        const snapshot = await getDocs(q);
+
+        const postPromises = snapshot.docs.map((doc) =>
+            postToEntity(doc.id, doc.data() as RawPostData)
+        );
+
+        const posts = await Promise.all(postPromises);
+        return posts;
+    } catch (error) {
+        console.error("Error al obtener posts por providerId:", error);
+        return [];
+    }
+};
