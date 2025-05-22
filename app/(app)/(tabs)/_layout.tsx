@@ -1,8 +1,8 @@
 import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 
-import { HomeIcon, InboxIcon, NotiIcon, SearchIcon, UserIcon } from '@/components/icons/Icons';
 import { useAuth } from '@/features/auth/useAuth';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const { isAuthenticated } = useAuth();
@@ -32,35 +32,35 @@ export default function TabLayout() {
             name="index"
             options={{
               title: 'Inicio',
-              tabBarIcon: ({ color }) => <HomeIcon color={color} />,
+              tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={24} color={color} />,
             }}
           />
           <Tabs.Screen
             name="saved"
             options={{
               title: 'Guardados',
-              tabBarIcon: ({ color }) => <SearchIcon color={color} />,
+              tabBarIcon: ({ color }) => <Ionicons name="bookmark-outline" size={24} color={color} />,
             }}
           />
           <Tabs.Screen
             name="inbox"
             options={{
               title: 'Inbox',
-              tabBarIcon: ({ color }) => <InboxIcon color={color} />,
+              tabBarIcon: ({ color }) => <Ionicons name="chatbubble-ellipses-outline" size={24} color={color} />,
             }}
           />
           <Tabs.Screen
             name="notifications"
             options={{
               title: 'Notificaciones',
-              tabBarIcon: ({ color }) => <NotiIcon color={color} />,
+              tabBarIcon: ({ color }) => <Ionicons name="notifications-outline" size={24} color={color} />,
             }}
           />
           <Tabs.Screen
             name="profile"
             options={{
               title: 'Perfil',
-              tabBarIcon: ({ color }) => <UserIcon color={color} />,
+              tabBarIcon: ({ color }) => <Ionicons name="person-circle-outline" size={24} color={color} />,
             }}
           />
         </Tabs>
