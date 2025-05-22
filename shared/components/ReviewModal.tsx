@@ -6,6 +6,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetFlatList,
 } from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Pressable, Text, View } from "react-native";
@@ -111,7 +112,7 @@ export function ReviewsModal({
             restSpeedThreshold: 0.01,
           }}
         >
-          <FloatingActionButton />
+          <FloatingActionButton onPress={() => router.push("/review/create")} />
           <BottomSheetFlatList
             data={reviews}
             keyExtractor={(item) => item.id}
