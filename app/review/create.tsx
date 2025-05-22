@@ -15,13 +15,12 @@ import * as Yup from "yup";
 const reviewSchema = Yup.object({
   rating: Yup.number().min(1, "Selecciona al menos una estrella").required(),
   opinion: Yup.string().optional(),
-  images: Yup.array().optional(), // Puedes hacerla requerida si quieres
+  images: Yup.array().optional(),
 });
 
 export default function CreateReviewScreen() {
   const [rating, setRating] = useState(0);
   const [imageUri, setImageUri] = useState<string | null>(null);
-
   const {
     control,
     handleSubmit,
@@ -40,7 +39,7 @@ export default function CreateReviewScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       quality: 0.6,
-      mediaTypes: "images", // ✅ sin warning
+      mediaTypes: "images",
     });
 
     if (!result.canceled && result.assets.length > 0) {
@@ -155,7 +154,7 @@ export default function CreateReviewScreen() {
             label="Publicar"
             onPress={handleSubmit((data) => {
               console.log("Review enviada:", data);
-              // Aquí puedes llamar a tu función createReview(data)
+
             })}
           />
         </View>

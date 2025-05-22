@@ -1,25 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
-import { usePathname, useRouter } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
-function hexToRgba(hex: string, alpha: number) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
+type FloatingActionButtonProps = {
+  onPress: () => void;
+};
 
-export function FloatingActionButton() {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const handlePress = () => {
-    router.push("/review/create");
-  };
-
-  return (
+export function FloatingActionButton({ onPress }: FloatingActionButtonProps) {
+  return(
     <View style={styles.container}>
-      <Pressable onPress={handlePress} style={({ pressed }) => [
+      <Pressable onPress={onPress} style={({ pressed }) => [
         styles.button,
         { opacity: pressed ? 0.85 : 1 },
       ]}>
@@ -27,7 +16,7 @@ export function FloatingActionButton() {
       </Pressable>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
