@@ -63,22 +63,22 @@ export function ReviewsModal({
     }, 500);
   };
 
-const handleAnimatedClose = () => {
-  bottomSheetRef.current?.close();
+  const handleAnimatedClose = () => {
+    bottomSheetRef.current?.close();
 
-  useEffect(() => {
-    getTotalReviewsCountByPostId(postId)
-      .then((total) => {
-        useReviewStore.setState({ totalReviews: total });
-      })
-      .catch((error) => {
-        console.error("Error fetching total reviews:", error);
-      });
-    return () => {
-      useReviewStore.getState().setTotalReviews(0);
-    }
-  })
-};
+    useEffect(() => {
+      getTotalReviewsCountByPostId(postId)
+        .then((total) => {
+          useReviewStore.setState({ totalReviews: total });
+        })
+        .catch((error) => {
+          console.error("Error fetching total reviews:", error);
+        });
+      return () => {
+        useReviewStore.getState().setTotalReviews(0);
+      }
+    })
+  };
 
   const renderBackdrop = (props: any) => (
     <BottomSheetBackdrop
@@ -94,24 +94,24 @@ const handleAnimatedClose = () => {
     <>
       {visible && (
         <BottomSheet
-        ref={bottomSheetRef}
-        index={1}
-        snapPoints={snapPoints}
-        onClose={onClose}
-        enablePanDownToClose
-        backgroundStyle={{ backgroundColor: "#161622" }}
-        handleIndicatorStyle={{ backgroundColor: "white" }}
-        backdropComponent={renderBackdrop}
-        animationConfigs={{
-          damping: 15,
-          mass: 0.8,
-          stiffness: 150,
-          overshootClamping: false,
-          restDisplacementThreshold: 0.01,
-          restSpeedThreshold: 0.01,
-        }}
+          ref={bottomSheetRef}
+          index={1}
+          snapPoints={snapPoints}
+          onClose={onClose}
+          enablePanDownToClose
+          backgroundStyle={{ backgroundColor: "#161622" }}
+          handleIndicatorStyle={{ backgroundColor: "white" }}
+          backdropComponent={renderBackdrop}
+          animationConfigs={{
+            damping: 15,
+            mass: 0.8,
+            stiffness: 150,
+            overshootClamping: false,
+            restDisplacementThreshold: 0.01,
+            restSpeedThreshold: 0.01,
+          }}
         >
-        <FloatingActionButton/>
+          <FloatingActionButton />
           <BottomSheetFlatList
             data={reviews}
             keyExtractor={(item) => item.id}
@@ -138,10 +138,10 @@ const handleAnimatedClose = () => {
                   <Pressable onPress={handleRefresh} className={"bg-black/20 p-2 rounded-full"}>
                     {showLottie ? (
                       <LottieView
-                      source={require("../../assets/animations/refresh.json")}
-                      autoPlay
-                      loop
-                      style={{ width: 20, height: 20 }}
+                        source={require("../../assets/animations/refresh.json")}
+                        autoPlay
+                        loop
+                        style={{ width: 20, height: 20 }}
                       />
                     ) : (
                       <Animated.View style={{ opacity: fadeAnim }}>
@@ -149,7 +149,7 @@ const handleAnimatedClose = () => {
                       </Animated.View>
                     )}
                   </Pressable>
-                  <Pressable onPress={handleAnimatedClose}  className={"bg-black/20 p-2 rounded-full"}>
+                  <Pressable onPress={handleAnimatedClose} className={"bg-black/20 p-2 rounded-full"}>
                     <Ionicons name="close" size={22} color="#fff" />
                   </Pressable>
                 </View>
@@ -157,10 +157,10 @@ const handleAnimatedClose = () => {
             }
             renderItem={({ item, index }) => (
               <Animatable.View
-              animation="zoomIn"
-              duration={300}
-              delay={index * 100}
-              useNativeDriver
+                animation="zoomIn"
+                duration={300}
+                delay={index * 100}
+                useNativeDriver
               >
                 <ReviewCard review={item} />
               </Animatable.View>
@@ -174,7 +174,7 @@ const handleAnimatedClose = () => {
                     autoPlay
                     loop
                     style={{ width: 100, height: 100 }}
-                    />
+                  />
                 </View>
               ) : null
             }
@@ -186,7 +186,7 @@ const handleAnimatedClose = () => {
                     autoPlay
                     loop
                     style={{ width: 100, height: 100 }}
-                    />
+                  />
                   <Text className="text-white/60 mt-4 text-base">
                     Cargando reseñas...
                   </Text>
@@ -197,7 +197,7 @@ const handleAnimatedClose = () => {
                 </Text>
               )
             }
-            />
+          />
         </BottomSheet>
       )}
     </>
