@@ -1,20 +1,21 @@
 import { Screen } from "@/components/Screen";
+import { TPost } from "@/entities/posts";
+import { usePosts } from "@/features/posts/usePosts";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import CustomInput from "@/shared/components/CustomInput";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from "expo-image-picker";
-import { Stack } from "expo-router";
-import { useState } from "react";
+import { Stack, useLocalSearchParams } from "expo-router";
+import LottieView from "lottie-react-native";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Image, Pressable, Text, View } from "react-native";
+import * as Animatable from "react-native-animatable";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Yup from "yup";
 
-type CreateReviewScreenProps = {
-  postId: string;
-}
 
 const reviewSchema = Yup.object({
   rating: Yup.number().min(1, "Selecciona al menos una estrella").required(),
@@ -22,7 +23,10 @@ const reviewSchema = Yup.object({
   images: Yup.array().optional(),
 });
 
-export default function CreateReviewScreen({ postId }: CreateReviewScreenProps) {
+export default function CreateReviewScreen() {
+  const { postId } = useLocalSearchParams<{ postId: string }>();
+  const { getPost, loading } = usePosts();
+  const [post, setPost] = useState<TPost | null>(null);
   const [rating, setRating] = useState(0);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const {
@@ -38,6 +42,12 @@ export default function CreateReviewScreen({ postId }: CreateReviewScreenProps) 
       images: [],
     },
   });
+
+  useEffect(() => {
+    getPost(postId as string).then((post) => {
+      setPost(post);
+    });
+  }, [postId]);
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -55,7 +65,6 @@ export default function CreateReviewScreen({ postId }: CreateReviewScreenProps) 
     <Screen>
       <Stack.Screen options={{ headerShown: false }} />
 
-      {/* ENCABEZADO */}
       <View className="flex-row items-center gap-x-4 p-4">
         <View className="bg-black/50 p-2 rounded-full">
           <BackButton />
@@ -66,93 +75,113 @@ export default function CreateReviewScreen({ postId }: CreateReviewScreenProps) 
       </View>
 
       <View className="flex-1 bg-primarybg-servilink">
-        <KeyboardAwareScrollView
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-          enableOnAndroid
-          extraScrollHeight={60}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text className="text-white text-2xl font-bold mt-2 mb-4">
-            Escribe tu evaluación
-          </Text>
-
-          {/* USUARIO */}
-          <View className="flex-row items-center gap-x-3 mb-1">
-            <Image
-              source={{ uri: "https://i.pravatar.cc/100" }}
-              className="w-10 h-10 rounded-full"
+        {loading || !post ? (
+          <View className="w-full mt-20 items-center justify-center">
+            <LottieView
+              source={require("../../assets/animations/loading.json")}
+              autoPlay
+              loop
+              style={{ width: 100, height: 100 }}
             />
-            <Text className="text-white font-semibold text-base">Jaime</Text>
+            <Text className="text-white/60 mt-4 text-base">
+              Cargando datos del serivcio...
+            </Text>
           </View>
-          <Text className="text-white/50 text-sm mb-4">
-            Las opiniones son públicas y contienen información de tu cuenta (el
-            contenido es opcional)
-          </Text>
+        ) : (
+          <>
+            <Animatable.View animation="fadeInUp" duration={300}>
+              <KeyboardAwareScrollView
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
+                showsVerticalScrollIndicator={false}
+                enableOnAndroid
+                extraScrollHeight={60}
+                keyboardShouldPersistTaps="handled"
+              >
+                <Text className="text-white text-2xl font-bold mt-2 mb-4">
+                  Escribe tu evaluación
+                </Text>
 
-          {/* RATING */}
-          <Controller
-            control={control}
-            name="rating"
-            render={({ field: { value, onChange }, fieldState: { error } }) => (
-              <>
-                <View className="flex-row items-center mb-2">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <Pressable key={index} onPress={() => onChange(index + 1)}>
-                      <Ionicons
-                        name={index < value ? "star" : "star-outline"}
-                        size={32}
-                        color="#FB9400"
-                        style={{ marginHorizontal: 4 }}
-                      />
-                    </Pressable>
-                  ))}
+                <View className="flex-row items-center gap-x-3 mb-1">
+                  <Image
+                    source={{ uri: post.provider.imageProfile || "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01" }}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <Text className="text-white font-semibold text-base">{post.provider.name} {post.provider.lastname}</Text>
                 </View>
-                {error?.message && (
-                  <Text className="text-red-500 text-sm mt-1">
-                    {error.message}
-                  </Text>
-                )}
-              </>
-            )}
-          />
+                <Text className="text-white/50 text-sm mb-4">
+                  Las opiniones son públicas y contienen información de tu cuenta (el
+                  contenido es opcional)
+                </Text>
 
-          {/* OPINIÓN */}
-          <Controller
-            control={control}
-            name="opinion"
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <CustomInput
-                type="text"
-                placeholder="Danos tu opinión"
-                label="Opinión (opcional)"
-                value={value}
-                onChangeText={onChange}
-                error={error?.message}
-                multiline
-                numberOfLines={4}
-                style={{ textAlignVertical: "top" }}
-              />
-            )}
-          />
+                {/* RATING */}
+                <Controller
+                  control={control}
+                  name="rating"
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                    <>
+                      <View className="flex-row items-center mb-2">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <Pressable key={index} onPress={() => onChange(index + 1)}>
+                            <Ionicons
+                              name={index < value ? "star" : "star-outline"}
+                              size={32}
+                              color="#FB9400"
+                              style={{ marginHorizontal: 4 }}
+                            />
+                          </Pressable>
+                        ))}
+                      </View>
+                      {error?.message && (
+                      <Animatable.View
+                        animation="fadeIn"
+                        duration={200}
+                        useNativeDriver>
+                        <Text className="text-red-500 text-sm mt-1">
+                          {error.message}
+                        </Text>
+                      </Animatable.View>
+                      )}
+                    </>
+                  )}
+                />
 
-          {/* IMAGEN */}
-          <Controller
-            control={control}
-            name="images"
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <CustomInput
-                type="image"
-                label="Imagen principal"
-                value={value}
-                onChangeText={onChange}
-                error={error?.message}
-              />
-            )}
-          />
-        </KeyboardAwareScrollView>
+                <Controller
+                  control={control}
+                  name="opinion"
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <CustomInput
+                      type="text"
+                      placeholder="Danos tu opinión"
+                      label="Opinión"
+                      value={value}
+                      onChangeText={onChange}
+                      error={error?.message}
+                      multiline
+                      numberOfLines={4}
+                      style={{ textAlignVertical: "top" }}
+                    />
+                  )}
+                />
 
-        {/* BOTÓN PUBLICAR */}
+                <Controller
+                  control={control}
+                  name="images"
+                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                    <CustomInput
+                      type="image"
+                      label="Imagen principal"
+                      value={value}
+                      onChangeText={onChange}
+                      error={error?.message}
+                    />
+                  )}
+                />
+              </KeyboardAwareScrollView>
+            </Animatable.View>
+
+          </>
+        )}
+
         <View className="absolute bottom-0 left-0 right-0 px-4 pb-6 bg-primarybg-servilink">
           <CustomButton
             label="Publicar"

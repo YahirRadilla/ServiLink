@@ -100,7 +100,7 @@ export function ReviewsModal({
             restSpeedThreshold: 0.01,
           }}
         >
-          <FloatingActionButton onPress={() => router.push("/review/create")} />
+          <FloatingActionButton onPress={() => router.push({pathname: "/review/create", params: {postId}})} />
           <BottomSheetFlatList
             data={reviews}
             keyExtractor={(item) => item.id}
