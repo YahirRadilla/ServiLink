@@ -6,11 +6,15 @@ import {
   Image,
   LayoutChangeEvent,
   Platform,
+  Pressable,
   Text,
   TouchableOpacity,
   UIManager,
-  View,
+  View
 } from "react-native";
+import Popover, { PopoverPlacement } from "react-native-popover-view";
+
+import { useUserStore } from "@/entities/users";
 import { Gallery } from "./Galery";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -22,11 +26,16 @@ type ReviewCardProps = {
 };
 
 export function ReviewCard({ review }: ReviewCardProps) {
+  const [showPopover, setShowPopover] = useState(false);
+  const anchorRef = React.createRef<View>();
   const [expanded, setExpanded] = useState(false);
   const [measured, setMeasured] = useState(false);
   const [collapsedHeight, setCollapsedHeight] = useState(0);
   const [expandedHeight, setExpandedHeight] = useState(0);
   const animation = useRef(new Animated.Value(0)).current;
+  const user = useUserStore((state) => state.user);
+
+  const isDeletable = review.client.id === user?.id;
 
   const dateObj = review.createdAt?.toDate?.() ?? new Date();
 
@@ -94,18 +103,63 @@ export function ReviewCard({ review }: ReviewCardProps) {
   return (
     <View className="gap-y-2 border border-links-servilink p-4 mb-4 rounded-xl">
       {/* Header */}
-      <View className="flex-row items-center">
-        <Image
-          source={{
-            uri: review.client.imageProfile ||
-              "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
-          }}
-          className="w-10 h-10 rounded-full mr-3"
-          resizeMode="cover"
-        />
-        <Text className="font-semibold text-lg text-white">
-          {review.client.name}
-        </Text>
+      <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center">
+          <Image
+            source={{
+              uri: review.client.imageProfile ||
+                "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
+            }}
+            className="w-10 h-10 rounded-full mr-3"
+            resizeMode="cover"
+          />
+          <Text className="font-semibold text-lg text-white">
+            {review.client.name}
+          </Text>
+        </View>
+        {isDeletable && (
+
+
+          <View style={{ position: "relative", zIndex: 9999 }}>
+            <Pressable
+              ref={anchorRef}
+              onPress={() => setShowPopover(true)}
+              className={"bg-black/20 rounded-full p-2"}
+            >
+              <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+            </Pressable>
+
+            <Popover
+              isVisible={showPopover}
+              onRequestClose={() => setShowPopover(false)}
+              from={anchorRef as React.RefObject<any>}
+              placement={PopoverPlacement.LEFT}
+              backgroundStyle={{ backgroundColor: "transparent" }}
+              popoverStyle={{
+                backgroundColor: "#1f1f2e",
+                paddingVertical: 8,
+                borderRadius: 8,
+              }}
+            >
+              <Pressable
+                onPress={() => {
+                  setShowPopover(false);
+                  console.log("Eliminar");
+                }}
+                className="px-4 py-2"
+                style={({ pressed }) => ({
+                  backgroundColor: pressed ? "#2a2a3a" : "transparent",
+                  borderRadius: 8,
+                })}
+              >
+                <View className="flex-row items-center gap-x-2">
+                  <Ionicons name="trash-outline" size={20} color="#F75555" />
+                  <Text className="text-[#F75555] font-medium text-base">Eliminar</Text>
+                </View>
+              </Pressable>
+            </Popover>
+          </View>
+        )}
       </View>
 
       {/* Metadata */}
@@ -151,7 +205,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
       {/* Galería */}
       {review.images && review.images.length > 0 && (
         <View className="mt-2">
-          <Gallery images={review.images} size={24} />
+          <Gallery images={review.images.map(img => img.toString())} size={24} />
         </View>
       )}
     </View>
