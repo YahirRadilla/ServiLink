@@ -1,6 +1,7 @@
 import { TReview } from "@/entities/reviews";
+import { useUserStore } from "@/entities/users";
 import { useEffect, useState } from "react";
-import { getFeaturedReviewByPostId, listenToReviewsByPostId } from "./service";
+import { createReview, getFeaturedReviewByPostId, listenToReviewsByPostId } from "./service";
 
 
 export const useFeaturedReview = (postId: string) => {
@@ -38,4 +39,35 @@ export const useLiveReviewsByPostId = (postId: string) => {
   }, [postId]);
 
   return { reviews, loading };
+};
+
+export const useReviews = () => {
+  const [loadingReview, setLoading] = useState(false);
+
+  const createNewReview = async (
+    review: any,
+    postId: string
+  ): Promise<string | null> => {
+    const user = useUserStore.getState().user;
+    if (!user?.id) {
+      console.warn("No hay usuario autenticado");
+      return null;
+    }
+
+    try {
+      setLoading(true);
+      const id = await createReview(review, user.id, postId);
+      return id;
+    } catch (err) {
+      console.error("🔥 Error en createNewReview:", err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    loadingReview,
+    createNewReview,
+  };
 };

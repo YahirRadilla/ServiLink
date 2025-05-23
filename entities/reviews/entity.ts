@@ -8,7 +8,7 @@ export type TReview = {
     post: TPost
     valoration: number
     textContent?: string
-    images?: [string]
+    images?: String[]
     createdAt: Timestamp
 }
 
@@ -18,6 +18,6 @@ export const emptyReview: TReview = {
     post: emptyPost,
     valoration: 0,
     textContent: '',
-    images: [''],
+    images: [],
     createdAt: Timestamp.now(),
 }

@@ -89,7 +89,7 @@ export default function Details() {
                     </View>
 
                     <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
-                        <BackButton />
+                        <BackButton fallbackToHome />
                     </View>
 
                     <Image
@@ -189,12 +189,6 @@ export default function Details() {
                     </View>
                 </View>
             </ScrollView>
-            <ReviewsModal
-                visible={isModalVisible}
-                onPress={() => console.log("modal interno")}
-                onClose={() => setModalVisible(false)}
-                postId={post.id}
-            />
             {
                 user?.profileStatus === "client" && (
                     <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-between bg-black/80">
@@ -210,6 +204,12 @@ export default function Details() {
 
                 )
             }
+            <ReviewsModal
+                visible={isModalVisible}
+                onPress={() => console.log("modal interno")}
+                onClose={() => setModalVisible(false)}
+                postId={post.id}
+            />
         </SingleEntityScreen>
     );
 }

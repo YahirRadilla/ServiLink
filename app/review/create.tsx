@@ -2,13 +2,13 @@ import { Screen } from "@/components/Screen";
 import { TPost } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
+import { useReviews } from "@/features/reviews/useReviews";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import CustomInput from "@/shared/components/CustomInput";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as ImagePicker from "expo-image-picker";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -18,6 +18,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import * as Yup from "yup";
 
 
+
 const reviewSchema = Yup.object({
   rating: Yup.number().min(1, "Selecciona al menos una estrella").required(),
   opinion: Yup.string().optional(),
@@ -25,15 +26,15 @@ const reviewSchema = Yup.object({
 });
 
 export default function CreateReviewScreen() {
+  const router = useRouter();
   const { postId } = useLocalSearchParams<{ postId: string }>();
-  const { getPost, loading } = usePosts();
+  const { getPost, loading: loadingPost } = usePosts();
+  const { createNewReview, loadingReview } = useReviews();
   const [post, setPost] = useState<TPost | null>(null);
   const user = useUserStore((state) => state.user);
   const {
     control,
     handleSubmit,
-    setValue,
-    formState: { errors },
   } = useForm({
     resolver: yupResolver(reviewSchema),
     defaultValues: {
@@ -49,15 +50,6 @@ export default function CreateReviewScreen() {
     });
   }, [postId]);
 
-  const handlePickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      quality: 0.6,
-      mediaTypes: "images",
-    });
-
-  };
-
   return (
     <Screen>
       <Stack.Screen options={{ headerShown: false }} />
@@ -72,7 +64,7 @@ export default function CreateReviewScreen() {
       </View>
 
       <View className="flex-1 bg-primarybg-servilink">
-        {loading || !post ? (
+        {loadingPost || !post ? (
           <View className="w-full mt-20 items-center justify-center">
             <LottieView
               source={require("../../assets/animations/loading.json")}
@@ -103,7 +95,7 @@ export default function CreateReviewScreen() {
                     source={{ uri: user?.imageProfile || "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01" }}
                     className="w-10 h-10 rounded-full"
                   />
-                  <Text className="text-white font-semibold text-base">{ user?.name } {user?.lastname}</Text>
+                  <Text className="text-white font-semibold text-base">{user?.name} {user?.lastname}</Text>
                 </View>
                 <Text className="text-white/50 text-sm mb-4">
                   Las opiniones son públicas y contienen información de tu cuenta (el
@@ -129,14 +121,14 @@ export default function CreateReviewScreen() {
                         ))}
                       </View>
                       {error?.message && (
-                      <Animatable.View
-                        animation="fadeIn"
-                        duration={200}
-                        useNativeDriver>
-                        <Text className="text-red-500 text-sm mt-1">
-                          {error.message}
-                        </Text>
-                      </Animatable.View>
+                        <Animatable.View
+                          animation="fadeIn"
+                          duration={200}
+                          useNativeDriver>
+                          <Text className="text-red-500 text-sm mt-1">
+                            {error.message}
+                          </Text>
+                        </Animatable.View>
                       )}
                     </>
                   )}
@@ -181,10 +173,14 @@ export default function CreateReviewScreen() {
 
         <View className="absolute bottom-0 left-0 right-0 px-4 pb-6 bg-primarybg-servilink">
           <CustomButton
-            label="Publicar"
-            onPress={handleSubmit((data) => {
-              console.log("Review enviada:", data);
-
+            label={"Publicar"}
+            loading={loadingReview}
+            onPress={handleSubmit(async (data) => {
+              const id = await createNewReview(data, postId);
+              console.log("Reseña creada con ID:", id);
+              if (postId) {
+                router.replace(`/post/${postId}`);
+              }
             })}
           />
         </View>

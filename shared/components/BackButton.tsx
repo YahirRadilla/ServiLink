@@ -1,13 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from 'expo-router';
+import { useRouter } from 'expo-router'; // ✅ esta sí tiene push, replace, etc.
 import React from 'react';
 import { Pressable } from 'react-native';
 
-export default function BackButton() {
-    const router = useNavigation();
+type BackButtonProps = {
+  fallbackToHome?: boolean;
+};
+
+export default function BackButton({ fallbackToHome  }: BackButtonProps) {
+    const router = useRouter();
 
     const handleBack = () => {
-        router.goBack();
+        if(fallbackToHome || !router.canGoBack()) {
+            router.replace("/(app)/(tabs)");
+        }else{
+            router.back();
+        }
     };
 
     return (

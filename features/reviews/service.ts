@@ -1,7 +1,9 @@
 import { TReview } from "@/entities/reviews";
 import { db } from "@/lib/firebaseConfig";
+import { storage } from "@/lib/firebaseStorageConfig";
 import { reviewToEntity } from "@/mappers/reviewToEntity";
 import {
+  addDoc,
   collection,
   doc,
   DocumentSnapshot,
@@ -11,8 +13,10 @@ import {
   orderBy,
   query,
   startAfter,
+  Timestamp,
   where,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const REVIEWS_PAGE_SIZE = 3;
 
@@ -91,7 +95,6 @@ export const getAverageReviewRating = async (postId: string): Promise<number> =>
   }
 };
 
-
 export const listenToReviewsByPostId = (
   postId: string,
   onUpdate: (reviews: TReview[]) => void
@@ -124,5 +127,43 @@ export const getTotalReviewsCountByPostId = async (postId: string): Promise<numb
   } catch (error) {
     console.error("🔥 Error al obtener el conteo de reseñas:", error);
     return 0;
+  }
+};
+
+export const createReview = async (
+  review: any,
+  userId: string,
+  postId: string
+): Promise<string | null> => {
+  try {
+    const reviewsRef = collection(db, "reviews");
+    const imageUrls: string[] = [];
+
+    for (const [index, uri] of review.images.entries()) {
+      if (!uri || typeof uri !== "string") continue;
+
+      const res = await fetch(uri);
+      const blob = await res.blob();
+
+      const imageRef = ref(storage, `reviews/${Date.now()}_${index}.jpg`);
+      await uploadBytes(imageRef, blob);
+      const downloadURL = await getDownloadURL(imageRef);
+      imageUrls.push(downloadURL);
+    }
+
+    const reviewToDB = {
+      valoration: review.rating,
+      textContent: review.opinion || "",
+      images: imageUrls,
+      created_at: Timestamp.now(),
+      client_id: doc(db, "users", userId),
+      post_id: doc(db, "posts", postId),
+    };
+
+    const newReview = await addDoc(reviewsRef, reviewToDB);
+    return newReview.id;
+  } catch (err) {
+    console.error("🔥 Error al crear review:", err);
+    return null;
   }
 };

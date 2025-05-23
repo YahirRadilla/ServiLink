@@ -32,5 +32,5 @@ export const useReviewStore = create<ReviewState>((set) => ({
     
     clearFeaturedReview: () => set({ featuredReview: null }),
 
-    setTotalReviews: (total) => set({ totalReviews: total })
+    setTotalReviews: (total) => set({ totalReviews: total }),
 }));
