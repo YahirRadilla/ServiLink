@@ -1,6 +1,6 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { useUserStore } from "@/entities/users";
-import { rejectProposal } from "@/features/proposals/service";
+import { acceptProposalAndCreateContract, rejectProposal } from "@/features/proposals/service";
 import { useProposalById } from "@/features/proposals/useProposal";
 import BackButton from "@/shared/components/BackButton";
 import { ConfirmModal } from "@/shared/components/ConfirmModal";
@@ -24,6 +24,8 @@ export default function ProposalDetails() {
     const user = useUserStore((state) => state.user);
     const router = useRouter();
     const [modalVisible, setModalVisible] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => { });
+
     const toast = useToastStore((s) => s.toastRef);
     const handleTouchPost = (id: string) => {
         if (!id) return;
@@ -34,17 +36,32 @@ export default function ProposalDetails() {
     };
 
     const handleReject = async () => {
-        console.log("Rechazar propuesta");
+
         if (!proposal) return;
-        console.log("si");
+
         const success = await rejectProposal(proposal.id);
 
         if (success) {
             setModalVisible(false);
             toast?.show("Propuesta rechazada", "success", 2000);
-            console.log("✅ Propuesta rechazada");
+            console.log("ropuesta rechazada");
         } else {
-            console.log("❌ No se pudo rechazar la propuesta");
+            console.log("No se pudo rechazar la propuesta");
+        }
+    };
+
+    const handleAccept = async () => {
+
+        if (!proposal) return;
+
+        const success = await acceptProposalAndCreateContract(proposal.id, proposal);
+
+        if (success) {
+            setModalVisible(false);
+            toast?.show("Propuesta aceptada", "success", 2000);
+            console.log("ropuesta aceptada");
+        } else {
+            console.log("No se pudo aceptar la propuesta");
         }
     };
 
@@ -185,7 +202,10 @@ export default function ProposalDetails() {
                             <>
                                 <CustomButton
                                     className="bg-green-600 rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
-                                    onPress={() => { }}
+                                    onPress={() => {
+                                        setConfirmAction(() => handleAccept);
+                                        setModalVisible(true);
+                                    }}
                                     icon={<Ionicons name="checkmark" size={24} color="white" />}
                                 />
 
@@ -200,13 +220,18 @@ export default function ProposalDetails() {
 
                     <CustomButton
                         className="bg-red-700 rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => {
+                            setConfirmAction(() => handleReject);
+                            setModalVisible(true);
+                        }}
                         icon={<Ionicons name="close" size={24} color="white" />}
                     />
                     <ConfirmModal
                         isVisible={modalVisible}
                         onClose={() => setModalVisible(false)}
-                        onConfirm={handleReject}
+                        onConfirm={() => {
+                            confirmAction();
+                        }}
                     />
                 </View>
 

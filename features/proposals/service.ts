@@ -169,3 +169,48 @@ export const rejectProposal = async (proposalId: string): Promise<boolean> => {
         return false;
     }
 };
+
+
+export const acceptProposalAndCreateContract = async (
+    proposalId: string,
+    data: any
+): Promise<boolean> => {
+    try {
+        const proposalRef = doc(db, "proposals", proposalId);
+
+
+        await updateDoc(proposalRef, {
+            accept_status: "accepted"
+        });
+
+
+        const contractsRef = collection(db, "contracts");
+        const contractData = {
+            client_id: doc(db, "users", data.client.id),
+            provider_id: doc(db, "users", data.provider.id),
+            post_id: doc(db, "posts", data.post.id),
+            offers: data.offers,
+            description: data.description,
+            reference_image: data.referenceImages ?? [],
+            pay_method: data.paymentMethod,
+            start_date: data.startDate,
+            created_at: Timestamp.now(),
+            progress_status: "pending",
+            address: {
+                ...data.address,
+                street_address: data.address.streetAddress,
+                zipcode: data.address.zipcode,
+                neighborhood: data.address.neighborhood,
+                latitude: data.address.latitude,
+                longitude: data.address.longitude,
+            }
+        };
+
+        await addDoc(contractsRef, contractData);
+
+        return true;
+    } catch (error) {
+        console.error("Error al aceptar propuesta y crear contrato:", error);
+        return false;
+    }
+};

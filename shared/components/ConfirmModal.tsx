@@ -20,7 +20,7 @@ export const ConfirmModal = ({
         <Modal isVisible={isVisible} onBackdropPress={onClose} backdropOpacity={0.6}>
             <View className="bg-primarybg-servilink rounded-xl p-6 border border-links-servilink">
                 <Text className="text-white text-lg font-semibold text-center mb-6">
-                    {message ?? "¿Estás seguro de que deseas rechazar esta propuesta?"}
+                    {message ?? "¿Estás seguro de efectuar esta acción?"}
                 </Text>
 
                 <View className="flex-row justify-between gap-4">
@@ -33,7 +33,7 @@ export const ConfirmModal = ({
                     </View>
                     <View className="flex-1">
                         <CustomButton
-                            label="Sí, rechazar"
+                            label="Aceptar"
                             className="bg-red-700 rounded-xl"
                             onPress={onConfirm}
                         />
