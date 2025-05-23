@@ -1,5 +1,6 @@
 import { Screen } from "@/components/Screen";
 import { TPost } from "@/entities/posts";
+import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
@@ -27,8 +28,7 @@ export default function CreateReviewScreen() {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const { getPost, loading } = usePosts();
   const [post, setPost] = useState<TPost | null>(null);
-  const [rating, setRating] = useState(0);
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const user = useUserStore((state) => state.user);
   const {
     control,
     handleSubmit,
@@ -56,9 +56,6 @@ export default function CreateReviewScreen() {
       mediaTypes: "images",
     });
 
-    if (!result.canceled && result.assets.length > 0) {
-      setImageUri(result.assets[0].uri);
-    }
   };
 
   return (
@@ -103,10 +100,10 @@ export default function CreateReviewScreen() {
 
                 <View className="flex-row items-center gap-x-3 mb-1">
                   <Image
-                    source={{ uri: post.provider.imageProfile || "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01" }}
+                    source={{ uri: user?.imageProfile || "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01" }}
                     className="w-10 h-10 rounded-full"
                   />
-                  <Text className="text-white font-semibold text-base">{post.provider.name} {post.provider.lastname}</Text>
+                  <Text className="text-white font-semibold text-base">{ user?.name } {user?.lastname}</Text>
                 </View>
                 <Text className="text-white/50 text-sm mb-4">
                   Las opiniones son públicas y contienen información de tu cuenta (el
@@ -119,12 +116,12 @@ export default function CreateReviewScreen() {
                   name="rating"
                   render={({ field: { value, onChange }, fieldState: { error } }) => (
                     <>
-                      <View className="flex-row items-center mb-2">
+                      <View className="flex-row justify-center gap-x-4 items-center my-2">
                         {Array.from({ length: 5 }).map((_, index) => (
                           <Pressable key={index} onPress={() => onChange(index + 1)}>
                             <Ionicons
                               name={index < value ? "star" : "star-outline"}
-                              size={32}
+                              size={36}
                               color="#FB9400"
                               style={{ marginHorizontal: 4 }}
                             />
@@ -169,7 +166,7 @@ export default function CreateReviewScreen() {
                   render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <CustomInput
                       type="image"
-                      label="Imagen principal"
+                      label="Imagenes"
                       value={value}
                       onChangeText={onChange}
                       error={error?.message}
