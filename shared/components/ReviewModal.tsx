@@ -39,8 +39,10 @@ export function ReviewsModal({
   const shouldRefresh = useReviewStore((state) => state.shouldRefreshReviews);
   const resetRefreshFlag = useReviewStore((state) => state.resetRefreshFlag);
   const user = useUserStore((state) => state.user);
-  const getProviderIdByPostId = usePostStore((state) => state.getProviderByPostId(postId));
-  const isPostOwner = user?.id === getProviderIdByPostId;
+  const getProviderByPostId = usePostStore((state) => state.getProviderByPostId);
+  const postProviderId = getProviderByPostId(postId);
+
+  const isPostOwner = user?.id === postProviderId;
 
 useEffect(() => {
   if (visible && shouldRefresh) {
