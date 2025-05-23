@@ -1,5 +1,7 @@
 import {
     DocumentSnapshot,
+    Timestamp,
+    addDoc,
     collection,
     doc,
     getDoc,
@@ -14,13 +16,17 @@ import {
 import { TProposal } from "@/entities/proposals";
 import { TUser } from "@/entities/users";
 import { db } from "@/lib/firebaseConfig";
+import { storage } from "@/lib/firebaseStorageConfig";
 import { RawProposalData, proposalToEntity } from "@/mappers/proposalToEntity";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const PAGE_SIZE = 5;
 
 type ProposalFilters = {
     ordenar?: "Recientes" | "Más Antigüos";
 };
+
+
 
 export const fetchProposalsPage = async (
     filters: ProposalFilters,
@@ -90,21 +96,60 @@ export const getProposalById = async (id: string): Promise<TProposal | null> => 
     }
 };
 
-export const getAverageReviewRating = async (postId: string): Promise<number> => {
+
+
+export const createProposal = async (
+    input: any
+): Promise<string | null> => {
     try {
-        const reviewsRef = collection(db, "reviews");
-        const q = query(reviewsRef, where("post_id", "==", doc(db, "posts", postId)));
-        const snapshot = await getDocs(q);
+        const proposalsRef = collection(db, "proposals");
+        const uploadedImages: string[] = [];
 
-        const reviews = snapshot.docs.map(doc => doc.data());
-        const total = reviews.length;
+        for (const [index, uri] of input.referenceImages.entries()) {
+            if (!uri || typeof uri !== "string") {
+                console.warn(`URI inválida en imagen ${index}:`, uri);
+                continue;
+            }
 
-        if (total === 0) return 0;
+            const response = await fetch(uri);
+            const blob = await response.blob();
 
-        const sum = reviews.reduce((acc, review) => acc + review.valoration, 0);
-        return sum / total;
+            const imageRef = ref(storage, `proposals/${Date.now()}_${index}.jpg`);
+            await uploadBytes(imageRef, blob);
+            const downloadURL = await getDownloadURL(imageRef);
+            uploadedImages.push(downloadURL);
+        }
+
+        const formattedOffers = input.offers.map((offer: any) => ({
+            ...offer,
+            time: Timestamp.fromDate(offer.time),
+        }));
+
+        const newProposal = {
+            client_id: doc(db, "users", input.clientId),
+            provider_id: doc(db, "users", input.providerId),
+            post_id: doc(db, "posts", input.postId),
+            offers: formattedOffers,
+            description: input.description,
+            reference_image: uploadedImages,
+            accept_status: 'pending',
+            pay_method: input.payMethod,
+            start_date: Timestamp.fromDate(input.startDate),
+            created_at: Timestamp.fromDate(new Date()),
+            address: {
+                street_address: input.streetAddress,
+                zipcode: input.zipCode,
+                neighborhood: input.neighborhood,
+                latitude: input.location.latitude,
+                longitude: input.location.longitude,
+            },
+        };
+
+        const docRef = await addDoc(proposalsRef, newProposal);
+        return docRef.id;
     } catch (error) {
-        console.error("Error al calcular promedio de valoraciones:", error);
-        return 0;
+        console.error("❌ Error al crear la propuesta:", error);
+        return null;
     }
 };
+

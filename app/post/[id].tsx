@@ -1,5 +1,5 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
-import { TPost } from "@/entities/posts";
+import { TPost, usePostStore } from "@/entities/posts";
 import { useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
@@ -13,7 +13,7 @@ import { ReviewsModal } from "@/shared/components/ReviewModal";
 import SaveButton from "@/shared/components/SavedButton";
 import { UserContact } from "@/shared/components/UserContact";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
@@ -21,6 +21,7 @@ import MapView, { Marker as MapMarker } from "react-native-maps";
 
 export default function Details() {
     const { id } = useLocalSearchParams();
+    const router = useRouter();
     const { getPost, loading } = usePosts();
     const [post, setPost] = useState<TPost | null>(null);
     const user = useUserStore((state) => state.user);
@@ -29,17 +30,23 @@ export default function Details() {
     const [averageRating, setAverageRating] = useState<number>(0);
     const { reviews } = useLiveReviewsByPostId(id as string);
     const totalReviews = useReviewStore((state) => state.totalReviews);
+    const postStore = usePostStore();
+
+    const handleHire = () => {
+        router.push("/proposal/createProposal");
+    };
 
     const [isModalVisible, setModalVisible] = useState(false);
     useEffect(() => {
         getPost(id as string).then((post) => {
             setPost(post);
+            postStore.setCurrentPost(post!);
         });
         getFeaturedReviewByPostId(id as string).then((review) => {
             setFeaturedReview(review);
         })
         getAverageReviewRating(id as string).then(setAverageRating);
-        
+
         getTotalReviewsCountByPostId(id as string).then((total) => {
             useReviewStore.getState().setTotalReviews(total);
         })
@@ -166,7 +173,7 @@ export default function Details() {
                                     android_ripple={{ color: "#ffffff10" }}
                                     style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
                                     className="px-4 py-2 rounded-xl bg-links-servilink/20"
-                                    >
+                                >
                                     <Text className="text-links-servilink font-semibold text-sm">Ver todas</Text>
                                 </Pressable>
                             </View>
@@ -198,7 +205,7 @@ export default function Details() {
                             </Text>
                         </View>
 
-                        <CustomButton label="Contratar" onPress={() => { }} />
+                        <CustomButton label="Contratar" onPress={() => { handleHire() }} />
                     </View>
 
                 )

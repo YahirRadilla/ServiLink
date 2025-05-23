@@ -168,8 +168,9 @@ export default function CreatePostScreen() {
                     name="zipCode"
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                         <CustomInput
-                            label="Codigo Postal"
-                            placeholder="Ej: 23030"
+                            label="Código postal"
+                            placeholder="Ej: 23020"
+                            keyboardType="numeric"
                             value={value}
                             onChangeText={onChange}
                             error={error?.message}

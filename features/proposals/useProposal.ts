@@ -30,5 +30,8 @@ export const useProposalById = (proposalId: string | null) => {
         fetchProposal();
     }, [proposalId]);
 
+
+
+
     return { proposal, loading, error };
 }

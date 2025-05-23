@@ -4,9 +4,11 @@ import { TPost } from './entity';
 
 type PostState = {
     posts: TPost[];
+    currentPost: TPost | null;
     filteredPosts: TPost[];
     filters: Record<string, string>;
     setPosts: (posts: TPost[]) => void;
+    setCurrentPost: (post: TPost) => void;
     setFilters: (filters: Record<string, string>) => void;
     applyFilters: (filters: any, searchTerm?: string) => void;
     clearPosts: () => void;
@@ -15,10 +17,13 @@ type PostState = {
 
 export const usePostStore = create<PostState>((set, get) => ({
     posts: [],
+    currentPost: null,
     filteredPosts: [],
     filters: {},
     setPosts: (posts) =>
         set({ posts }, false),
+    setCurrentPost: (post) =>
+        set({ currentPost: post }, false),
     setFilters: (filters) => set({ filters }, false),
     applyFilters: (filters: any, searchTerm?: string) => {
         const posts = get().posts;
