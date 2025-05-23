@@ -17,24 +17,24 @@ export const ConfirmModal = ({
     message,
 }: ConfirmModalProps) => {
     return (
-        <Modal isVisible={isVisible} onBackdropPress={onClose} backdropOpacity={0.6}>
-            <View className="bg-primarybg-servilink rounded-xl p-6 border border-links-servilink">
+        <Modal isVisible={isVisible} onBackdropPress={onClose} backdropOpacity={0.6}  animationIn={"zoomIn"} animationOut={"zoomOut"} useNativeDriver >
+            <View className="bg-primarybg-servilink rounded-xl p-6 border ">
                 <Text className="text-white text-lg font-semibold text-center mb-6">
                     {message ?? "¿Estás seguro de efectuar esta acción?"}
                 </Text>
 
                 <View className="flex-row justify-between gap-4">
-                    <View className="flex-1">
+                    <View className="flex-1 ">
                         <CustomButton
                             label="Cancelar"
-                            className="bg-gray-400 rounded-xl"
+                            className="border border-gray-200 bg-transparent rounded-xl"
                             onPress={onClose}
                         />
                     </View>
                     <View className="flex-1">
                         <CustomButton
                             label="Aceptar"
-                            className="bg-red-700 rounded-xl"
+                            className=" rounded-xl"
                             onPress={onConfirm}
                         />
                     </View>
