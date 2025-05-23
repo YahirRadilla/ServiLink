@@ -1,16 +1,20 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { useUserStore } from "@/entities/users";
+import { rejectProposal } from "@/features/proposals/service";
 import { useProposalById } from "@/features/proposals/useProposal";
 import BackButton from "@/shared/components/BackButton";
+import { ConfirmModal } from "@/shared/components/ConfirmModal";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Gallery } from "@/shared/components/Galery";
 import OfferTimeline from "@/shared/components/OfferTimeline";
 import { PostItemCard } from "@/shared/components/PostItemCard";
 import { StatusChip, StatusType } from "@/shared/components/StatusChip";
 import { UserContact } from "@/shared/components/UserContact";
+import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
+import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import MapView, { MapMarker } from "react-native-maps";
 
@@ -19,12 +23,29 @@ export default function ProposalDetails() {
     const { proposal, loading } = useProposalById(id as string || null);
     const user = useUserStore((state) => state.user);
     const router = useRouter();
+    const [modalVisible, setModalVisible] = useState(false);
+    const toast = useToastStore((s) => s.toastRef);
     const handleTouchPost = (id: string) => {
         if (!id) return;
         router.push({
             pathname: "/post/[id]",
             params: { id },
         });
+    };
+
+    const handleReject = async () => {
+        console.log("Rechazar propuesta");
+        if (!proposal) return;
+        console.log("si");
+        const success = await rejectProposal(proposal.id);
+
+        if (success) {
+            setModalVisible(false);
+            toast?.show("Propuesta rechazada", "success", 2000);
+            console.log("✅ Propuesta rechazada");
+        } else {
+            console.log("❌ No se pudo rechazar la propuesta");
+        }
     };
 
     if (loading || !proposal) {
@@ -179,8 +200,13 @@ export default function ProposalDetails() {
 
                     <CustomButton
                         className="bg-red-700 rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                        onPress={() => { }}
+                        onPress={() => setModalVisible(true)}
                         icon={<Ionicons name="close" size={24} color="white" />}
+                    />
+                    <ConfirmModal
+                        isVisible={modalVisible}
+                        onClose={() => setModalVisible(false)}
+                        onConfirm={handleReject}
                     />
                 </View>
 

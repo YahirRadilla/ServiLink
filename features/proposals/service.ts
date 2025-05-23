@@ -10,6 +10,7 @@ import {
     orderBy,
     query,
     startAfter,
+    updateDoc,
     where
 } from "firebase/firestore";
 
@@ -153,3 +154,18 @@ export const createProposal = async (
     }
 };
 
+
+export const rejectProposal = async (proposalId: string): Promise<boolean> => {
+    try {
+        const proposalRef = doc(db, "proposals", proposalId);
+
+        await updateDoc(proposalRef, {
+            accept_status: "rejected",
+        });
+
+        return true;
+    } catch (error) {
+        console.error("❌ Error al rechazar propuesta:", error);
+        return false;
+    }
+};

@@ -29,6 +29,7 @@ export const ProposalsTab = () => {
         });
     };
 
+
     return (
         <FlatList
             data={proposals}
