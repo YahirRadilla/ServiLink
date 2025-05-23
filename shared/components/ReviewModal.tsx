@@ -1,4 +1,6 @@
+import { usePostStore } from "@/entities/posts";
 import { useReviewStore } from "@/entities/reviews";
+import { useUserStore } from "@/entities/users";
 import { getTotalReviewsCountByPostId } from "@/features/reviews/service";
 import { usePaginatedReviewsByPostId } from "@/features/reviews/usePaginatedFilteredPosts";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,12 +32,15 @@ export function ReviewsModal({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["60%", "100%"], []);
   const { reviews, loadMore, loading, hasMore, refresh, isRefreshing } =
-    usePaginatedReviewsByPostId(postId);
+  usePaginatedReviewsByPostId(postId);
   const [showLottie, setShowLottie] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const totalReviews = useReviewStore((state) => state.totalReviews);
   const shouldRefresh = useReviewStore((state) => state.shouldRefreshReviews);
   const resetRefreshFlag = useReviewStore((state) => state.resetRefreshFlag);
+  const user = useUserStore((state) => state.user);
+  const getProviderIdByPostId = usePostStore((state) => state.getProviderByPostId(postId));
+  const isPostOwner = user?.id === getProviderIdByPostId;
 
 useEffect(() => {
   if (visible && shouldRefresh) {
@@ -103,7 +108,9 @@ useEffect(() => {
             restSpeedThreshold: 0.01,
           }}
         >
-          <FloatingActionButton onPress={() => router.push({pathname: "/review/create", params: {postId}})} />
+          {!isPostOwner && ( 
+            <FloatingActionButton onPress={() => router.push({pathname: "/review/create", params: {postId}})} />
+          )}
           <BottomSheetFlatList
             data={reviews}
             keyExtractor={(item) => item.id}

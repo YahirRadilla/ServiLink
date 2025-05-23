@@ -13,6 +13,7 @@ type PostState = {
     applyFilters: (filters: any, searchTerm?: string) => void;
     clearPosts: () => void;
     resetFilters: () => void;
+    getProviderByPostId: (id: string) => string | null;
 };
 
 export const usePostStore = create<PostState>((set, get) => ({
@@ -72,4 +73,8 @@ export const usePostStore = create<PostState>((set, get) => ({
         },
         filteredPosts: get().posts,
     }),
+    getProviderByPostId: (id) => {
+        const post = get().posts.find((post) => post.id === id);
+        return post ? post.provider.id : null;
+    },
 }));
