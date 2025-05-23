@@ -16,13 +16,6 @@ export const useCreateProposals = () => {
             console.warn("⚠️ Usuario no autenticado");
             return null;
         }
-        console.log({
-            ...proposalData,
-            clientId: user.id,
-            postId: currentPost?.id!,
-            providerId: currentPost?.provider.id!,
-            payMethod: proposalData.payMethod as string === "Tarjeta" ? "card" : "effective",
-        });
         setLoading(true);
         try {
             const proposalId = await createProposal({
