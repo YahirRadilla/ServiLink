@@ -85,3 +85,18 @@ export const getContractById = async (id: string): Promise<TContract | null> => 
         return null;
     }
 };
+
+export const getContractsByPostId = async (postId: string): Promise<TContract[]> => {
+  const postRef = doc(db, "posts", postId);
+
+  const q = query(collection(db, "contracts"), where("post_id", "==", postRef));
+  const snapshot = await getDocs(q);
+
+  const contracts = await Promise.all(
+    snapshot.docs.map((docSnap) =>
+      contractToEntity(docSnap.id, docSnap.data() as RawContractData)
+    )
+  );
+
+  return contracts;
+};

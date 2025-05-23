@@ -1,5 +1,5 @@
 import { TContract } from "@/entities/contracts";
-import { getContractById } from "@/features/contracts/service";
+import { getContractById, getContractsByPostId } from "@/features/contracts/service";
 import { useEffect, useState } from "react";
 
 export const useContractById = (id?: string) => {
@@ -34,4 +34,20 @@ export const useContractById = (id?: string) => {
         error,
         refetch: fetchContract,
     };
+};
+
+export const useContractsByPostId = (postId: string) => {
+  const [contracts, setContracts] = useState<TContract[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!postId) return;
+
+    setLoading(true);
+    getContractsByPostId(postId)
+      .then(setContracts)
+      .finally(() => setLoading(false));
+  }, [postId]);
+
+  return { contracts, loading };
 };

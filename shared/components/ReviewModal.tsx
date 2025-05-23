@@ -1,6 +1,7 @@
 import { usePostStore } from "@/entities/posts";
 import { useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
+import { useContractsByPostId } from "@/features/contracts/useContractById";
 import { getTotalReviewsCountByPostId } from "@/features/reviews/service";
 import { usePaginatedReviewsByPostId } from "@/features/reviews/usePaginatedFilteredPosts";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,8 +32,7 @@ export function ReviewsModal({
 }: ReviewsModalProps) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["60%", "100%"], []);
-  const { reviews, loadMore, loading, hasMore, refresh, isRefreshing } =
-  usePaginatedReviewsByPostId(postId);
+  const { reviews, loadMore, loading, hasMore, refresh, isRefreshing } = usePaginatedReviewsByPostId(postId);
   const [showLottie, setShowLottie] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const totalReviews = useReviewStore((state) => state.totalReviews);
@@ -42,17 +42,21 @@ export function ReviewsModal({
   const getProviderByPostId = usePostStore((state) => state.getProviderByPostId);
   const postProviderId = getProviderByPostId(postId);
 
+  const { contracts, loading: contractsLoading } = useContractsByPostId(postId);
+  const canReview = contracts.some(
+    (c) => c.client.id === user?.id && c.progressStatus === "finished"
+  );
   const isPostOwner = user?.id === postProviderId;
 
-useEffect(() => {
-  if (visible && shouldRefresh) {
-    refresh();
-    getTotalReviewsCountByPostId(postId).then((total) => {
-      useReviewStore.getState().setTotalReviews(total);
-    });
-    resetRefreshFlag();
-  }
-}, [visible, shouldRefresh, postId]);
+  useEffect(() => {
+    if (visible && shouldRefresh) {
+      refresh();
+      getTotalReviewsCountByPostId(postId).then((total) => {
+        useReviewStore.getState().setTotalReviews(total);
+      });
+      resetRefreshFlag();
+    }
+  }, [visible, shouldRefresh, postId, contracts]);
 
 
   const handleRefresh = async () => {
@@ -110,8 +114,10 @@ useEffect(() => {
             restSpeedThreshold: 0.01,
           }}
         >
-          {!isPostOwner && ( 
-            <FloatingActionButton onPress={() => router.push({pathname: "/review/create", params: {postId}})} />
+          {!isPostOwner && !contractsLoading && canReview && (
+            <FloatingActionButton
+              onPress={() => router.push({ pathname: "/review/create", params: { postId } })}
+            />
           )}
           <BottomSheetFlatList
             data={reviews}
