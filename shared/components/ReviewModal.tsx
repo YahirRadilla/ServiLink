@@ -34,15 +34,18 @@ export function ReviewsModal({
   const [showLottie, setShowLottie] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const totalReviews = useReviewStore((state) => state.totalReviews);
+  const shouldRefresh = useReviewStore((state) => state.shouldRefreshReviews);
+  const resetRefreshFlag = useReviewStore((state) => state.resetRefreshFlag);
 
-  useEffect(() => {
-    if (!visible) {
-      getTotalReviewsCountByPostId(postId)
-        .then((total) => {
-          useReviewStore.setState({ totalReviews: total });
-        });
-    }
-  }, [visible]);
+useEffect(() => {
+  if (visible && shouldRefresh) {
+    refresh();
+    getTotalReviewsCountByPostId(postId).then((total) => {
+      useReviewStore.getState().setTotalReviews(total);
+    });
+    resetRefreshFlag();
+  }
+}, [visible, shouldRefresh, postId]);
 
 
   const handleRefresh = async () => {

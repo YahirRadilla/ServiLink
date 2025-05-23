@@ -12,12 +12,16 @@ type ReviewState = {
     clearFeaturedReview: () => void;
     totalReviews: number;
     setTotalReviews: (total: number) => void;
+    shouldRefreshReviews: boolean;
+    resetRefreshFlag: () => void;
+    triggerRefresh: () => void;
 }
 
 export const useReviewStore = create<ReviewState>((set) => ({
     reviews: [],
     featuredReview: null,
     totalReviews: 0,
+    shouldRefreshReviews: false,
 
     setReviews: (reviews: TReview[]) => set({ reviews }),
 
@@ -33,4 +37,8 @@ export const useReviewStore = create<ReviewState>((set) => ({
     clearFeaturedReview: () => set({ featuredReview: null }),
 
     setTotalReviews: (total) => set({ totalReviews: total }),
+
+    
+    triggerRefresh: () => set({ shouldRefreshReviews: true }),
+    resetRefreshFlag: () => set({ shouldRefreshReviews: false }),
 }));

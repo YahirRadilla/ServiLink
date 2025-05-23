@@ -1,5 +1,6 @@
 import { Screen } from "@/components/Screen";
 import { TPost } from "@/entities/posts";
+import { useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
 import { usePosts } from "@/features/posts/usePosts";
 import { useReviews } from "@/features/reviews/useReviews";
@@ -178,10 +179,18 @@ export default function CreateReviewScreen() {
             onPress={handleSubmit(async (data) => {
               const id = await createNewReview(data, postId);
               console.log("Reseña creada con ID:", id);
+              useReviewStore.getState().triggerRefresh();
               if (postId) {
-                router.replace(`/post/${postId}`);
+                router.back();
               }
             })}
+/*            onPress={() => {
+              console.log("Reseña creada con ID:", postId);
+              if (postId) {
+                router.back();
+
+              }
+           }} */
           />
         </View>
       </View>

@@ -89,7 +89,7 @@ export default function Details() {
                     </View>
 
                     <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
-                        <BackButton fallbackToHome />
+                        <BackButton />
                     </View>
 
                     <Image
