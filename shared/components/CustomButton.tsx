@@ -2,7 +2,8 @@ import React from 'react';
 import { Pressable, PressableProps, Text, View } from 'react-native';
 
 interface CustomButtonProps extends PressableProps {
-    label: string;
+    label?: string;
+    icon?: React.ReactNode;
     variant?: 'primary' | 'disabled';
     className?: string;
     loading?: boolean;
@@ -10,6 +11,7 @@ interface CustomButtonProps extends PressableProps {
 
 export function CustomButton({
     label,
+    icon,
     onPress,
     variant = 'primary',
     className,
@@ -18,19 +20,24 @@ export function CustomButton({
 }: CustomButtonProps) {
     const baseStyles = variant === 'disabled' ? 'bg-gray-400' : 'bg-primary-servilink';
 
-
     return (
-        <View className={`overflow-hidden rounded-xl`}>
+        <View className="overflow-hidden rounded-xl">
             <Pressable
-                className={`px-4 py-3 items-center ${baseStyles} ${className}`}
+                className={`px-4 py-3 items-center justify-center ${baseStyles} ${className}`}
                 onPress={onPress}
                 android_ripple={{ color: "#ffffff10" }}
                 disabled={loading || variant === 'disabled'}
                 style={({ pressed }) => [{ opacity: loading ? 0.5 : pressed ? 0.8 : 1, transitionDuration: '200' }]}
                 {...rest}
             >
-                <Text className="text-white text-base font-medium">{loading ? "Cargando..." : label}</Text>
+                {icon ? (
+                    icon
+                ) : (
+                    <Text className="text-white text-base font-medium">
+                        {loading ? 'Cargando...' : label}
+                    </Text>
+                )}
             </Pressable>
         </View>
-    )
+    );
 }

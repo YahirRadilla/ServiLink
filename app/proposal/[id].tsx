@@ -153,27 +153,40 @@ export default function ProposalDetails() {
 
             {proposal.acceptStatus === "pending" &&
 
-                <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-center bg-black/80">
-                    {
-                        ((proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "provider") || (!proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "client")) && (
-                            <View className="flex-1 mr-2">
-                                <CustomButton
-                                    label="Contraofertar"
-                                    className="bg-transparent border border-links-servilink rounded-xl"
-                                    onPress={() => { }}
-                                />
-                            </View>
-                        )
-                    }
 
-                    <View className="flex-1">
-                        <CustomButton
-                            label="Cancelar"
-                            className="bg-red-700 rounded-xl"
-                            onPress={() => { }}
-                        />
-                    </View>
+
+                <View className="absolute bottom-6 right-4 items-end space-y-3">
+
+                    {(
+                        (proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "provider") ||
+                        (!proposal.offers[proposal.offers.length - 1].isClient && user?.profileStatus === "client")
+                    ) && (
+                            <>
+                                <CustomButton
+                                    className="bg-green-600 rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
+                                    onPress={() => { }}
+                                    icon={<Ionicons name="checkmark" size={24} color="white" />}
+                                />
+
+                                <CustomButton
+                                    className="bg-blue-600 rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                    onPress={() => { }}
+                                    icon={<Ionicons name="swap-horizontal" size={24} color="white" />}
+                                />
+                            </>
+                        )}
+
+
+                    <CustomButton
+                        className="bg-red-700 rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                        onPress={() => { }}
+                        icon={<Ionicons name="close" size={24} color="white" />}
+                    />
                 </View>
+
+
+
+
 
             }
 
