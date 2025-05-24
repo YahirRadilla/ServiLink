@@ -7,6 +7,7 @@ import {
     getDoc,
     getDocs,
     limit,
+    onSnapshot,
     orderBy,
     query,
     startAfter,
@@ -96,6 +97,28 @@ export const getProposalById = async (id: string): Promise<TProposal | null> => 
         return null;
     }
 };
+
+
+export const subscribeToProposalById = (
+    id: string,
+    callback: (proposal: TProposal | null) => void
+): (() => void) => {
+    const proposalRef = doc(db, "proposals", id);
+
+    const unsubscribe = onSnapshot(proposalRef, async (docSnap) => {
+        if (!docSnap.exists()) {
+            callback(null);
+            return;
+        }
+
+        const rawData = docSnap.data() as RawProposalData;
+        const proposal = await proposalToEntity(docSnap.id, rawData);
+        callback(proposal);
+    });
+
+    return unsubscribe;
+};
+
 
 
 

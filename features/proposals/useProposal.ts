@@ -1,4 +1,4 @@
-import { TProposal } from "@/entities/proposals";
+/* import { TProposal } from "@/entities/proposals";
 import { useEffect, useState } from "react";
 import { getProposalById } from "./service";
 
@@ -34,4 +34,30 @@ export const useProposalById = (proposalId: string | null) => {
 
 
     return { proposal, loading, error };
-}
+} */
+
+import { TProposal } from "@/entities/proposals";
+import { useEffect, useState } from "react";
+import { subscribeToProposalById } from "./service";
+
+export const useProposalById = (proposalId: string | null) => {
+    const [proposal, setProposal] = useState<TProposal | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!proposalId) return;
+
+        setLoading(true);
+        setError(null);
+
+        const unsubscribe = subscribeToProposalById(proposalId, (data) => {
+            setProposal(data);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [proposalId]);
+
+    return { proposal, loading, error };
+};
