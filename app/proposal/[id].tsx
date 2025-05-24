@@ -5,6 +5,7 @@ import { useProposalById } from "@/features/proposals/useProposal";
 import BackButton from "@/shared/components/BackButton";
 import { ConfirmModal } from "@/shared/components/ConfirmModal";
 import { CustomButton } from "@/shared/components/CustomButton";
+import { FormBottomSheetModal } from "@/shared/components/FormBottomSheetModal";
 import { Gallery } from "@/shared/components/Galery";
 import OfferTimeline from "@/shared/components/OfferTimeline";
 import { PostItemCard } from "@/shared/components/PostItemCard";
@@ -24,8 +25,9 @@ export default function ProposalDetails() {
     const user = useUserStore((state) => state.user);
     const router = useRouter();
     const [modalVisible, setModalVisible] = useState(false);
+    const [formVisible, setFormVisible] = useState(false);
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => { });
-    const mapCustomStyle = [ { "elementType": "geometry", "stylers": [ { "color": "#242f3e" } ] }, { "elementType": "labels.text.fill", "stylers": [ { "color": "#746855" } ] }, { "elementType": "labels.text.stroke", "stylers": [ { "color": "#242f3e" } ] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [ { "color": "#263c3f" } ] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76" } ] }, { "featureType": "road", "elementType": "geometry", "stylers": [ { "color": "#38414e" } ] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#212a37" } ] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [ { "color": "#9ca5b3" } ] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [ { "color": "#746855" } ] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#1f2835" } ] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [ { "color": "#f3d19c" } ] }, { "featureType": "transit", "elementType": "geometry", "stylers": [ { "color": "#2f3948" } ] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "water", "elementType": "geometry", "stylers": [ { "color": "#17263c" } ] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#515c6d" } ] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } ]
+    const mapCustomStyle = [{ "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] }, { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] }, { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#2f3948" }] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }]
 
     const toast = useToastStore((s) => s.toastRef);
     const handleTouchPost = (id: string) => {
@@ -64,6 +66,12 @@ export default function ProposalDetails() {
         } else {
             console.log("No se pudo aceptar la propuesta");
         }
+    };
+
+    const handleCounterOffer = (data: any) => {
+        console.log("Contraoferta enviada:", data);
+        toast?.show("Contraoferta enviada", "success", 2000);
+        setFormVisible(false);
     };
 
     if (loading || !proposal) {
@@ -208,14 +216,15 @@ export default function ProposalDetails() {
                                         setConfirmAction(() => handleAccept);
                                         setModalVisible(true);
                                     }}
-                                    icon={<Ionicons name="checkmark" size={24} color="#8DFAB9"  />}
+                                    icon={<Ionicons name="checkmark" size={24} color="#8DFAB9" />}
                                 />
 
                                 <CustomButton
                                     className="bg-[#163780] rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                                    onPress={() => { }}
+                                    onPress={() => setFormVisible(true)}
                                     icon={<Ionicons name="swap-horizontal" size={24} color="#54BCF1" />}
                                 />
+
                             </>
                         )}
 
@@ -244,7 +253,12 @@ export default function ProposalDetails() {
             }
 
 
-
+            <FormBottomSheetModal
+                title="Contraoferta"
+                visible={formVisible}
+                onClose={() => setFormVisible(false)}
+                onSubmit={handleCounterOffer}
+            />
         </SingleEntityScreen>
     );
 }

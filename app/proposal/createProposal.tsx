@@ -13,7 +13,7 @@ import * as Yup from "yup";
 
 const schema = Yup.object({
     price: Yup.string().required("Campo requerido"),
-    startDate: Yup.date().required("Campo requerido"),
+    startDate: Yup.date().nullable().required('Selecciona una fecha'),
     payMethod: Yup.string().required("Campo requerido"),
     description: Yup.string().required("Campo requerido"),
     referenceImages: Yup.array()
@@ -44,7 +44,7 @@ export default function CreateProposalScreen() {
         resolver: yupResolver(schema),
         defaultValues: {
             price: currentPost?.minPrice.toString(),
-            startDate: new Date(),
+            startDate: undefined,
             payMethod: "",
             description: "",
             referenceImages: [],
@@ -121,7 +121,8 @@ export default function CreateProposalScreen() {
                             type="date"
                             label="Fecha inicio"
                             value={value}
-                            onChangeText={onChange}
+                            onDateChange={onChange}
+                            placeholder="Seleccionar fecha"
                             error={error?.message}
                         />
                     )}
@@ -172,7 +173,7 @@ export default function CreateProposalScreen() {
                     )}
                 />
 
-                {/* 🏡 Inputs de ubicación */}
+
                 <Controller
                     control={control}
                     name="neighborhood"
