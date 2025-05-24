@@ -24,7 +24,7 @@ export function FormBottomSheetModal({ visible, onClose, onSubmit, title, defaul
 }) {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["100%"], []);
-    console.log(defaultValues);
+
     const {
         control,
         handleSubmit,
