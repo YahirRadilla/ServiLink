@@ -9,6 +9,7 @@ import {
     getDoc,
     getDocs,
     limit,
+    onSnapshot,
     orderBy,
     query,
     startAfter,
@@ -86,17 +87,50 @@ export const getContractById = async (id: string): Promise<TContract | null> => 
     }
 };
 
+export const subscribeToContractById = (
+    id: string,
+    onSuccess: (contract: TContract | null) => void,
+    onError: (error: any) => void
+) => {
+    const contractRef = doc(db, "contracts", id);
+
+    const unsubscribe = onSnapshot(
+        contractRef,
+        async (snapshot) => {
+            if (!snapshot.exists()) {
+                onSuccess(null);
+                return;
+            }
+
+            try {
+                const rawData = snapshot.data() as RawContractData;
+                const contract = await contractToEntity(snapshot.id, rawData);
+                onSuccess(contract);
+            } catch (error) {
+                console.error("❌ Error al mapear el contrato:", error);
+                onError(error);
+            }
+        },
+        (error) => {
+            console.error("❌ Error en snapshot del contrato:", error);
+            onError(error);
+        }
+    );
+
+    return unsubscribe;
+};
+
 export const getContractsByPostId = async (postId: string): Promise<TContract[]> => {
-  const postRef = doc(db, "posts", postId);
+    const postRef = doc(db, "posts", postId);
 
-  const q = query(collection(db, "contracts"), where("post_id", "==", postRef));
-  const snapshot = await getDocs(q);
+    const q = query(collection(db, "contracts"), where("post_id", "==", postRef));
+    const snapshot = await getDocs(q);
 
-  const contracts = await Promise.all(
-    snapshot.docs.map((docSnap) =>
-      contractToEntity(docSnap.id, docSnap.data() as RawContractData)
-    )
-  );
+    const contracts = await Promise.all(
+        snapshot.docs.map((docSnap) =>
+            contractToEntity(docSnap.id, docSnap.data() as RawContractData)
+        )
+    );
 
-  return contracts;
+    return contracts;
 };

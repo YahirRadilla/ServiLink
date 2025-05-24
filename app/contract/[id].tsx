@@ -17,7 +17,7 @@ import MapView, { MapMarker } from "react-native-maps";
 export default function ContractDetails() {
     const { id } = useLocalSearchParams();
     const { contract, loading, error, refetch } = useContractById(id as string);
-    const mapCustomStyle = [ { "elementType": "geometry", "stylers": [ { "color": "#242f3e" } ] }, { "elementType": "labels.text.fill", "stylers": [ { "color": "#746855" } ] }, { "elementType": "labels.text.stroke", "stylers": [ { "color": "#242f3e" } ] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [ { "color": "#263c3f" } ] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76" } ] }, { "featureType": "road", "elementType": "geometry", "stylers": [ { "color": "#38414e" } ] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#212a37" } ] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [ { "color": "#9ca5b3" } ] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [ { "color": "#746855" } ] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#1f2835" } ] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [ { "color": "#f3d19c" } ] }, { "featureType": "transit", "elementType": "geometry", "stylers": [ { "color": "#2f3948" } ] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "water", "elementType": "geometry", "stylers": [ { "color": "#17263c" } ] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#515c6d" } ] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } ]
+    const mapCustomStyle = [{ "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] }, { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] }, { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#2f3948" }] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }]
     const user = useUserStore((state) => state.user);
     const router = useRouter();
     const handleTouchPost = (id: string) => {
@@ -153,31 +153,59 @@ export default function ContractDetails() {
                 </View>
             </ScrollView>
 
-            {contract.progressStatus === "pending" &&
+            {contract.progressStatus === "pending" && (
+                <View className="absolute bottom-6 right-4 items-end space-y-3">
+                    {user?.profileStatus === "provider" && (
+                        <>
+                            <CustomButton
+                                className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
+                                onPress={() => {
+                                    // lógica para activar contrato
+                                }}
+                                icon={<Ionicons name="checkmark" size={24} color="#8DFAB9" />}
+                            />
+                            <CustomButton
+                                className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                onPress={() => {
+                                    // lógica para cancelar contrato
+                                }}
+                                icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                            />
+                        </>
+                    )}
 
-                <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-center bg-black/80">
-                    {
-                        ((contract.offers[contract.offers.length - 1].isClient && user?.profileStatus === "provider") || (!contract.offers[contract.offers.length - 1].isClient && user?.profileStatus === "client")) && (
-                            <View className="flex-1 mr-2">
-                                <CustomButton
-                                    label="Contraofertar"
-                                    className="bg-transparent border border-links-servilink rounded-xl"
-                                    onPress={() => { }}
-                                />
-                            </View>
-                        )
-                    }
-
-                    <View className="flex-1">
+                    {user?.profileStatus === "client" && (
                         <CustomButton
-                            label="Cancelar"
-                            className="bg-red-700 rounded-xl"
-                            onPress={() => { }}
+                            className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                            onPress={() => {
+                                // lógica para cancelar contrato
+                            }}
+                            icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
                         />
-                    </View>
+                    )}
                 </View>
+            )}
 
-            }
+            {contract.progressStatus === "active" && user?.profileStatus === "provider" && (
+                <View className="absolute bottom-6 right-4 items-end space-y-3">
+                    <CustomButton
+                        className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
+                        onPress={() => {
+                            // lógica para finalizar contrato
+                        }}
+                        icon={<Ionicons name="checkmark-done" size={24} color="#8DFAB9" />}
+                    />
+                    <CustomButton
+                        className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                        onPress={() => {
+                            // lógica para cancelar contrato
+                        }}
+                        icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                    />
+                </View>
+            )}
+
+
 
 
 

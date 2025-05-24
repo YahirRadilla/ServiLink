@@ -1,8 +1,8 @@
 import { TContract } from "@/entities/contracts";
-import { getContractById, getContractsByPostId } from "@/features/contracts/service";
+import { getContractsByPostId, subscribeToContractById } from "@/features/contracts/service";
 import { useEffect, useState } from "react";
 
-export const useContractById = (id?: string) => {
+/* export const useContractById = (id?: string) => {
     const [contract, setContract] = useState<TContract | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -34,20 +34,56 @@ export const useContractById = (id?: string) => {
         error,
         refetch: fetchContract,
     };
+}; */
+
+export const useContractById = (id?: string) => {
+    const [contract, setContract] = useState<TContract | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!id) return;
+
+        setLoading(true);
+        setError(null);
+
+        const unsubscribe = subscribeToContractById(
+            id,
+            (newContract) => {
+                setContract(newContract);
+                setLoading(false);
+            },
+            (err) => {
+                setError("No se pudo cargar el contrato.");
+                setLoading(false);
+            }
+        );
+
+        return () => unsubscribe();
+    }, [id]);
+
+    return {
+        contract,
+        loading,
+        error,
+        refetch: () => { },
+    };
 };
 
+
+
 export const useContractsByPostId = (postId: string) => {
-  const [contracts, setContracts] = useState<TContract[]>([]);
-  const [loading, setLoading] = useState(true);
+    const [contracts, setContracts] = useState<TContract[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!postId) return;
+    useEffect(() => {
+        if (!postId) return;
 
-    setLoading(true);
-    getContractsByPostId(postId)
-      .then(setContracts)
-      .finally(() => setLoading(false));
-  }, [postId]);
+        setLoading(true);
+        getContractsByPostId(postId)
+            .then(setContracts)
+            .finally(() => setLoading(false));
+    }, [postId]);
 
-  return { contracts, loading };
+    return { contracts, loading };
 };
