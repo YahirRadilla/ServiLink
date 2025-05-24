@@ -13,6 +13,7 @@ import {
     orderBy,
     query,
     startAfter,
+    updateDoc,
     where,
 } from "firebase/firestore";
 
@@ -133,4 +134,19 @@ export const getContractsByPostId = async (postId: string): Promise<TContract[]>
     );
 
     return contracts;
+};
+
+export const manageStatusContract = async (contractId: string, type: "active" | "cancelled" | "finished" | "pending"): Promise<boolean> => {
+    try {
+        const contractRef = doc(db, "contracts", contractId);
+
+        await updateDoc(contractRef, {
+            progress_status: type,
+        });
+
+        return true;
+    } catch (error) {
+        console.error("❌ Error al cancelar contrato:", error);
+        return false;
+    }
 };

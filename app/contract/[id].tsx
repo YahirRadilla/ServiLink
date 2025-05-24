@@ -1,16 +1,20 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { useUserStore } from "@/entities/users";
+import { manageStatusContract } from "@/features/contracts/service";
 import { useContractById } from "@/features/contracts/useContractById";
 import BackButton from "@/shared/components/BackButton";
+import { ConfirmModal } from "@/shared/components/ConfirmModal";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Gallery } from "@/shared/components/Galery";
 import OfferTimeline from "@/shared/components/OfferTimeline";
 import { PostItemCard } from "@/shared/components/PostItemCard";
 import { StatusChip, StatusType } from "@/shared/components/StatusChip";
 import { UserContact } from "@/shared/components/UserContact";
+import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
+import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import MapView, { MapMarker } from "react-native-maps";
 
@@ -20,12 +24,42 @@ export default function ContractDetails() {
     const mapCustomStyle = [{ "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] }, { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] }, { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#2f3948" }] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }]
     const user = useUserStore((state) => state.user);
     const router = useRouter();
+    const toast = useToastStore((s) => s.toastRef);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => { });
     const handleTouchPost = (id: string) => {
         if (!id) return;
         router.push({
             pathname: "/post/[id]",
             params: { id },
         });
+    };
+
+
+    const handleCancelContract = async () => {
+        if (!contract) return;
+
+        const success = await manageStatusContract(contract.id, "cancelled");
+        if (success) {
+            setModalVisible(false);
+            toast?.show("Contrato cancelado", "success", 2000);
+            console.log("Contrato cancelado");
+        } else {
+            console.log("No se pudo cancelar el contrato");
+        }
+    };
+
+    const handleActiveContract = async () => {
+        if (!contract) return;
+
+        const success = await manageStatusContract(contract.id, "active");
+        if (success) {
+            setModalVisible(false);
+            toast?.show("Contrato activado", "success", 2000);
+            console.log("Contrato activado");
+        } else {
+            console.log("No se pudo activar el contrato");
+        }
     };
 
     if (loading || !contract) {
@@ -160,7 +194,8 @@ export default function ContractDetails() {
                             <CustomButton
                                 className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
                                 onPress={() => {
-                                    // lógica para activar contrato
+                                    setConfirmAction(() => handleActiveContract);
+                                    setModalVisible(true);
                                 }}
                                 icon={<Ionicons name="checkmark" size={24} color="#8DFAB9" />}
                             />
@@ -168,6 +203,8 @@ export default function ContractDetails() {
                                 className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
                                 onPress={() => {
                                     // lógica para cancelar contrato
+                                    setConfirmAction(() => handleCancelContract);
+                                    setModalVisible(true);
                                 }}
                                 icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
                             />
@@ -179,6 +216,8 @@ export default function ContractDetails() {
                             className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
                             onPress={() => {
                                 // lógica para cancelar contrato
+                                setConfirmAction(() => handleCancelContract);
+                                setModalVisible(true);
                             }}
                             icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
                         />
@@ -199,6 +238,8 @@ export default function ContractDetails() {
                         className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
                         onPress={() => {
                             // lógica para cancelar contrato
+                            setConfirmAction(() => handleCancelContract);
+                            setModalVisible(true);
                         }}
                         icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
                     />
@@ -207,7 +248,13 @@ export default function ContractDetails() {
 
 
 
-
+            <ConfirmModal
+                isVisible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onConfirm={() => {
+                    confirmAction();
+                }}
+            />
 
         </SingleEntityScreen>
     );
