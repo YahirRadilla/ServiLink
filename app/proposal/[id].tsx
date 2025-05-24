@@ -1,6 +1,6 @@
 import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { useUserStore } from "@/entities/users";
-import { acceptProposalAndCreateContract, rejectProposal } from "@/features/proposals/service";
+import { acceptProposalAndCreateContract, addCounterOffer, rejectProposal } from "@/features/proposals/service";
 import { useProposalById } from "@/features/proposals/useProposal";
 import BackButton from "@/shared/components/BackButton";
 import { ConfirmModal } from "@/shared/components/ConfirmModal";
@@ -68,10 +68,22 @@ export default function ProposalDetails() {
         }
     };
 
-    const handleCounterOffer = (data: any) => {
-        console.log("Contraoferta enviada:", data);
-        toast?.show("Contraoferta enviada", "success", 2000);
-        setFormVisible(false);
+    const handleCounterOffer = async (data: any) => {
+        if (!proposal) return;
+
+        const success = await addCounterOffer(proposal.id, {
+            price: data.price,
+            time: new Date(),
+            isClient: user?.profileStatus === "client",
+        }, data.startDate);
+
+        if (success) {
+            setFormVisible(false);
+            toast?.show("Contraoferta enviada", "success", 2000);
+            console.log("Contraoferta enviada");
+        } else {
+            toast?.show("No se pudo enviar la contraoferta", "error", 2000);
+        }
     };
 
     if (loading || !proposal) {
@@ -258,6 +270,7 @@ export default function ProposalDetails() {
                 visible={formVisible}
                 onClose={() => setFormVisible(false)}
                 onSubmit={handleCounterOffer}
+                defaultValues={{ price: proposal.offers[proposal.offers.length - 1].price, startDate: proposal.startDate.toDate() }}
             />
         </SingleEntityScreen>
     );

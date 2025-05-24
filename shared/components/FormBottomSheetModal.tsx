@@ -8,19 +8,23 @@ import { Text, View } from "react-native";
 import * as Yup from "yup";
 
 const schema = Yup.object({
-    price: Yup.number().required("Campo requerido"),
+    price: Yup.string().required("Campo requerido"),
     startDate: Yup.date().nullable().required('Selecciona una fecha'),
 });
 
-export function FormBottomSheetModal({ visible, onClose, onSubmit, title }: {
+export function FormBottomSheetModal({ visible, onClose, onSubmit, title, defaultValues }: {
     visible: boolean;
     onClose: () => void;
     onSubmit: (data: any) => void;
     title: string;
+    defaultValues: {
+        price: number;
+        startDate: Date;
+    };
 }) {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["100%"], []);
-
+    console.log(defaultValues);
     const {
         control,
         handleSubmit,
@@ -28,8 +32,8 @@ export function FormBottomSheetModal({ visible, onClose, onSubmit, title }: {
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            price: undefined,
-            startDate: undefined,
+            price: defaultValues.price.toString(),
+            startDate: defaultValues.startDate || undefined,
         },
     });
 

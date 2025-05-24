@@ -214,3 +214,48 @@ export const acceptProposalAndCreateContract = async (
         return false;
     }
 };
+
+
+export const addCounterOffer = async (
+    proposalId: string,
+    newOffer: {
+        price: number;
+        time: Date;
+        isClient: boolean;
+    },
+    newStartDate: Date
+): Promise<boolean> => {
+    try {
+        const proposalRef = doc(db, "proposals", proposalId);
+        const proposalSnap = await getDoc(proposalRef);
+
+        if (!proposalSnap.exists()) throw new Error("Propuesta no encontrada");
+
+        const proposalData = proposalSnap.data();
+
+        const updatedOffers = [...proposalData.offers];
+
+        if (updatedOffers.length > 0) {
+            // Desactivar la última oferta
+            updatedOffers[updatedOffers.length - 1].active = false;
+        }
+
+        // Agregar la nueva oferta
+        updatedOffers.push({
+            ...newOffer,
+            active: true,
+            time: Timestamp.fromDate(newOffer.time),
+        });
+
+        await updateDoc(proposalRef, {
+            offers: updatedOffers,
+            start_date: Timestamp.fromDate(newStartDate),
+        });
+
+        return true;
+    } catch (error) {
+        console.error("❌ Error al agregar contraoferta y actualizar fecha:", error);
+        return false;
+    }
+};
+
