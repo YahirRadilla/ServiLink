@@ -9,11 +9,11 @@ const InboxScreen = () => {
     const { conversations } = useInbox();
     const router = useRouter();
 
-    const handleTouchConversation = (id: string) => {
-        if (!id) return;
+    const handleTouchConversation = (item: TConversationEntity) => {
+        if (!item.id) return;
         router.push({
             pathname: "/inbox/[id]",
-            params: { id },
+            params: { id: item.id, conversationReceiver: item.userRef.id },
         });
     };
 
@@ -22,7 +22,7 @@ const InboxScreen = () => {
         return (
             <View className="overflow-hidden">
                 <Pressable
-                    onPress={() => handleTouchConversation(item.id)}
+                    onPress={() => handleTouchConversation(item)}
                     className="flex-row items-center gap-4 px-4 py-3"
                     android_ripple={{
                         color: "#ffffff10",
