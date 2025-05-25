@@ -1,25 +1,16 @@
-import { emptyConversation, TConversation } from "../conversations/index";
-import { emptyUser, TUser } from "../users/index";
+import { DocumentReference, Timestamp } from "firebase/firestore";
+
 
 export type TTypeMessage = 'text' | 'image' | 'video';
 
 export type TMessage = {
-  id: string
-  sender: TUser
-  conversation: TConversation
-  type: TTypeMessage
-  content: any
-  seen: boolean
-  date: Date
+  id: string;
+  senderId: DocumentReference;
+  conversationId: DocumentReference;
+  type: "image" | "text" | "video";
+  content: string;
+  seen: boolean;
+  date: Timestamp;
 };
 
-export const emptyMessage: TMessage = {
-  id: '',
-  sender: emptyUser,
-  conversation: emptyConversation,
-  type: 'text',
-  content: '',
-  seen: false,
-  date: new Date(),
-}
 

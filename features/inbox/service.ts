@@ -1,4 +1,6 @@
+import { TConversationEntity } from "@/entities/conversations";
 import { db } from "@/lib/firebaseConfig";
+import { conversationToEntity } from "@/mappers/conversationToEntity";
 import {
     addDoc,
     collection,
@@ -11,24 +13,28 @@ import {
     updateDoc,
     where
 } from "firebase/firestore";
-import { TConversation, TMessage } from "./types";
+import { TMessage } from "./types";
 
 // Obtiene las conversaciones donde participa un usuario
 export const listenUserConversations = (
-    userRef: any,
-    callback: (data: TConversation[]) => void
+    userId: string,
+    profileStatus: string,
+    callback: (data: TConversationEntity[]) => void
 ) => {
+    const userRef = doc(db, "users", userId);
+
     const q = query(
         collection(db, "conversations"),
-        where("client_id", "==", userRef) // o where("provider_id", "==", userRef)
+        where(profileStatus === "client" ? "client_id" : "provider_id", "==", userRef)
     );
 
-    return onSnapshot(q, (snap) => {
-        const result = snap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        })) as TConversation[];
-        callback(result);
+    return onSnapshot(q, async (snap) => {
+        const promises = snap.docs.map((docSnap) =>
+            conversationToEntity(docSnap, userId)
+        );
+
+        const enriched = await Promise.all(promises);
+        callback(enriched);
     });
 };
 

@@ -1,18 +1,10 @@
-import { TProvider, emptyProvider } from '../providers/index'
-import { TUser, emptyUser } from '../users/index'
 
-export type TConversation = {
-    id: string
-    client: TUser
-    provider: TProvider
-    lastMessage: string
-    date: Date
-}
+import { TUser } from "@/entities/users";
+import { DocumentReference } from "firebase/firestore";
 
-export const emptyConversation: TConversation = {
-    id: '',
-    client: emptyUser,
-    provider: emptyProvider,
-    lastMessage: '',
-    date: new Date(),
-}
+export type TConversationEntity = {
+    id: string;
+    lastMessage: string;
+    userRef: DocumentReference;
+    user: TUser;
+};
