@@ -1,6 +1,6 @@
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
-import { updateUserFields } from "@/features/users/services";
+import { deleteProfileImage, updateUserFields, uploadProfileImage } from "@/features/users/services";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Ionicons } from "@expo/vector-icons";
@@ -66,7 +66,8 @@ export default function UpdateProfileScreen() {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: "images",
-      allowsEditing: true,
+      allowsMultipleSelection: false,
+      selectionLimit: 1,
       aspect: [1, 1],
       quality: 1,
     });
@@ -94,32 +95,57 @@ export default function UpdateProfileScreen() {
 
   const onUpdate = async (data: any) => {
     if (!user?.id) return Alert.alert("Error", "No se encontró el usuario");
-    const formatted = {
-      ...data,
-      birthDate: data.birthDate.toISOString(),
-    };
 
     try {
+      const previousImageUrl = user.imageProfile;
+      let imageUrl = previousImageUrl;
+
+      const isNewImage =
+        profileImage &&
+        profileImage !== previousImageUrl &&
+        !profileImage.startsWith("https://");
+
+      const isImageRemoved = !profileImage && !!previousImageUrl;
+
+      // Caso: se subió nueva imagen
+      if (isNewImage) {
+        console.log("🆕 Nueva imagen seleccionada:", profileImage);
+        imageUrl = await uploadProfileImage(profileImage, user.id);
+      }
+
       const payload = {
         name: data.name,
         lastname: data.lastName,
         email: data.email,
         phone_number: data.phone,
         birth_date: data.birthDate,
-        image_profile: profileImage,
+        image_profile: isImageRemoved ? "" : imageUrl,
         address: {
           neighborhood: data.neighborhood,
           streetAddress: data.streetAddress,
           zipCode: data.zipCode,
         },
       };
+
       await updateUserFields(user.id, payload);
+
+      // Eliminar imagen si fue reemplazada o borrada
+      if (
+        previousImageUrl &&
+        previousImageUrl.startsWith("https://") &&
+        (isNewImage || isImageRemoved)
+      ) {
+        console.log("🗑 Eliminando imagen anterior del storage...");
+        await deleteProfileImage(previousImageUrl);
+      }
+
       Alert.alert("Perfil actualizado");
     } catch (error) {
       console.error("Error al actualizar el perfil:", error);
       Alert.alert("Error", "No se pudo actualizar el perfil");
     }
   };
+
 
   return (
     <Screen>
