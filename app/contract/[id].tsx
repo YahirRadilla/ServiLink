@@ -173,6 +173,7 @@ export default function ContractDetails() {
                         <View className="mb-8 pb-16">
                             <Text className="font-semibold text-lg text-white pb-2">Publicación</Text>
                             <PostItemCard
+                                postId={contract.post.id}
                                 onPress={() => handleTouchPost(contract.post.id)}
                                 image={contract.post.images[0]}
                                 title={contract.post.title}

@@ -1,19 +1,23 @@
+import { listenToAverageReviewRating } from "@/features/reviews/service";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import SaveButton from "./SavedButton";
 
 type PostItemCardProps = {
   onPress: () => void;
+  postId: string;
   image: string;
   title: string;
   neighborhood: string;
   provider: string;
   service: string;
-  rate: number;
+  rate?: number;
 };
 
 export function PostItemCard({
   onPress,
+  postId,
   image,
   title,
   neighborhood,
@@ -21,13 +25,32 @@ export function PostItemCard({
   service,
   rate,
 }: PostItemCardProps) {
+
+  const [averageRating, setAverageRating] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = listenToAverageReviewRating(postId, (avg) => {
+      setAverageRating(avg);
+    });
+
+    return () => unsubscribe();
+  }, [postId]);
+
   const renderStars = () => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
+      const diff = averageRating - i;
+      let iconName: "star" | "star-half" | "star-outline" = "star-outline";
+      if (diff >= 1) {
+        iconName = "star";
+      } else if (diff >= 0.4) {
+        iconName = "star-half";
+      }
+
       stars.push(
         <Ionicons
-          key={i}
-          name={i < rate ? "star" : "star-outline"}
+          key={`star-${postId}-${i}`}
+          name={iconName}
           size={16}
           color="#FB9400"
         />

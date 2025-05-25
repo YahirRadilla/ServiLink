@@ -197,6 +197,7 @@ export default function ProposalDetails() {
                         <View className="mb-8 pb-16">
                             <Text className="font-semibold text-lg text-white pb-2">Publicación</Text>
                             <PostItemCard
+                                postId={proposal.post.id}
                                 onPress={() => handleTouchPost(proposal.post.id)}
                                 image={proposal.post.images[0]}
                                 title={proposal.post.title}

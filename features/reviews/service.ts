@@ -58,6 +58,25 @@ export const getPaginatedReviewsByPostId = async (
   }
 };
 
+export const listenToAverageReviewRating = (
+  postId: string,
+  onUpdate: (avg: number) => void
+) => {
+  const q = query(
+    collection(db, "reviews"),
+    where("post_id", "==", doc(db, "posts", postId))
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const docs = snapshot.docs.map((doc) => doc.data());
+    const total = docs.length;
+    if (total === 0) return onUpdate(0);
+
+    const sum = docs.reduce((acc, review) => acc + review.valoration, 0);
+    onUpdate(sum / total);
+  });
+};
+
 export const getFeaturedReviewByPostId = async (
     postId: string,
 ): Promise<TReview | null> => {

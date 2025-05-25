@@ -129,13 +129,14 @@ export default function Index() {
                         useNativeDriver
                     >
                         <PostItemCard
+                            postId={item.id}
                             onPress={() => handleTouchPost(item.id)}
                             image={item.images[0]}
                             title={item.title}
                             neighborhood={item.address.neighborhood}
                             provider={item.provider.name}
                             service={item.service}
-                            rate={item.valoration}
+                            rate={item.valoration ? item.valoration : 0}
                         />
                     </Animatable.View>
 

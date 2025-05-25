@@ -63,6 +63,7 @@ export const PostsTab = () => {
                         useNativeDriver
                     >
                         <PostItemCard
+                            postId={item.id}
                             onPress={() => handleTouchPost(item.id)}
                             image={item.images[0]}
                             title={item.title}
