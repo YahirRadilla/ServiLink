@@ -1,43 +1,52 @@
 import { Screen } from "@/components/Screen";
 import { TConversationEntity } from "@/entities/conversations";
 import { useInbox } from "@/features/inbox/useInbox";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 
 
 const InboxScreen = () => {
     const { conversations } = useInbox();
-    const navigation = useNavigation();
+    const router = useRouter();
+
+    const handleTouchConversation = (id: string) => {
+        if (!id) return;
+        router.push({
+            pathname: "/inbox/[id]",
+            params: { id },
+        });
+    };
 
     const renderItem = ({ item }: { item: TConversationEntity }) => {
 
         return (
-            <Pressable
-                onPress={() => { }}
-                className="flex-row items-center gap-4 px-4 py-3"
-                android_ripple={{
-                    color: "#ffffff10",
-                    borderless: false,
-                }}
-            >
-                <Image
-                    source={{
-                        uri:
-                            item.user.imageProfile ||
-                            "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
+            <View className="overflow-hidden">
+                <Pressable
+                    onPress={() => handleTouchConversation(item.id)}
+                    className="flex-row items-center gap-4 px-4 py-3"
+                    android_ripple={{
+                        color: "#ffffff10",
+                        borderless: false,
                     }}
-                    className="w-12 h-12 rounded-full"
-                />
-                <View>
-                    <Text className="font-semibold text-lg text-white">
-                        {item.user.name}
-                    </Text>
-                    <Text className="text-gray-400 max-w-[220px]" numberOfLines={1}>
-                        {item.lastMessage}
-                    </Text>
-                </View>
-            </Pressable>
-
+                >
+                    <Image
+                        source={{
+                            uri:
+                                item.user.imageProfile ||
+                                "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
+                        }}
+                        className="w-12 h-12 rounded-full"
+                    />
+                    <View>
+                        <Text className="font-semibold text-lg text-white">
+                            {item.user.name}
+                        </Text>
+                        <Text className="text-gray-400 max-w-[220px]" numberOfLines={1}>
+                            {item.lastMessage}
+                        </Text>
+                    </View>
+                </Pressable>
+            </View>
 
 
         );
