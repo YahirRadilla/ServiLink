@@ -107,16 +107,21 @@ export function ReviewsModal({
 
 
   const handleRefresh = async () => {
+
     Animated.timing(fadeAnim, {
       toValue: 0,
       duration: 150,
       useNativeDriver: true,
-    }).start(() => {
+    }).start();
+
+
+    setTimeout(() => {
       setShowLottie(true);
-    });
+    }, 150);
+
 
     await refresh();
-    setLocalReviews(usePaginatedReviewsByPostId(postId).reviews);
+
     setTimeout(() => {
       setShowLottie(false);
       Animated.timing(fadeAnim, {
@@ -126,6 +131,11 @@ export function ReviewsModal({
       }).start();
     }, 500);
   };
+
+
+  useEffect(() => {
+    setLocalReviews(reviews);
+  }, [reviews]);
 
   useEffect(() => {
     if (onRef) {
@@ -196,8 +206,8 @@ export function ReviewsModal({
                   </Text>
                 </View>
                 <View className="flex-row items-center gap-x-3">
-                  <Pressable onPress={handleRefresh} 
-                  className={"bg-black/20 p-2 rounded-full"}>
+                  <Pressable onPress={handleRefresh}
+                    className={"bg-black/20 p-2 rounded-full"}>
                     {(showLottie || isRefreshing) ? (
                       <LottieView
                         source={require("../../assets/animations/refresh.json")}
