@@ -117,19 +117,6 @@ export default function Index() {
                                 <Ionicons name="filter" size={16} color="#ccc" />
                                 <Text className="ml-2 text-white">Filtros</Text>
                             </Pressable>
-
-                            <FilterPanelModal
-                                visible={filtersVisible}
-                                onClose={() => setFiltersVisible(false)}
-                                filters={filtersData}
-                                selected={selectedFilters}
-                                onApply={(newFilters) => {
-                                    setSelectedFilters(newFilters as any);
-                                    setFilters(newFilters);
-                                    applyFilters(newFilters, searchTerm);
-                                    setFiltersVisible(false);
-                                }}
-                            />
                         </View>
                     </>
                 }
@@ -185,6 +172,17 @@ export default function Index() {
                 }
 
 
+            />
+            <FilterPanelModal
+                visible={filtersVisible}
+                onClose={() => setFiltersVisible(false)}
+                filters={filtersData}
+                selected={selectedFilters}
+                onApply={(newFilters) => {
+                    setSelectedFilters(newFilters as any);
+                    setFilters(newFilters);
+                    applyFilters(newFilters, searchTerm);
+                }}
             />
         </Screen>
     );
