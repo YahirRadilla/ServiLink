@@ -5,9 +5,9 @@ import { useMessages } from "@/features/inbox/useMessage";
 import { db } from "@/lib/firebaseConfig";
 import BackButton from "@/shared/components/BackButton";
 import ChatInput from "@/shared/components/ChatInput";
+import VideoModalPlayer from "@/shared/components/VideoModalPlayer";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
-import { ResizeMode, Video } from "expo-av";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { doc } from "firebase/firestore";
 import LottieView from "lottie-react-native";
@@ -25,24 +25,33 @@ import {
 } from "react-native";
 import EnhancedImageViewing from "react-native-image-viewing";
 
-
-
 const ChatScreen = () => {
     const user = useUserStore((state) => state.user);
     const { id: conversationId, conversationReceiver } = useLocalSearchParams();
     const { messages } = useMessages(conversationId as string);
     const [userReceiver, setUserReceiver] = useState<TUser | null>(null);
     const [viewerVisible, setViewerVisible] = useState(false);
-    const [mediaToView, setMediaToView] = useState<{ uri: string; type: "image" | "video" } | null>(null);
-
+    const [mediaToView, setMediaToView] = useState<{
+        uri: string;
+        type: "image" | "video";
+    } | null>(null);
 
     useEffect(() => {
-        if (!conversationReceiver) return
-        const conversationReceiverRef = doc(db, "users", conversationReceiver as string);
-        getUserByRef(conversationReceiverRef).then((user) => setUserReceiver(user));
+        if (!conversationReceiver) return;
+        const conversationReceiverRef = doc(
+            db,
+            "users",
+            conversationReceiver as string
+        );
+        getUserByRef(conversationReceiverRef).then((user) =>
+            setUserReceiver(user)
+        );
     }, []);
 
-    const handleSend = async (content: string, type: "text" | "image" | "video") => {
+    const handleSend = async (
+        content: string,
+        type: "text" | "image" | "video"
+    ) => {
         if (!content.trim()) return;
 
         await sendMessage({
@@ -53,7 +62,6 @@ const ChatScreen = () => {
             conversation_id: doc(db, "conversations", conversationId as string),
         });
     };
-
 
     const renderItem = ({ item }: any) => {
         const isOwn = item.sender_id.id === user!.id;
@@ -72,16 +80,15 @@ const ChatScreen = () => {
                 className={`max-w-[80%] rounded-xl px-4 py-2 my-1 ${messageStyle}`}
             >
                 {item.type === "image" && (
-                    <Image source={{ uri: item.content }} className="w-52 h-52 rounded-2xl" />
-                )}
-                {item.type === "video" && (
-                    <Video
+                    <Image
                         source={{ uri: item.content }}
                         className="w-52 h-52 rounded-2xl"
-                        useNativeControls
-                        resizeMode={ResizeMode.COVER}
-                        isLooping
                     />
+                )}
+                {item.type === "video" && (
+                    <View className="w-52 h-52 bg-black/20 rounded-2xl justify-center items-center">
+                        <Ionicons name="play-circle-outline" size={48} color="white" />
+                    </View>
                 )}
                 {item.type === "text" && (
                     <Text className="text-sm text-white">{item.content}</Text>
@@ -92,7 +99,6 @@ const ChatScreen = () => {
             </Pressable>
         );
     };
-
 
     if (!userReceiver) {
         return (
@@ -105,9 +111,7 @@ const ChatScreen = () => {
                         loop
                         style={{ width: 120, height: 120 }}
                     />
-                    <Text className="text-white/60 mt-4 text-base">
-                        Cargando Chat...
-                    </Text>
+                    <Text className="text-white/60 mt-4 text-base">Cargando Chat...</Text>
                 </View>
             </SingleEntityScreen>
         );
@@ -115,18 +119,31 @@ const ChatScreen = () => {
 
     return (
         <SingleEntityScreen>
-
             <Stack.Screen options={{ headerShown: false }} />
             <View className="flex-row items-center justify-between w-full p-4">
                 <View className="flex-row items-center">
                     <View className="bg-black/50 p-2 rounded-full mr-2">
                         <BackButton />
                     </View>
-                    <Image source={{ uri: userReceiver?.imageProfile || "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01" }} className="w-10 h-10 rounded-full mr-2" />
-                    <Text numberOfLines={2} style={{ maxWidth: "70%" }} ellipsizeMode="tail" className="font-semibold text-lg text-white">{userReceiver?.name} {userReceiver?.lastname} </Text>
+                    <Image
+                        source={{
+                            uri:
+                                userReceiver?.imageProfile ||
+                                "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
+                        }}
+                        className="w-10 h-10 rounded-full mr-2"
+                    />
+                    <Text
+                        numberOfLines={2}
+                        style={{ maxWidth: "70%" }}
+                        ellipsizeMode="tail"
+                        className="font-semibold text-lg text-white"
+                    >
+                        {userReceiver?.name} {userReceiver?.lastname}
+                    </Text>
                 </View>
-
             </View>
+
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
@@ -141,15 +158,14 @@ const ChatScreen = () => {
                         contentContainerStyle={{ padding: 12, flexGrow: 1 }}
                         keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
-
                     />
                 </TouchableWithoutFeedback>
                 <View className="mb-3">
                     <ChatInput onSend={handleSend} />
-
                 </View>
             </KeyboardAvoidingView>
-            {viewerVisible && mediaToView && mediaToView.type === "image" && (
+
+            {viewerVisible && mediaToView?.type === "image" && (
                 <EnhancedImageViewing
                     images={[{ uri: mediaToView.uri }]}
                     imageIndex={0}
@@ -160,19 +176,15 @@ const ChatScreen = () => {
 
             {viewerVisible && mediaToView?.type === "video" && (
                 <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/95 justify-center items-center z-50">
-                    <Video
-                        source={{ uri: mediaToView.uri }}
-                        useNativeControls
-                        resizeMode={ResizeMode.COVER}
-                        style={{ width: "100%", height: "60%" }}
-                        shouldPlay
-                    />
-                    <Pressable onPress={() => setViewerVisible(false)} className="absolute top-8 right-6">
+                    <VideoModalPlayer uri={mediaToView.uri} />
+                    <Pressable
+                        onPress={() => setViewerVisible(false)}
+                        className="absolute top-8 right-6"
+                    >
                         <Ionicons name="close" size={30} color="white" />
                     </Pressable>
                 </View>
             )}
-
         </SingleEntityScreen>
     );
 };

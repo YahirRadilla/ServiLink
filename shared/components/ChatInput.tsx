@@ -1,10 +1,15 @@
 import { uploadFileToStorage } from "@/features/inbox/uploadFileToStorage";
 import { Ionicons } from "@expo/vector-icons";
-import { ResizeMode, Video } from 'expo-av';
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
-import { Image, Pressable, ScrollView, TextInput, View } from "react-native";
-
+import {
+    Image,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 
 interface ChatInputProps {
     onSend: (content: string, type: "text" | "image" | "video") => void;
@@ -12,15 +17,17 @@ interface ChatInputProps {
 
 const ChatInput = ({ onSend }: ChatInputProps) => {
     const [message, setMessage] = useState("");
-    const [images, setImages] = useState<string[]>([]);
-    const [media, setMedia] = useState<{ uri: string; type: 'image' | 'video' }[]>([]);
-
-
+    const [media, setMedia] = useState<
+        { uri: string; type: "image" | "video" }[]
+    >([]);
 
     const handleSend = async () => {
         if (media.length > 0) {
             for (const item of media) {
-                const url = await uploadFileToStorage(item.uri, item.type === "image" ? "chat-images" : "chat-videos");
+                const url = await uploadFileToStorage(
+                    item.uri,
+                    item.type === "image" ? "chat-images" : "chat-videos"
+                );
                 onSend(url, item.type);
             }
             setMedia([]);
@@ -32,17 +39,13 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         }
     };
 
-
-
     const removeMedia = (uri: string) => {
         setMedia((prev) => prev.filter((item) => item.uri !== uri));
     };
 
-
-
     const pickMedia = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images', 'videos'],
+            mediaTypes: ["images", "videos"],
             allowsMultipleSelection: true,
             quality: 1,
         });
@@ -50,38 +53,36 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         if (!result.canceled && result.assets) {
             const selectedMedia = result.assets.map((asset) => ({
                 uri: asset.uri,
-                type: asset.type as 'image' | 'video',
+                type: asset.type as "image" | "video",
             }));
             setMedia((prev) => [...prev, ...selectedMedia]);
         }
     };
 
-
-
-
     return (
         <View className="px-3 pt-2 pb-3 bg-[#0F0F1A] border-t border-white/10">
-            {/* Preview de imágenes */}
+            {/* Previews */}
             {media.length > 0 && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2">
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    className="mb-2"
+                >
                     {media.map((item) => (
                         <View key={item.uri} className="relative mr-2">
-                            {item.type === 'image' ? (
+                            {item.type === "image" ? (
                                 <Image
                                     source={{ uri: item.uri }}
                                     className="w-20 h-20 rounded-lg"
                                     resizeMode="cover"
                                 />
                             ) : (
-                                <Video
-                                    source={{ uri: item.uri }}
-                                    className="w-20 h-20 rounded-lg"
-                                    resizeMode={ResizeMode.COVER}
-                                    useNativeControls={false}
-                                    isLooping
-                                    shouldPlay={true}
-                                />
+                                <View className="w-20 h-20 rounded-lg bg-black/40 justify-center items-center">
+                                    <Ionicons name="videocam-outline" size={28} color="white" />
+                                    <Text className="text-white text-xs mt-1">Video</Text>
+                                </View>
                             )}
+
                             <Pressable
                                 onPress={() => removeMedia(item.uri)}
                                 className="absolute -top-2 -right-2 bg-black/70 rounded-full p-1"
@@ -93,11 +94,12 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
                 </ScrollView>
             )}
 
-
-
-            {/* Input de mensaje + acciones */}
+            {/* Input + acciones */}
             <View className="flex-row items-center justify-between bg-[#131323] rounded-2xl border border-[#3D5DC7] px-4 py-3">
-                <Pressable onPress={pickMedia} android_ripple={{ color: "#ffffff10", borderless: true, radius: 20 }}>
+                <Pressable
+                    onPress={pickMedia}
+                    android_ripple={{ color: "#ffffff10", borderless: true, radius: 20 }}
+                >
                     <Ionicons name="image-outline" size={24} color="#FFF" />
                 </Pressable>
 
@@ -112,7 +114,11 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
 
                 <Pressable
                     onPress={handleSend}
-                    android_ripple={{ color: "#ffffff10", borderless: false, radius: 20 }}
+                    android_ripple={{
+                        color: "#ffffff10",
+                        borderless: false,
+                        radius: 20,
+                    }}
                 >
                     <Ionicons name="send" size={22} color="#FFF" />
                 </Pressable>
