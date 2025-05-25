@@ -5,7 +5,9 @@ import { useMessages } from "@/features/inbox/useMessage";
 import { db } from "@/lib/firebaseConfig";
 import BackButton from "@/shared/components/BackButton";
 import ChatInput from "@/shared/components/ChatInput";
+import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
+import { ResizeMode, Video } from "expo-av";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { doc } from "firebase/firestore";
 import LottieView from "lottie-react-native";
@@ -16,17 +18,22 @@ import {
     Keyboard,
     KeyboardAvoidingView,
     Platform,
+    Pressable,
     Text,
     TouchableWithoutFeedback,
     View,
 } from "react-native";
+import EnhancedImageViewing from "react-native-image-viewing";
+
+
 
 const ChatScreen = () => {
     const user = useUserStore((state) => state.user);
     const { id: conversationId, conversationReceiver } = useLocalSearchParams();
     const { messages } = useMessages(conversationId as string);
     const [userReceiver, setUserReceiver] = useState<TUser | null>(null);
-
+    const [viewerVisible, setViewerVisible] = useState(false);
+    const [mediaToView, setMediaToView] = useState<{ uri: string; type: "image" | "video" } | null>(null);
 
 
     useEffect(() => {
@@ -35,17 +42,18 @@ const ChatScreen = () => {
         getUserByRef(conversationReceiverRef).then((user) => setUserReceiver(user));
     }, []);
 
-    const handleSend = async (message: string) => {
-        if (!message.trim()) return;
+    const handleSend = async (content: string, type: "text" | "image" | "video") => {
+        if (!content.trim()) return;
 
         await sendMessage({
-            content: message,
-            type: "text",
+            content,
+            type,
             seen: false,
             sender_id: doc(db, "users", user!.id),
             conversation_id: doc(db, "conversations", conversationId as string),
         });
     };
+
 
     const renderItem = ({ item }: any) => {
         const isOwn = item.sender_id.id === user!.id;
@@ -54,18 +62,37 @@ const ChatScreen = () => {
             : "bg-[#1A1A2F] mr-auto border border-gray-600 rounded-tl-none";
 
         return (
-            <View className={`max-w-[80%] rounded-xl px-4 py-2 my-1 ${messageStyle}`}>
-                {item.type === "image" ? (
+            <Pressable
+                onPress={() => {
+                    if (item.type === "image" || item.type === "video") {
+                        setMediaToView({ uri: item.content, type: item.type });
+                        setViewerVisible(true);
+                    }
+                }}
+                className={`max-w-[80%] rounded-xl px-4 py-2 my-1 ${messageStyle}`}
+            >
+                {item.type === "image" && (
                     <Image source={{ uri: item.content }} className="w-52 h-52 rounded-2xl" />
-                ) : (
+                )}
+                {item.type === "video" && (
+                    <Video
+                        source={{ uri: item.content }}
+                        className="w-52 h-52 rounded-2xl"
+                        useNativeControls
+                        resizeMode={ResizeMode.COVER}
+                        isLooping
+                    />
+                )}
+                {item.type === "text" && (
                     <Text className="text-sm text-white">{item.content}</Text>
                 )}
                 <Text className="text-[10px] text-right text-gray-400 mt-1">
                     {dayjs(item.date?.toDate?.() || new Date()).format("h:mm A")}
                 </Text>
-            </View>
+            </Pressable>
         );
     };
+
 
     if (!userReceiver) {
         return (
@@ -118,10 +145,34 @@ const ChatScreen = () => {
                     />
                 </TouchableWithoutFeedback>
                 <View className="mb-3">
-                    <ChatInput onSend={handleSend} onPickImage={() => { }} />
+                    <ChatInput onSend={handleSend} />
 
                 </View>
             </KeyboardAvoidingView>
+            {viewerVisible && mediaToView && mediaToView.type === "image" && (
+                <EnhancedImageViewing
+                    images={[{ uri: mediaToView.uri }]}
+                    imageIndex={0}
+                    visible={viewerVisible}
+                    onRequestClose={() => setViewerVisible(false)}
+                />
+            )}
+
+            {viewerVisible && mediaToView?.type === "video" && (
+                <View className="absolute top-0 left-0 right-0 bottom-0 bg-black/95 justify-center items-center z-50">
+                    <Video
+                        source={{ uri: mediaToView.uri }}
+                        useNativeControls
+                        resizeMode={ResizeMode.COVER}
+                        style={{ width: "100%", height: "60%" }}
+                        shouldPlay
+                    />
+                    <Pressable onPress={() => setViewerVisible(false)} className="absolute top-8 right-6">
+                        <Ionicons name="close" size={30} color="white" />
+                    </Pressable>
+                </View>
+            )}
+
         </SingleEntityScreen>
     );
 };

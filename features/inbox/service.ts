@@ -65,9 +65,9 @@ export const sendMessage = async (message: Omit<TMessage, "id" | "date">) => {
         ...message,
         date: serverTimestamp(),
     });
-
+    let lastMessage = message.type === "text" ? message.content : message.type === "video" ? "📹 Video" : "📷 Foto";
     // Actualizar último mensaje en conversación
-    await updateLastMessage(message.conversation_id.id, message.content);
+    await updateLastMessage(message.conversation_id.id, lastMessage);
 };
 
 const updateLastMessage = async (conversationId: string, lastMessage: string) => {
