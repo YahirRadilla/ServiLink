@@ -1,5 +1,6 @@
 
 import { usePaginatedFilteredContracts } from "@/features/contracts/usePaginatedFilteredContracts";
+import { FilterWorkspace } from "@/shared/components/FilterWorkspace";
 import { ItemCard } from "@/shared/components/ItemCard";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -11,6 +12,7 @@ export const ContractsTab = () => {
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
         ordenar: "",
+        status: "",
     });
 
     const {
@@ -43,6 +45,17 @@ export const ContractsTab = () => {
                     <Text className="text-white text-2xl font-bold ml-2">
                         Contratos
                     </Text>
+                    <View className="flex-col mt-2">
+                        <View>
+                            <FilterWorkspace
+                                type="contract"
+                                value={selectedFilters.status}
+                                onChange={(status) =>
+                                    setSelectedFilters((prev) => ({ ...prev, status }))
+                                }
+                            />
+                        </View>
+                    </View>
                 </View>
             }
             renderItem={({ item }) => (

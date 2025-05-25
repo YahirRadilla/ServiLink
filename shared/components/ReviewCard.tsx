@@ -84,9 +84,10 @@ export function ReviewCard({ review, onDeleteLocal }: ReviewCardProps) {
 
   // Animar expansión/colapso
   const toggleExpanded = () => {
-    Animated.timing(animation, {
+    Animated.spring(animation, {
       toValue: expanded ? 0 : 1,
-      duration: 250,
+      friction: 10,
+      tension: 100,
       useNativeDriver: false,
     }).start();
     setExpanded((prev) => !prev);
