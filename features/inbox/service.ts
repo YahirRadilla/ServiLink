@@ -55,7 +55,7 @@ export const listenMessages = (
             id: doc.id,
             ...doc.data(),
         })) as TMessage[];
-        callback(result.reverse()); // ordenar ascendente
+        callback(result); // ordenar ascendente
     });
 };
 

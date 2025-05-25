@@ -7,7 +7,6 @@ import ChatInput from "@/shared/components/ChatInput";
 import dayjs from "dayjs";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { doc } from "firebase/firestore";
-import { useState } from "react";
 import {
     FlatList,
     Image,
@@ -23,10 +22,8 @@ const ChatScreen = () => {
     const user = useUserStore((state) => state.user);
     const { id: conversationId } = useLocalSearchParams();
     const { messages } = useMessages(conversationId as string);
-    const [text, setText] = useState("");
 
     const handleSend = async (message: string) => {
-
         if (!message.trim()) return;
 
         await sendMessage({
@@ -38,7 +35,6 @@ const ChatScreen = () => {
         });
     };
 
-
     const renderItem = ({ item }: any) => {
         const isOwn = item.sender_id.id === user!.id;
         const messageStyle = isOwn
@@ -47,9 +43,11 @@ const ChatScreen = () => {
 
         return (
             <View className={`max-w-[80%] rounded-2xl px-4 py-2 my-1 ${messageStyle}`}>
-
-                {item.type === "image" ? <Image src={item.content} className="w-52 h-52 rounded-2xl" /> : <Text className="text-sm text-white">{item.content}</Text>}
-
+                {item.type === "image" ? (
+                    <Image source={{ uri: item.content }} className="w-52 h-52 rounded-2xl" />
+                ) : (
+                    <Text className="text-sm text-white">{item.content}</Text>
+                )}
                 <Text className="text-[10px] text-right text-gray-400 mt-1">
                     {dayjs(item.date?.toDate?.() || new Date()).format("h:mm A")}
                 </Text>
@@ -59,28 +57,28 @@ const ChatScreen = () => {
 
     return (
         <SingleEntityScreen>
+            <Stack.Screen options={{ headerShown: false }} />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1, backgroundColor: "#161622" }}
+                style={{ flex: 1 }}
                 keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View className="flex-1 bg-primarybg-servilink px-3">
-                        <Stack.Screen options={{ headerShown: false }} />
-                        <FlatList
-                            data={messages}
-                            keyExtractor={(item) => item.id}
-                            renderItem={renderItem}
-                            contentContainerStyle={{ paddingVertical: 12 }}
-                            showsVerticalScrollIndicator={false}
-                        />
-                        <ChatInput
-                            onSend={handleSend}
-                            onPickImage={() => { }}
-                        />
-                    </View>
+                    <FlatList
+                        data={messages}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderItem}
+                        inverted
+                        contentContainerStyle={{ padding: 12, flexGrow: 1 }}
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+
+                    />
                 </TouchableWithoutFeedback>
+                <View className="mb-3">
+                    <ChatInput onSend={handleSend} onPickImage={() => { }} />
+
+                </View>
             </KeyboardAvoidingView>
         </SingleEntityScreen>
     );
