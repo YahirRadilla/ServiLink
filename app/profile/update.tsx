@@ -1,5 +1,6 @@
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
+import { updateUserFields } from "@/features/users/services";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,8 +12,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Alert, Dimensions, Image, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
 import * as Yup from "yup";
-import AddressTab from "./addressInfo";
-import PersonalInfoTab from "./personalInfo";
+import AddressTab from "./tabs/addressInfo";
+import PersonalInfoTab from "./tabs/personalInfo";
 // @ts-ignore
 import Avatar from "../../shared/svg/avatar.svg";
 
@@ -91,15 +92,34 @@ export default function UpdateProfileScreen() {
     }
   };
 
-  const onUpdate = (data: any) => {
+  const onUpdate = async (data: any) => {
+    if (!user?.id) return Alert.alert("Error", "No se encontró el usuario");
     const formatted = {
       ...data,
       birthDate: data.birthDate.toISOString(),
     };
-    console.log("Datos actualizados:", formatted);
-    // Aquí harías update en Firestore
-  };
 
+    try {
+      const payload = {
+        name: data.name,
+        lastname: data.lastName,
+        email: data.email,
+        phone_number: data.phone,
+        birth_date: data.birthDate,
+        image_profile: profileImage,
+        address: {
+          neighborhood: data.neighborhood,
+          streetAddress: data.streetAddress,
+          zipCode: data.zipCode,
+        },
+      };
+      await updateUserFields(user.id, payload);
+      Alert.alert("Perfil actualizado");
+    } catch (error) {
+      console.error("Error al actualizar el perfil:", error);
+      Alert.alert("Error", "No se pudo actualizar el perfil");
+    }
+  };
 
   return (
     <Screen>
@@ -145,7 +165,7 @@ export default function UpdateProfileScreen() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={100} // Ajusta este valor según tu header
+        keyboardVerticalOffset={100}
       >
         <FormProvider {...methods}>
           <TabView
@@ -172,7 +192,6 @@ export default function UpdateProfileScreen() {
         </FormProvider>
       </KeyboardAvoidingView>
 
-      {/* Botón flotante fuera del KeyboardAvoidingView */}
       <View
         className="px-4 pt-4 pb-4 bg-primarybg-servilink"
         style={{

@@ -9,7 +9,7 @@ import {
     signInWithEmailAndPassword,
     signOut
 } from "firebase/auth";
-import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -35,31 +35,38 @@ export type RegisterUserProps = {
 
 export const loginUser = async (
     email: string,
-    password: string
-): Promise<TUser> => {
-    try {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        const uid = result.user.uid;
+    password: string,
+    onUserUpdate: (user: TUser) => void
+): Promise<() => void> => {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    const uid = result.user.uid;
 
-        const userSnap = await getDoc(doc(db, "users", uid));
-        if (!userSnap.exists()) throw new Error("Usuario no encontrado en Firestore");
+    const userRef = doc(db, "users", uid);
 
-        const providerSnap = await getDoc(userSnap.data().provider_id);
+    return new Promise((resolve, reject) => {
+        const unsub = onSnapshot(userRef, async (snap) => {
+            if (!snap.exists()) return;
 
-        const providerData = { ...providerSnap.data() as Object, provider_id: providerSnap.id };
+            const data = snap.data();
+            let providerData = null;
 
-        const userData: TUser = mapFirestoreUserToTUser({
-            id: userSnap.id,
-            ...userSnap.data(),
-            provider: providerData,
-        });
+            if (data.profile_status === "provider" && data.provider_id) {
+                const providerSnap = await getDoc(data.provider_id);
+                const providerDataRaw = providerSnap.data();
+                providerData = providerDataRaw ? { ...providerDataRaw, provider_id: providerSnap.id } : null;
+            }
 
-        return userData;
-    } catch (error) {
-        throw error;
-    }
+            const user = mapFirestoreUserToTUser({
+                id: snap.id,
+                ...data,
+                provider: providerData,
+            });
+
+            onUserUpdate(user);
+            resolve(unsub);
+        }, reject);
+    });
 };
-
 export const registerUser = async ({ email,
     password,
     name,
