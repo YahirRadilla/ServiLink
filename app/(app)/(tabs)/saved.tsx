@@ -1,9 +1,6 @@
 import { Screen } from "@/components/Screen";
-import { FilterPanelModal } from "@/shared/components/FilterPanelModal";
-import { PostItemCard } from "@/shared/components/PostItemCard";
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 // @ts-ignore
 import Logo from "../../../shared/svg/logo.svg";
 
@@ -98,40 +95,7 @@ export default function Saved() {
           </View>
           <Logo />
         </View>
-        <View className="flex-row py-2 mb-4">
-          <View className ="overflow-hidden border border-links-servilink rounded-lg">
-              <Pressable
-              onPress={() => setFiltersVisible(true)}
-              android_ripple={{ color: "#ffffff10" }}
-              className="flex-row items-center  px-4 py-2"
-              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
-            >
-              <Ionicons name="filter" size={16} color="#ccc" />
-              <Text className="ml-2 text-white">Filtros</Text>
-            </Pressable>
-          </View>
 
-          <FilterPanelModal
-            visible={filtersVisible}
-            onClose={() => setFiltersVisible(false)}
-            filters={filtersData}
-            selected={selectedFilters}
-            onSelect={handleSelect}
-            onApply={() => {
-              setFiltersVisible(false);
-            }}
-          />
-        </View>
-
-        <PostItemCard
-          onPress={() => console.log("HOPLA")}
-          image={"https://picsum.photos/400/300"}
-          title="Mesa"
-          neighborhood="Los Olivos"
-          provider="Juan Rodriguez - Plomería"
-          service="Electricista"
-          rate={4}
-        />
       </ScrollView>
     </Screen>
   );

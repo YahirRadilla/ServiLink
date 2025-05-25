@@ -239,7 +239,6 @@ export default function Details() {
                 onClose={() => setModalVisible(false)}
                 postId={post.id}
                 onRef={(fn) => {
-                    console.log("✅ Refresh set");
                 }}
             />
         </SingleEntityScreen>
