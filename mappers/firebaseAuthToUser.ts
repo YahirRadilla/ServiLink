@@ -1,5 +1,6 @@
 import { emptyProvider } from "@/entities/providers";
 import { TUser } from "@/entities/users";
+import { Timestamp } from "firebase/firestore";
 
 export const mapFirestoreUserToTUser = (doc: any): TUser => {
     return {
@@ -13,7 +14,11 @@ export const mapFirestoreUserToTUser = (doc: any): TUser => {
         status: doc.status,
         profileStatus: doc.profile_status,
         imageProfile: doc.image_profile || "",
-        birthDate: doc.birth_date,
+        birthDate: doc.birth_date instanceof Timestamp
+            ? doc.birth_date.toDate()
+            : typeof doc.birth_date === "string"
+              ? new Date(doc.birth_date)
+              : undefined,
         provider:
             doc.profile_status === "provider" && doc.provider
                 ? {

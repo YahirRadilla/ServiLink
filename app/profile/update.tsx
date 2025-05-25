@@ -1,112 +1,194 @@
 import { Screen } from "@/components/Screen";
+import { useUserStore } from "@/entities/users";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
-import CustomInput from "@/shared/components/CustomInput";
+import { Ionicons } from "@expo/vector-icons";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as ImagePicker from "expo-image-picker";
 import { Stack } from "expo-router";
-import { Dimensions, Image, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-import { useUserStore } from "@/entities/users";
+import React, { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { Alert, Dimensions, Image, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
+import { TabBar, TabView } from "react-native-tab-view";
+import * as Yup from "yup";
+import AddressTab from "./addressInfo";
+import PersonalInfoTab from "./personalInfo";
 // @ts-ignore
 import Avatar from "../../shared/svg/avatar.svg";
 
+const schema = Yup.object({
+  name: Yup.string().required("Campo requerido"),
+  lastName: Yup.string().required("Campo requerido"),
+  email: Yup.string().email("Correo inválido").required("Campo requerido"),
+  phone: Yup.string().required("Campo requerido"),
+  birthDate: Yup.date().required("Campo requerido"),
+  password: Yup.string().min(6, "Mínimo 6 caracteres").required("Campo requerido"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
+    .required("Campo requerido"),
+  neighborhood: Yup.string().required("Campo requerido"),
+  streetAddress: Yup.string().required("Campo requerido"),
+  zipCode: Yup.string().required("Campo requerido"),
+});
+
+
+
 export default function UpdateProfileScreen() {
-  const { height } = Dimensions.get("window");
   const user = useUserStore((state) => state.user);
-  const hasProfileImage = !!user?.imageProfile?.trim();
+  const [profileImage, setProfileImage] = useState(user?.imageProfile || "");
+
+  const methods = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: user?.name || "",
+      lastName: user?.lastname || "",
+      email: user?.email || "",
+      phone: user?.phoneNumber || "",
+      birthDate: user?.birthDate ? new Date(user.birthDate) : new Date(),
+      password: "",
+      confirmPassword: "",
+      neighborhood: user?.address?.neighborhood || "",
+      streetAddress: user?.address?.streetAddress || "",
+      zipCode: user?.address?.zipCode || "",
+    },
+  });
+
+  const { control, handleSubmit, formState: { errors } } = methods;
+  const layout = Dimensions.get("window");
+  const [index, setIndex] = React.useState(0);
+
+  const handlePickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      return Alert.alert("Permiso requerido", "Se necesita acceso a la galería");
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: "images",
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const routes = [
+    { key: "personal", title: "Información Personal" },
+    { key: "address", title: "Dirección" },
+  ];
+
+  const renderScene = ({ route }: { route: { key: string } }) => {
+    switch (route.key) {
+      case "personal":
+        return <PersonalInfoTab />;
+      case "address":
+        return <AddressTab />;
+      default:
+        return null;
+    }
+  };
+
+  const onUpdate = (data: any) => {
+    const formatted = {
+      ...data,
+      birthDate: data.birthDate.toISOString(),
+    };
+    console.log("Datos actualizados:", formatted);
+    // Aquí harías update en Firestore
+  };
+
+
   return (
     <Screen>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <SafeAreaView className="flex-1 bg-primarybg-servilink gap-y-14">
-        {/* Fondo decorativo */}
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingVertical: 12 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className=" items-center mb-6 space-y-3">
-            {hasProfileImage ? (
-              <Image
-                source={{ uri: user?.imageProfile || "" }}
-                className="w-24 h-24 rounded-full border border-white/10"
-              />
-            ) : (
-              <Avatar
-                width={96}
-                height={96}
-                style={{ borderRadius: 9999, borderWidth: 1, borderColor: "rgba(255,255,255,0.1)" }}
+      <View className="ml-14 p-4">
+        <Text className="text-white font-bold text-xl">Editar Perfil</Text>
+      </View>
+      <View className="items-center mb-2 space-y-2">
+        <Pressable onPress={handlePickImage} className="relative">
+          {profileImage ? (
+            <Image
+              source={{ uri: profileImage }}
+              className="w-24 h-24 rounded-full border border-white/10"
+            />
+          ) : (
+            <Avatar
+              width={96}
+              height={96}
+              style={{
+                borderRadius: 9999,
+                borderWidth: 1,
+                borderColor: "rgba(255,255,255,0.1)",
+              }}
+            />
+          )}
+          {profileImage && (
+            <Pressable
+              onPress={() => setProfileImage("")}
+              className="absolute -right-3 -top-3 p-1.5 rounded-full "
+              hitSlop={5}
+            >
+              <Ionicons name="close" size={22} color="#FFFFFF" />
+            </Pressable>
+          )}
+          <View className="absolute bottom-1 right-1 bg-black/60 p-1 rounded-full border border-white/10">
+            <Ionicons name="create" size={16} color="white" />
+          </View>
+        </Pressable>
+        <Text className="text-white/60 text-sm">Toca para cambiar la imagen</Text>
+      </View>
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={100} // Ajusta este valor según tu header
+      >
+        <FormProvider {...methods}>
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+            style={{ flex: 1 }}
+            renderTabBar={(props) => (
+              <TabBar
+                {...props}
+                style={{ backgroundColor: "#161622" }}
+                indicatorStyle={{
+                  backgroundColor: "#3D5DC7",
+                  height: 3,
+                  borderRadius: 2,
+                }}
+                activeColor="#fff"
+                inactiveColor="#888"
+                pressColor="#3D5DC7"
               />
             )}
-          </View>
-          <View className="items-center">
-            <View className="w-[95%] max-w-md flex-col items-center">
-              <View className="w-full flex-row gap-2">
-                <View className="flex-1">
-                  <CustomInput
-                    type="text"
-                    placeholder="Nombre"
-                    label="Nombre"
-                  />
-                </View>
-                <View className="flex-1">
-                  <CustomInput
-                    type="text"
-                    placeholder="Apellido"
-                    label="Apellido"
-                  />
-                </View>
-              </View>
+          />
+        </FormProvider>
+      </KeyboardAvoidingView>
 
-              <View className="w-full">
-                <CustomInput
-                  type="email"
-                  placeholder="Correo electrónico"
-                  label="Correo"
-                />
-              </View>
+      {/* Botón flotante fuera del KeyboardAvoidingView */}
+      <View
+        className="px-4 pt-4 pb-4 bg-primarybg-servilink"
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+        }}
+      >
+        <CustomButton label="Guardar Cambios" onPress={handleSubmit(onUpdate)} />
+      </View>
 
-              <View className="w-full">
-                <CustomInput
-                  type="date"
-                  label="Fecha de nacimiento"
-                  placeholder="Seleccionar fecha"
-                />
-              </View>
-
-              <View className="w-full">
-                <CustomInput
-                  type="number"
-                  placeholder="Número de teléfono"
-                  label="Número de teléfono"
-                />
-              </View>
-
-              <View className="w-full">
-                <CustomInput
-                  type="password"
-                  label="Contraseña"
-                  placeholder="Contraseña"
-                />
-              </View>
-
-              <View className="w-full">
-                <CustomInput
-                  type="password"
-                  label="Confirmar contraseña"
-                  placeholder="Confirmar contraseña"
-                />
-              </View>
-
-              <View className="w-full mt-6 ">
-                <CustomButton label="Guardar cambios" />
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-        <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
-          <BackButton />
-        </View>
-      </SafeAreaView>
+      <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
+        <BackButton />
+      </View>
     </Screen>
   );
 }

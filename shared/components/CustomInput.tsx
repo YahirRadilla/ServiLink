@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import dayjs from 'dayjs';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import React, { useState } from 'react';
@@ -117,7 +118,9 @@ export default function CustomInput({
                 {label && <Text className="text-white/90 pt-4">{label}</Text>}
                 <Pressable onPress={() => setShowDatePicker(true)} className={`w-full px-4 py-3 rounded-xl border ${error ? 'border-red-500' : 'border-auth-border-servilink'} flex-row justify-between items-center`}>
                     <Text className={`text-white/50 ${!value ? 'italic' : ''}`}>
-                        {value ? new Date(value).toLocaleDateString() : placeholder || 'Seleccionar fecha'}
+                        {value instanceof Date && !isNaN(value.getTime())
+                        ? dayjs(value).format("DD/MM/YYYY")
+                        : placeholder || 'Seleccionar fecha'}
                     </Text>
                     <Ionicons name="calendar-outline" size={22} color="#888" />
                 </Pressable>
