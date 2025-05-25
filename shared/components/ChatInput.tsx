@@ -1,3 +1,4 @@
+import { uploadFileToStorage } from "@/features/inbox/uploadFileToStorage";
 import { Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from 'expo-av';
 import * as ImagePicker from "expo-image-picker";
@@ -16,19 +17,21 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
 
 
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (media.length > 0) {
-            media.forEach((item) => {
-                onSend(item.uri, item.type);
-            });
+            for (const item of media) {
+                const url = await uploadFileToStorage(item.uri, item.type === "image" ? "chat-images" : "chat-videos");
+                onSend(url, item.type);
+            }
             setMedia([]);
         }
 
         if (message.trim()) {
-            onSend(message.trim(), 'text');
-            setMessage('');
+            onSend(message.trim(), "text");
+            setMessage("");
         }
     };
+
 
 
     const removeMedia = (uri: string) => {
@@ -55,9 +58,6 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
 
 
 
-    const removeImage = (uri: string) => {
-        setImages((prev) => prev.filter((img) => img !== uri));
-    };
 
     return (
         <View className="px-3 pt-2 pb-3 bg-[#0F0F1A] border-t border-white/10">
