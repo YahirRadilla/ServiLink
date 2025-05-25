@@ -1,10 +1,12 @@
+import { TProposal } from "@/entities/proposals";
 import { useProposalStore } from "@/entities/proposals/store";
 import { TUser, useUserStore } from "@/entities/users";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchProposalsPage } from "./service";
 
 type Filters = {
     ordenar?: string;
+    status?: string;
 };
 
 export const usePaginatedFilteredProposals = (filters: Filters) => {
@@ -23,6 +25,15 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
 
     const user = useUserStore((state) => state.user);
 
+    const filteredProposals = useMemo(() => {
+        return proposals.filter((proposal: TProposal) => {
+            if (filters.status && filters.status !== "all") {
+                return proposal.acceptStatus === filters.status;
+            }
+            return true;
+        });
+    }, [ proposals, filters.status]);
+
     const loadMore = async () => {
         if (loading || !hasMore) return;
         setLoading(true);
@@ -40,8 +51,12 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
         setIsRefreshing(true);
 
         const { proposals: newProposals, last } = await fetchProposalsPage(filters as any, user as TUser);
+        const unique = newProposals.filter(
+            (proposal, index, self) =>
+                self.findIndex((p) => p.id === proposal.id) === index
+        );
 
-        setProposals(newProposals);
+        setProposals(unique);
         setLastDoc(last);
         setHasMore(!!last);
         setIsRefreshing(false);
@@ -50,10 +65,10 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
 
     useEffect(() => {
         refresh();
-    }, [filters.ordenar]);
+    }, [filters.ordenar, filters.status]);
 
     return {
-        proposals,
+        proposals: filteredProposals,
         loadMore,
         loading,
         hasMore,

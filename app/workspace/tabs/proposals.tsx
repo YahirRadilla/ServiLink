@@ -1,4 +1,5 @@
 import { usePaginatedFilteredProposals } from "@/features/proposals/usePaginatedFilteredProposals";
+import { FilterWorkspace } from "@/shared/components/FilterWorkspace";
 import { ItemCard } from "@/shared/components/ItemCard";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -10,6 +11,7 @@ export const ProposalsTab = () => {
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
         ordenar: "",
+        status: "",
     });
 
     const {
@@ -43,6 +45,17 @@ export const ProposalsTab = () => {
                     <Text className="text-white text-2xl font-bold ml-2">
                         Propuestas
                     </Text>
+                    <View className="flex-col mt-2">
+                        <View>
+                            <FilterWorkspace
+                                type="proposal"
+                                value={selectedFilters.status}
+                                onChange={(status) =>
+                                    setSelectedFilters((prev) => ({ ...prev, status }))
+                                }
+                            />
+                        </View>
+                    </View>
                 </View>
             }
             renderItem={({ item }) => (
