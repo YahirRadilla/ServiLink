@@ -1,9 +1,9 @@
 import { usePostStore } from "@/entities/posts";
-import { useReviewStore } from "@/entities/reviews";
+import { TReview, useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
 import { useContractsByPostId } from "@/features/contracts/useContractById";
-import { getTotalReviewsCountByPostId } from "@/features/reviews/service";
-import { usePaginatedReviewsByPostId } from "@/features/reviews/usePaginatedFilteredPosts";
+import { getAverageReviewRating, getFeaturedReviewByPostId, getTotalReviewsCountByPostId } from "@/features/reviews/service";
+import { usePaginatedReviewsByPostId } from "@/features/reviews/usePaginatedFilteredReviews";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -12,7 +12,7 @@ import BottomSheet, {
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Pressable, Text, View } from "react-native";
+import { Animated, LayoutAnimation, Pressable, Text, View } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { FloatingActionButton } from "./FloatingActionButton";
 import { ReviewCard } from "./ReviewCard";
@@ -22,6 +22,7 @@ type ReviewsModalProps = {
   onClose: () => void;
   onPress: () => void;
   postId: string;
+  onRef?: (refresh: () => void) => void;
 };
 
 export function ReviewsModal({
@@ -29,6 +30,7 @@ export function ReviewsModal({
   onClose,
   onPress,
   postId,
+  onRef,
 }: ReviewsModalProps) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["60%", "100%"], []);
@@ -41,6 +43,10 @@ export function ReviewsModal({
   const user = useUserStore((state) => state.user);
   const getProviderByPostId = usePostStore((state) => state.getProviderByPostId);
   const postProviderId = getProviderByPostId(postId);
+  const setTotalReviews = useReviewStore((state) => state.setTotalReviews);
+  /* const setFeaturedReview = useReviewStore((state) => state.setFeaturedReview); */
+  const reviewStore = useRef(useReviewStore.getState()).current;
+
 
   const { contracts, loading: contractsLoading } = useContractsByPostId(postId);
   const canReview = contracts.some(
@@ -48,15 +54,56 @@ export function ReviewsModal({
   );
   const isPostOwner = user?.id === postProviderId;
 
+  const [localReviews, setLocalReviews] = useState<TReview[]>([]);
+
   useEffect(() => {
-    if (visible && shouldRefresh) {
-      refresh();
-      getTotalReviewsCountByPostId(postId).then((total) => {
-        useReviewStore.getState().setTotalReviews(total);
+    setLocalReviews(reviews);
+  }, [reviews]);
+
+  useEffect(() => {
+    if (!visible || !shouldRefresh) return;
+
+    let mounted = true;
+
+    (async () => {
+      await refresh();
+
+      const [total, featured] = await Promise.all([
+        getTotalReviewsCountByPostId(postId),
+        getFeaturedReviewByPostId(postId),
+      ]);
+
+      if (!mounted) return;
+
+      requestAnimationFrame(() => {
+        reviewStore.setTotalReviews(total);
+        reviewStore.setFeaturedReview(featured);
+        reviewStore.resetRefreshFlag();
       });
-      resetRefreshFlag();
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [visible, shouldRefresh]);
+
+
+
+  const handleDeleteLocal = async (id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setLocalReviews((prev) => prev.filter((r) => r.id !== id));
+
+    const featured = useReviewStore.getState().featuredReview;
+    if (featured?.id === id) {
+      useReviewStore.getState().clearFeaturedReview();
+      const nextFeatured = await getFeaturedReviewByPostId(postId);
+      useReviewStore.getState().setFeaturedReview(nextFeatured);
     }
-  }, [visible, shouldRefresh, postId, contracts]);
+    const total = await getTotalReviewsCountByPostId(postId);
+    useReviewStore.getState().setTotalReviews(total);
+    await getAverageReviewRating(postId);
+    useReviewStore.getState().removeReview(id);
+  };
 
 
   const handleRefresh = async () => {
@@ -69,6 +116,7 @@ export function ReviewsModal({
     });
 
     await refresh();
+    setLocalReviews(usePaginatedReviewsByPostId(postId).reviews);
     setTimeout(() => {
       setShowLottie(false);
       Animated.timing(fadeAnim, {
@@ -79,8 +127,14 @@ export function ReviewsModal({
     }, 500);
   };
 
+  useEffect(() => {
+    if (onRef) {
+      onRef(handleRefresh);
+    }
+  }, []);
+
   const handleAnimatedClose = () => {
-    bottomSheetRef.current?.close(); // Si necesitas cerrar desde el padre
+    bottomSheetRef.current?.close();
   };
 
   const renderBackdrop = (props: any) => (
@@ -120,7 +174,7 @@ export function ReviewsModal({
             />
           )}
           <BottomSheetFlatList
-            data={reviews}
+            data={localReviews}
             keyExtractor={(item) => item.id}
             onEndReached={hasMore ? loadMore : undefined}
             onEndReachedThreshold={0.5}
@@ -142,8 +196,9 @@ export function ReviewsModal({
                   </Text>
                 </View>
                 <View className="flex-row items-center gap-x-3">
-                  <Pressable onPress={handleRefresh} className={"bg-black/20 p-2 rounded-full"}>
-                    {showLottie ? (
+                  <Pressable onPress={handleRefresh} 
+                  className={"bg-black/20 p-2 rounded-full"}>
+                    {(showLottie || isRefreshing) ? (
                       <LottieView
                         source={require("../../assets/animations/refresh.json")}
                         autoPlay
@@ -169,7 +224,7 @@ export function ReviewsModal({
                 delay={index * 100}
                 useNativeDriver
               >
-                <ReviewCard review={item} />
+                <ReviewCard review={item} onDeleteLocal={handleDeleteLocal} />
               </Animatable.View>
             )}
             ItemSeparatorComponent={() => <View style={{ height: 12 }} />}

@@ -5,8 +5,10 @@ import { reviewToEntity } from "@/mappers/reviewToEntity";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   DocumentSnapshot,
+  getDoc,
   getDocs,
   limit,
   onSnapshot,
@@ -16,7 +18,7 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const REVIEWS_PAGE_SIZE = 3;
 
@@ -165,5 +167,44 @@ export const createReview = async (
   } catch (err) {
     console.error("🔥 Error al crear review:", err);
     return null;
+  }
+};
+
+export const deleteReview = async (reviewId: string): Promise<boolean> => {
+  try {
+    const reviewRef = doc(db, "reviews", reviewId);
+    const reviewSnap = await getDoc(reviewRef);
+
+    if (!reviewSnap.exists()) {
+      console.warn("Review no encontrada");
+      return false;
+    }
+
+    const data = reviewSnap.data();
+    const imageUrls: string[] = data.images || [];
+
+    // Eliminar cada imagen del storage
+    await Promise.all(
+      imageUrls.map(async (url) => {
+        try {
+          const pathStart = url.indexOf("/o/") + 3;
+          const pathEnd = url.indexOf("?alt=");
+          const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
+
+          const imageRef = ref(storage, filePath);
+          await deleteObject(imageRef);
+        } catch (err) {
+          console.warn("No se pudo borrar una imagen:", err);
+        }
+      })
+    );
+
+    // Eliminar documento
+    await deleteDoc(reviewRef);
+
+    return true;
+  } catch (error) {
+    console.error("🔥 Error al eliminar review:", error);
+    return false;
   }
 };

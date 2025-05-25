@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import {
   Animated,
   Image,
+  LayoutAnimation,
   LayoutChangeEvent,
   Platform,
   Pressable,
@@ -12,9 +13,12 @@ import {
   UIManager,
   View
 } from "react-native";
+import * as Animatable from 'react-native-animatable';
 import Popover, { PopoverPlacement } from "react-native-popover-view";
 
+import { useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
+import { deleteReview } from "@/features/reviews/service";
 import { Gallery } from "./Galery";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -23,9 +27,10 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 
 type ReviewCardProps = {
   review: TReview;
+  onDeleteLocal: (id: string) => void;
 };
 
-export function ReviewCard({ review }: ReviewCardProps) {
+export function ReviewCard({ review, onDeleteLocal }: ReviewCardProps) {
   const [showPopover, setShowPopover] = useState(false);
   const anchorRef = React.createRef<View>();
   const [expanded, setExpanded] = useState(false);
@@ -34,6 +39,23 @@ export function ReviewCard({ review }: ReviewCardProps) {
   const [expandedHeight, setExpandedHeight] = useState(0);
   const animation = useRef(new Animated.Value(0)).current;
   const user = useUserStore((state) => state.user);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const cardRef = useRef(null);
+  const removeReview = useReviewStore((state) => state.removeReview);
+  const triggerRefresh = useReviewStore((s) => s.triggerRefresh);
+
+  const handleDelete = async () => {
+    setShowPopover(false);
+    setIsDeleting(true);
+
+    const success = await deleteReview(review.id);
+
+    if (success) {
+      setIsDeleting(true);
+      triggerRefresh();
+    }
+  };
+
 
   const isDeletable = review.client.id === user?.id;
 
@@ -101,113 +123,118 @@ export function ReviewCard({ review }: ReviewCardProps) {
   }
 
   return (
-    <View className="gap-y-2 border border-links-servilink p-4 mb-4 rounded-xl">
-      {/* Header */}
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center">
-          <Image
-            source={{
-              uri: review.client.imageProfile ||
-                "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
-            }}
-            className="w-10 h-10 rounded-full mr-3"
-            resizeMode="cover"
-          />
-          <Text className="font-semibold text-lg text-white">
-            {review.client.name}
-          </Text>
-        </View>
-        {isDeletable && (
-
-
-          <View style={{ position: "relative", zIndex: 9999 }}>
-            <Pressable
-              ref={anchorRef}
-              onPress={() => setShowPopover(true)}
-              className={"bg-black/20 rounded-full p-2"}
-            >
-              <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
-            </Pressable>
-
-            <Popover
-              isVisible={showPopover}
-              onRequestClose={() => setShowPopover(false)}
-              from={anchorRef as React.RefObject<any>}
-              placement={PopoverPlacement.LEFT}
-              backgroundStyle={{ backgroundColor: "transparent" }}
-              popoverStyle={{
-                backgroundColor: "#1f1f2e",
-                paddingVertical: 8,
-                borderRadius: 8,
+    <Animatable.View
+      ref={cardRef}
+      animation={isDeleting ? "fadeOutUp" : undefined}
+      duration={300}
+      onAnimationEnd={() => {
+        if (isDeleting) {
+          setTimeout(() => {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            onDeleteLocal(review.id);
+          }, 100); // pequeño delay para asegurar que LayoutAnimation se active correctamente
+        }
+      }}
+    >
+      <View className="gap-y-2 border border-links-servilink p-4 mb-4 rounded-xl">
+        {/* Header */}
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center">
+            <Image
+              source={{
+                uri: review.client.imageProfile ||
+                  "https://firebasestorage.googleapis.com/v0/b/servilink-68398.firebasestorage.app/o/user-placeholder.png?alt=media&token=f1ee8fe8-276f-4b86-9ee9-ffce09655e01",
               }}
-            >
-              <Pressable
-                onPress={() => {
-                  setShowPopover(false);
-                  console.log("Eliminar");
-                }}
-                className="px-4 py-2"
-                style={({ pressed }) => ({
-                  backgroundColor: pressed ? "#2a2a3a" : "transparent",
-                  borderRadius: 8,
-                })}
-              >
-                <View className="flex-row items-center gap-x-2">
-                  <Ionicons name="trash-outline" size={20} color="#F75555" />
-                  <Text className="text-[#F75555] font-medium text-base">Eliminar</Text>
-                </View>
-              </Pressable>
-            </Popover>
+              className="w-10 h-10 rounded-full mr-3"
+              resizeMode="cover"
+            />
+            <Text className="font-semibold text-lg text-white">
+              {review.client.name}
+            </Text>
           </View>
-        )}
-      </View>
+          {isDeletable && (
+            <View style={{ position: "relative", zIndex: 9999 }}>
+              <Pressable
+                ref={anchorRef}
+                onPress={() => setShowPopover(true)}
+                className={"bg-black/20 rounded-full p-2"}
+              >
+                <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+              </Pressable>
+              <Popover
+                isVisible={showPopover}
+                onRequestClose={() => setShowPopover(false)}
+                from={anchorRef as React.RefObject<any>}
+                placement={PopoverPlacement.LEFT}
+                backgroundStyle={{ backgroundColor: "transparent" }}
+                popoverStyle={{
+                  backgroundColor: "#1f1f2e",
+                  paddingVertical: 8,
+                  borderRadius: 8,
+                }}
+              >
+                <Pressable
+                  onPress={handleDelete}
+                  className="px-4 py-2"
+                  style={({ pressed }) => ({
+                    backgroundColor: pressed ? "#2a2a3a" : "transparent",
+                    borderRadius: 8,
+                  })}
+                >
+                  <View className="flex-row items-center gap-x-2">
+                    <Ionicons name="trash-outline" size={20} color="#F75555" />
+                    <Text className="text-[#F75555] font-medium text-base">Eliminar</Text>
+                  </View>
+                </Pressable>
+              </Popover>
+            </View>
+          )}
+        </View>
 
-      {/* Metadata */}
-      <View className="flex-row flex-wrap items-center gap-x-2">
-        {renderStars()}
-        <Text className="text-white/60 text-xs">-</Text>
-        <Text className="text-white/60 text-xs">
-          {dateObj.toLocaleDateString("es-MX", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </Text>
-        <Text className="text-white/60 text-xs">-</Text>
-        <Text className="text-white/60 text-xs flex-shrink">
-          {review.post.provider.name} {review.post.provider.lastname}
-        </Text>
-        <Text className="text-white/60 text-xs">-</Text>
-        <Text className="text-white/60 text-xs">{review.post.service}</Text>
-      </View>
+        <View className="flex-row flex-wrap items-center gap-x-2">
+          {renderStars()}
+          <Text className="text-white/60 text-xs">-</Text>
+          <Text className="text-white/60 text-xs">
+            {dateObj.toLocaleDateString("es-MX", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </Text>
+          <Text className="text-white/60 text-xs">-</Text>
+          <Text className="text-white/60 text-xs flex-shrink">
+            {review.post.provider.name} {review.post.provider.lastname}
+          </Text>
+          <Text className="text-white/60 text-xs">-</Text>
+          <Text className="text-white/60 text-xs">{review.post.service}</Text>
+        </View>
 
-      {/* Texto con expansión animada */}
-      {review.textContent && review.textContent.length > 150 ? (
-        <Animated.View style={{ height, overflow: "hidden" }}>
+        {review.textContent && review.textContent.length > 150 ? (
+          <Animated.View style={{ height, overflow: "hidden" }}>
+            <Text className="text-white text-base leading-6">
+              {review.textContent}
+            </Text>
+          </Animated.View>
+        ) : (
           <Text className="text-white text-base leading-6">
             {review.textContent}
           </Text>
-        </Animated.View>
-      ) : (
-        <Text className="text-white text-base leading-6">
-          {review.textContent}
-        </Text>
-      )}
+        )}
 
-      {review.textContent && review.textContent.length > 150 && (
-        <TouchableOpacity onPress={toggleExpanded} activeOpacity={0.7} className="flex-row-reverse">
-          <Text className="text-links-servilink font-semibold mr-1 mt-1">
-            {expanded ? "Ver menos" : "Ver más"}
-          </Text>
-        </TouchableOpacity>
-      )}
+        {review.textContent && review.textContent.length > 150 && (
+          <TouchableOpacity onPress={toggleExpanded} activeOpacity={0.7} className="flex-row-reverse">
+            <Text className="text-links-servilink font-semibold mr-1 mt-1">
+              {expanded ? "Ver menos" : "Ver más"}
+            </Text>
+          </TouchableOpacity>
+        )}
 
-      {/* Galería */}
-      {review.images && review.images.length > 0 && (
-        <View className="mt-2">
-          <Gallery images={review.images.map(img => img.toString())} size={24} />
-        </View>
-      )}
-    </View>
+        {review.images && review.images.length > 0 && (
+          <View className="mt-2">
+            <Gallery images={review.images.map(img => img.toString())} size={24} />
+          </View>
+        )}
+      </View>
+    </Animatable.View>
   );
 }

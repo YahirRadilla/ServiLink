@@ -25,13 +25,20 @@ export default function Details() {
     const { getPost, loading } = usePosts();
     const [post, setPost] = useState<TPost | null>(null);
     const user = useUserStore((state) => state.user);
-    const featuredReview = useReviewStore((state) => state.featuredReview);
-    const setFeaturedReview = useReviewStore.getState().setFeaturedReview;
     const [averageRating, setAverageRating] = useState<number>(0);
     const { reviews } = useLiveReviewsByPostId(id as string);
     const totalReviews = useReviewStore((state) => state.totalReviews);
     const postStore = usePostStore();
-    const mapCustomStyle = [ { "elementType": "geometry", "stylers": [ { "color": "#242f3e" } ] }, { "elementType": "labels.text.fill", "stylers": [ { "color": "#746855" } ] }, { "elementType": "labels.text.stroke", "stylers": [ { "color": "#242f3e" } ] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [ { "color": "#263c3f" } ] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76" } ] }, { "featureType": "road", "elementType": "geometry", "stylers": [ { "color": "#38414e" } ] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#212a37" } ] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [ { "color": "#9ca5b3" } ] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [ { "color": "#746855" } ] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#1f2835" } ] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [ { "color": "#f3d19c" } ] }, { "featureType": "transit", "elementType": "geometry", "stylers": [ { "color": "#2f3948" } ] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "water", "elementType": "geometry", "stylers": [ { "color": "#17263c" } ] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#515c6d" } ] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } ]
+    const mapCustomStyle = [{ "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] }, { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] }, { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#2f3948" }] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }]
+    const [refreshModal, setRefreshModal] = useState<() => void>(() => () => { });
+    const shouldRefresh = useReviewStore((state) => state.shouldRefreshReviews);
+    const featuredReview = useReviewStore((state) => state.featuredReview);
+    const setFeaturedReview = useReviewStore((state) => state.setFeaturedReview);
+    const setTotalReviews = useReviewStore((state) => state.setTotalReviews);
+    const resetRefreshFlag = useReviewStore((state) => state.resetRefreshFlag);
+    const clearFeaturedReview = useReviewStore((state) => state.clearFeaturedReview);
+    const removeReview = useReviewStore((state) => state.removeReview);
+
 
     const handleHire = () => {
         router.push("/proposal/createProposal");
@@ -48,11 +55,9 @@ export default function Details() {
         })
         getAverageReviewRating(id as string).then(setAverageRating);
 
-        getTotalReviewsCountByPostId(id as string).then((total) => {
-            useReviewStore.getState().setTotalReviews(total);
-        })
+        getTotalReviewsCountByPostId(id as string).then(setTotalReviews);
         return () => {
-            useReviewStore.getState().clearFeaturedReview();
+            clearFeaturedReview();
         };
     }, []);
     if (loading || !post) {
@@ -171,7 +176,12 @@ export default function Details() {
                                     </Text>
                                 </View>
                                 <Pressable
-                                    onPress={() => setModalVisible(true)}
+                                    onPress={() => {
+                                        setModalVisible(true);
+                                        setTimeout(() => {
+                                            refreshModal();
+                                        }, 0);
+                                    }}
                                     android_ripple={{ color: "#ffffff10" }}
                                     style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
                                     className="px-4 py-2 rounded-xl bg-links-servilink/20"
@@ -184,7 +194,24 @@ export default function Details() {
 
                         <View>
                             {featuredReview && (
-                                <ReviewCard review={featuredReview} />
+                                <ReviewCard
+                                    review={featuredReview}
+                                    onDeleteLocal={async (id) => {
+                                        clearFeaturedReview();
+
+                                        const total = await getTotalReviewsCountByPostId(post.id);
+                                        setTotalReviews(total);
+
+                                        const avg = await getAverageReviewRating(post.id);
+                                        setAverageRating(avg);
+
+                                        const nextFeatured = await getFeaturedReviewByPostId(post.id);
+                                        setFeaturedReview(nextFeatured);
+
+                                        refreshModal();
+                                    }}
+                                />
+
                             )}
                         </View>
 
@@ -211,6 +238,9 @@ export default function Details() {
                 onPress={() => console.log("modal interno")}
                 onClose={() => setModalVisible(false)}
                 postId={post.id}
+                onRef={(fn) => {
+                    console.log("✅ Refresh set");
+                }}
             />
         </SingleEntityScreen>
     );
