@@ -111,7 +111,7 @@ export const emailExistsInFirestore = async (email: string) => {
 
 export const updateProviderRFC = async (userId: string, rfc: string, providerId: string) => {
   try {
-    console.log("✅ Iniciando update RFC");
+    /* console.log("✅ Iniciando update RFC"); */
     const providerRef = doc(db, "providers", providerId);
     await updateDoc(providerRef, { rfc });
     console.log("✅ RFC actualizado en provider");
@@ -127,10 +127,10 @@ export const updateProviderRFC = async (userId: string, rfc: string, providerId:
 
 export const updateProviderStatus = async (userId: string, status: "client" | "provider") => {
   try {
-    console.log("✅ Iniciando update provider status");
+    /* console.log("✅ Iniciando update provider status"); */
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, { profile_status: status });
-    console.log(`✅ Perfil actualizado a ${status}`);
+    console.log(`actualizado a ${status}`);
   } catch (err) {
     console.error("🔥 Error exacto:", err);
     throw err;

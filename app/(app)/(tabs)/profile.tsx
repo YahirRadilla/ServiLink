@@ -89,7 +89,7 @@ export default function Profile() {
   const { signOut } = useAuth();
   const user = useUserStore((state) => state.user);
   const hasProfileImage = !!user?.imageProfile?.trim();
-  console.log(user?.provider)
+  /* console.log(user?.provider) */
   const isProvider = user?.profileStatus === "provider";
 
   return (

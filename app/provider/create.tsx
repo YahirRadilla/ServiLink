@@ -31,8 +31,8 @@ export default function CreateProviderScreen() {
     },
   })
   const onSubmit = async (data: { rfc: string }) => {
-    console.log(user?.provider);
-    console.log("📤 Enviando datos del formulario:", data);
+    /* console.log(user?.provider);
+    console.log("📤 Enviando datos del formulario:", data); */
 
     try {
       if (!user?.id || !user.provider?.id) {
