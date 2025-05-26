@@ -1,6 +1,7 @@
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
-import { deleteProfileImage, updateUserFields, uploadProfileImage } from "@/features/users/services";
+import { changeEmail, changePassword, deleteProfileImage, reauthenticateUser, updateUserFields, uploadProfileImage } from "@/features/users/services";
+import { auth } from "@/lib/firebaseConfig";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,7 +22,7 @@ const schema = Yup.object({
   name: Yup.string().required("Campo requerido"),
   lastName: Yup.string().required("Campo requerido"),
   email: Yup.string().email("Correo inválido").required("Campo requerido"),
-  phone: Yup.string().required("Campo requerido"),
+  phone: Yup.string().min(10, "Ingresa un número de telefono de 10 dígitos").required("Campo requerido"),
   birthDate: Yup.date().required("Campo requerido"),
   password: Yup.string().min(6, "Mínimo 6 caracteres").required("Campo requerido"),
   confirmPassword: Yup.string()
@@ -30,8 +31,16 @@ const schema = Yup.object({
   neighborhood: Yup.string().required("Campo requerido"),
   streetAddress: Yup.string().required("Campo requerido"),
   zipCode: Yup.string().required("Campo requerido"),
+  /* currentPassword: Yup.string().when(['email', 'password'], {
+    is: (email: string, password: string) => !!email || !!password,
+    then: Yup.string().required("Debes confirmar tu contraseña actual"),
+  }), */
+  currentPassword: Yup.string().when("password", (password, schema) => {
+    return !!password && password.length >= 6
+      ? schema.required("Debes confirmar tu contraseña actual")
+      : schema.notRequired();
+  }),
 });
-
 
 
 export default function UpdateProfileScreen() {
@@ -51,6 +60,7 @@ export default function UpdateProfileScreen() {
       neighborhood: user?.address?.neighborhood || "",
       streetAddress: user?.address?.streetAddress || "",
       zipCode: user?.address?.zipCode || "",
+      currentPassword: "",
     },
   });
 
@@ -92,13 +102,16 @@ export default function UpdateProfileScreen() {
         return null;
     }
   };
-
+ //TO-DO
   const onUpdate = async (data: any) => {
     if (!user?.id) return Alert.alert("Error", "No se encontró el usuario");
 
     try {
       const previousImageUrl = user.imageProfile;
       let imageUrl = previousImageUrl;
+
+      const userAuth = auth.currentUser;
+      const isPasswordUser = userAuth?.providerData.some(p => p.providerId === "password");
 
       const isNewImage =
         profileImage &&
@@ -107,16 +120,51 @@ export default function UpdateProfileScreen() {
 
       const isImageRemoved = !profileImage && !!previousImageUrl;
 
-      // Caso: se subió nueva imagen
-      if (isNewImage) {
-        console.log("🆕 Nueva imagen seleccionada:", profileImage);
-        imageUrl = await uploadProfileImage(profileImage, user.id);
+      // Reautenticación si se quiere cambiar email o password
+      if ((data.password.length >= 6 || data.email !== user.email)) {
+        try {
+          await reauthenticateUser(user.email || "", data.currentPassword);
+        } catch (error) {
+          Alert.alert("Error", "La contraseña actual es incorrecta.");
+          return;
+        }
+      }
+      await auth.currentUser?.reload();
+      console.log("Verificado:", auth.currentUser?.emailVerified);
+      // Cambiar correo si es distinto
+      if (isPasswordUser && data.email !== user.email) {
+        try {
+          await changeEmail(data.email);
+
+          // Revisa si ya está verificado (opcional)
+          await auth.currentUser?.reload();
+          const verified = auth.currentUser?.emailVerified;
+
+          if (!verified) {
+            Alert.alert(
+              "Verificación enviada",
+              "Hemos enviado un correo de verificación a tu nuevo email. Revisa tu bandeja de entrada o spam."
+            );
+          }
+        } catch (error) {
+          Alert.alert("Error", "No se pudo cambiar el correo. Intenta más tarde.");
+        }
       }
 
+      // Cambiar contraseña si aplica
+      if (isPasswordUser && data.password?.length >= 6) {
+        await changePassword(data.password);
+      }
+
+      // Subir nueva imagen si aplica
+      if (isNewImage) {
+        imageUrl = await uploadProfileImage(profileImage, user.id);
+      }
+      // Actualizar campos de usuario
       const payload = {
         name: data.name,
         lastname: data.lastName,
-        email: data.email,
+        email: auth.currentUser?.email || user.email,
         phone_number: data.phone,
         birth_date: data.birthDate,
         image_profile: isImageRemoved ? "" : imageUrl,
@@ -129,22 +177,22 @@ export default function UpdateProfileScreen() {
 
       await updateUserFields(user.id, payload);
 
-      // Eliminar imagen si fue reemplazada o borrada
+      // Eliminar imagen anterior si fue reemplazada o removida
       if (
         previousImageUrl &&
         previousImageUrl.startsWith("https://") &&
         (isNewImage || isImageRemoved)
       ) {
-        console.log("🗑 Eliminando imagen anterior del storage...");
         await deleteProfileImage(previousImageUrl);
       }
 
-      Alert.alert("Perfil actualizado");
-    } catch (error) {
-      console.error("Error al actualizar el perfil:", error);
-      Alert.alert("Error", "No se pudo actualizar el perfil");
+      Alert.alert("Perfil actualizado correctamente");
+    } catch (error: any) {
+      console.error("❌ Error al actualizar el perfil:", error);
+      Alert.alert("Error", error.message || "No se pudo actualizar el perfil");
     }
   };
+
 
 
   return (

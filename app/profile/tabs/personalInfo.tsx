@@ -14,7 +14,7 @@ export default function PersonalInfoTab() {
     const { control, formState: { errors }, handleSubmit } = useFormContext();
 
     return (
-        <ScrollView 
+        <ScrollView
             className="px-4"
             contentContainerStyle={{ paddingBottom: 24 }}
             showsVerticalScrollIndicator={false}
@@ -123,6 +123,21 @@ export default function PersonalInfoTab() {
                             type="password"
                             label="Confirmar contraseña"
                             placeholder="Confirmar contraseña"
+                            value={value}
+                            onChangeText={onChange}
+                            error={error?.message}
+                        />
+                    )}
+                />
+
+                <Controller
+                    control={control}
+                    name="currentPassword"
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <CustomInput
+                            type="password"
+                            label="Contraseña actual"
+                            placeholder="Contraseña actual"
                             value={value}
                             onChangeText={onChange}
                             error={error?.message}
