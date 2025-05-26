@@ -1,12 +1,12 @@
 import Toast, { IToast } from '@/shared/components/Toast';
 import { useToastStore } from '@/shared/toastStore';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-
 export default function RootLayout() {
 
   const toastRef = useRef<IToast>(null);
@@ -20,17 +20,22 @@ export default function RootLayout() {
   }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <Stack>
-          <Stack.Screen name="(app)/(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+      <StripeProvider
+        publishableKey="pk_test_51RSvCs2fv0xNPjGzWnfebcbezI6OsGnaMwKZ9RCHq53SCGN81k4XEALcqioHlYNSaIRnnbJFTIXRWwL0Bz7QvENQ009dgJfc7M"
+        merchantIdentifier="merchant.com.servilink"
+      >
+        <SafeAreaProvider>
+          <Stack>
+            <Stack.Screen name="(app)/(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
 
 
-        <Toast ref={toastRef} />
+          <Toast ref={toastRef} />
 
-        <StatusBar style="light" />
-      </SafeAreaProvider>
+          <StatusBar style="light" />
+        </SafeAreaProvider>
+      </StripeProvider>
     </GestureHandlerRootView>
   );
 }
