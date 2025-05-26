@@ -148,7 +148,7 @@ export default function ProposalDetails() {
                         </View>
                         <View className="border-b border-gray-300/10" />
                         <View>
-                            <UserContact provider={proposal.client} />
+                            <UserContact provider={user?.profileStatus === "client" ? proposal.provider : proposal.client} />
                         </View>
                         <View className="border-b border-gray-300/10" />
 

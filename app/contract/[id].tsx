@@ -124,7 +124,7 @@ export default function ContractDetails() {
                         </View>
                         <View className="border-b border-gray-300/10" />
                         <View>
-                            <UserContact provider={contract.client} />
+                            <UserContact provider={user?.profileStatus === "client" ? contract.provider : contract.client} />
                         </View>
                         <View className="border-b border-gray-300/10" />
 
