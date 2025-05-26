@@ -2,10 +2,9 @@ import { useUserStore } from "@/entities/users";
 import { auth } from "@/lib/firebaseConfig";
 import CustomInput from "@/shared/components/CustomInput";
 import { useToastStore } from "@/shared/toastStore";
-import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView } from "react-native";
 
 
 export default function AuthInfoTab() {
@@ -49,7 +48,7 @@ export default function AuthInfoTab() {
                     />
                 )}
             />
-            <View className={`flex-row justify-center items-center rounded-xl px-5 py-3 ${emailVerified
+{/*             <View className={`flex-row justify-center items-center rounded-xl px-5 py-3 ${emailVerified
                 ? "bg-active-status-servilink/20"
                 : "bg-pending-status-servilink/40"
                 }`}
@@ -60,7 +59,7 @@ export default function AuthInfoTab() {
                 <Text className="text-white font-bold text-sm ml-2">
                     {emailVerified ? "Correo verificado" : "Verificar Correo electrónico"}
                 </Text>
-            </View>
+            </View> */}
 
             <Controller
                 control={control}
