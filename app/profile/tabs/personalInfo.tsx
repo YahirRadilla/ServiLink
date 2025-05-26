@@ -16,53 +16,45 @@ export default function PersonalInfoTab() {
     return (
         <ScrollView
             className="px-4"
-            contentContainerStyle={{ paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: 84 }}
             showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps="always"
         >
             {/* Inputs */}
             <View>
-                <View className="flex-row gap-2">
-                    <View className="flex-1">
-                        <Controller
-                            control={control}
-                            name="name"
-                            render={({ field: { onChange, value }, fieldState: { error } }) => (
-                                <CustomInput
-                                    label="Nombre"
-                                    placeholder="Nombre"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    error={error?.message}
-                                />
-                            )}
-                        />
-                    </View>
-                    <View className="flex-1">
-                        <Controller
-                            control={control}
-                            name="lastName"
-                            render={({ field: { onChange, value }, fieldState: { error } }) => (
-                                <CustomInput
-                                    label="Apellido"
-                                    placeholder="Apellido"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    error={error?.message}
-                                />
-                            )}
-                        />
-                    </View>
-                </View>
-
                 <Controller
                     control={control}
-                    name="email"
+                    name="name"
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                         <CustomInput
-                            type="email"
-                            label="Correo"
-                            placeholder="Correo electrónico"
+                            label="Nombre(s)"
+                            placeholder="Nombre"
+                            value={value}
+                            onChangeText={onChange}
+                            error={error?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name="lastName"
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <CustomInput
+                            label="Primer apellido"
+                            placeholder="Primer apellido"
+                            value={value}
+                            onChangeText={onChange}
+                            error={error?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name="secondLastname"
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <CustomInput
+                            label="Segundo apellido"
+                            placeholder="Segundo apellido"
                             value={value}
                             onChangeText={onChange}
                             error={error?.message}
@@ -84,7 +76,6 @@ export default function PersonalInfoTab() {
                         />
                     )}
                 />
-
                 <Controller
                     control={control}
                     name="phone"
@@ -100,50 +91,7 @@ export default function PersonalInfoTab() {
                     )}
                 />
 
-                <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <CustomInput
-                            type="password"
-                            label="Contraseña"
-                            placeholder="Contraseña"
-                            value={value}
-                            onChangeText={onChange}
-                            error={error?.message}
-                        />
-                    )}
-                />
 
-                <Controller
-                    control={control}
-                    name="confirmPassword"
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <CustomInput
-                            type="password"
-                            label="Confirmar contraseña"
-                            placeholder="Confirmar contraseña"
-                            value={value}
-                            onChangeText={onChange}
-                            error={error?.message}
-                        />
-                    )}
-                />
-
-                <Controller
-                    control={control}
-                    name="currentPassword"
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <CustomInput
-                            type="password"
-                            label="Contraseña actual"
-                            placeholder="Contraseña actual"
-                            value={value}
-                            onChangeText={onChange}
-                            error={error?.message}
-                        />
-                    )}
-                />
             </View>
         </ScrollView>
     );

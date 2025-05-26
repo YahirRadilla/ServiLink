@@ -4,54 +4,75 @@ import { changeEmail, changePassword, deleteProfileImage, reauthenticateUser, up
 import { auth } from "@/lib/firebaseConfig";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
+import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from "expo-image-picker";
 import { Stack } from "expo-router";
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { Alert, Dimensions, Image, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
+import { Dimensions, Image, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
 import * as Yup from "yup";
 import AddressTab from "./tabs/addressInfo";
 import PersonalInfoTab from "./tabs/personalInfo";
 // @ts-ignore
 import Avatar from "../../shared/svg/avatar.svg";
+import AuthInfoTab from "./tabs/authInfo";
 
-const schema = Yup.object({
+const schema = (userEmail: string) => Yup.object({
   name: Yup.string().required("Campo requerido"),
   lastName: Yup.string().required("Campo requerido"),
-  email: Yup.string().email("Correo inválido").required("Campo requerido"),
+  secondLastname: Yup.string().notRequired(),
   phone: Yup.string().min(10, "Ingresa un número de telefono de 10 dígitos").required("Campo requerido"),
   birthDate: Yup.date().required("Campo requerido"),
-  password: Yup.string().min(6, "Mínimo 6 caracteres").required("Campo requerido"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
-    .required("Campo requerido"),
-  neighborhood: Yup.string().required("Campo requerido"),
-  streetAddress: Yup.string().required("Campo requerido"),
-  zipCode: Yup.string().required("Campo requerido"),
-  /* currentPassword: Yup.string().when(['email', 'password'], {
-    is: (email: string, password: string) => !!email || !!password,
-    then: Yup.string().required("Debes confirmar tu contraseña actual"),
+  neighborhood: Yup.string(),
+  streetAddress: Yup.string(),
+  zipCode: Yup.string(),
+  email: Yup.string().email("Correo inválido"),
+  /* password: Yup.string().min(6, "Mínimo 6 caracteres").when((value) => {
+    return value ? Yup.string().notRequired() : Yup.string().required("Campo requerido");
   }), */
-  currentPassword: Yup.string().when("password", (password, schema) => {
-    return !!password && password.length >= 6
-      ? schema.required("Debes confirmar tu contraseña actual")
-      : schema.notRequired();
+  password: Yup.string()
+    .transform((value) => (value === "" ? undefined : value))
+    .min(6, "Mínimo 6 caracteres")
+    .notRequired(),
+  confirmPassword: Yup.string()
+    .when("password", {
+      is: (password: string) => !!password,
+      then: (schema) =>
+        schema
+          .required("Confirma tu nueva contraseña")
+          .oneOf([Yup.ref("password")], "Las contraseñas no coinciden"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+  currentPassword: Yup.string().when(["email", "password", "confirmPassword"], {
+    is: (email: string, password: string, confirmPassword: string, schema: any) => {
+      /* !!password || !!confirmPassword, // Si se está cambiando la contraseña */
+      /* const emailChanged = email && schema?.options?.context?.userEmail !== email; */
+      const emailChanged = !!email && userEmail !== email;
+      const passwordChanged = !!password || !!confirmPassword;
+
+      return emailChanged || passwordChanged;
+    },
+    then: (schema) =>
+      schema.required("Debes confirmar tu contraseña actual"),
+    otherwise: (schema) => schema.notRequired(),
   }),
 });
 
 
 export default function UpdateProfileScreen() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToastStore((s) => s.toastRef);
   const user = useUserStore((state) => state.user);
   const [profileImage, setProfileImage] = useState(user?.imageProfile || "");
-
   const methods = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema(user?.email || "")),
     defaultValues: {
       name: user?.name || "",
       lastName: user?.lastname || "",
+      secondLastname: user?.secondLastname || "",
       email: user?.email || "",
       phone: user?.phoneNumber || "",
       birthDate: user?.birthDate ? new Date(user.birthDate) : new Date(),
@@ -71,7 +92,7 @@ export default function UpdateProfileScreen() {
   const handlePickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      return Alert.alert("Permiso requerido", "Se necesita acceso a la galería");
+      return toast?.show("Acceso a galería denegado", "error", 2000);
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -90,6 +111,7 @@ export default function UpdateProfileScreen() {
   const routes = [
     { key: "personal", title: "Información Personal" },
     { key: "address", title: "Dirección" },
+    { key: "auth", title: "Credenciales" }
   ];
 
   const renderScene = ({ route }: { route: { key: string } }) => {
@@ -98,14 +120,17 @@ export default function UpdateProfileScreen() {
         return <PersonalInfoTab />;
       case "address":
         return <AddressTab />;
+      case "auth":
+        return <AuthInfoTab />;
       default:
         return null;
     }
   };
- //TO-DO
+  //TO-DO
   const onUpdate = async (data: any) => {
-    if (!user?.id) return Alert.alert("Error", "No se encontró el usuario");
-
+    if (!user?.id) return toast?.show("Usuario no encontrado", "error", 2000);
+    
+    setIsSubmitting(true);
     try {
       const previousImageUrl = user.imageProfile;
       let imageUrl = previousImageUrl;
@@ -120,12 +145,44 @@ export default function UpdateProfileScreen() {
 
       const isImageRemoved = !profileImage && !!previousImageUrl;
 
+      // Subir nueva imagen si aplica
+      if (isNewImage) {
+        imageUrl = await uploadProfileImage(profileImage, user.id);
+      }
+
+      // Eliminar imagen anterior si fue reemplazada o removida
+      if (
+        previousImageUrl &&
+        previousImageUrl.startsWith("https://") &&
+        (isNewImage || isImageRemoved)
+      ) {
+        await deleteProfileImage(previousImageUrl);
+      }
+
+      // Actualizar campos de usuario
+      const payload = {
+        name: data.name,
+        lastname: data.lastName,
+        second_lastname: data.secondLastname,
+        email: auth.currentUser?.email || user.email,
+        phone_number: data.phone,
+        birth_date: data.birthDate,
+        image_profile: isImageRemoved ? "" : imageUrl,
+        address: {
+          neighborhood: data.neighborhood,
+          streetAddress: data.streetAddress,
+          zipCode: data.zipCode,
+        },
+      };
+
+      await updateUserFields(user.id, payload);
+
       // Reautenticación si se quiere cambiar email o password
-      if ((data.password.length >= 6 || data.email !== user.email)) {
+      if ((data.password?.length >= 6 || data.email !== user.email)) {
         try {
           await reauthenticateUser(user.email || "", data.currentPassword);
         } catch (error) {
-          Alert.alert("Error", "La contraseña actual es incorrecta.");
+          toast?.show("Contraseña actual incorrecta", "error", 2000);
           return;
         }
       }
@@ -141,55 +198,22 @@ export default function UpdateProfileScreen() {
           const verified = auth.currentUser?.emailVerified;
 
           if (!verified) {
-            Alert.alert(
-              "Verificación enviada",
-              "Hemos enviado un correo de verificación a tu nuevo email. Revisa tu bandeja de entrada o spam."
-            );
+            toast?.show("Hemos enviado un correo de verificación", "info", 2000);
           }
         } catch (error) {
-          Alert.alert("Error", "No se pudo cambiar el correo. Intenta más tarde.");
+          toast?.show("Error al actualizar el correo", "error", 2000);
         }
       }
-
       // Cambiar contraseña si aplica
       if (isPasswordUser && data.password?.length >= 6) {
         await changePassword(data.password);
       }
-
-      // Subir nueva imagen si aplica
-      if (isNewImage) {
-        imageUrl = await uploadProfileImage(profileImage, user.id);
-      }
-      // Actualizar campos de usuario
-      const payload = {
-        name: data.name,
-        lastname: data.lastName,
-        email: auth.currentUser?.email || user.email,
-        phone_number: data.phone,
-        birth_date: data.birthDate,
-        image_profile: isImageRemoved ? "" : imageUrl,
-        address: {
-          neighborhood: data.neighborhood,
-          streetAddress: data.streetAddress,
-          zipCode: data.zipCode,
-        },
-      };
-
-      await updateUserFields(user.id, payload);
-
-      // Eliminar imagen anterior si fue reemplazada o removida
-      if (
-        previousImageUrl &&
-        previousImageUrl.startsWith("https://") &&
-        (isNewImage || isImageRemoved)
-      ) {
-        await deleteProfileImage(previousImageUrl);
-      }
-
-      Alert.alert("Perfil actualizado correctamente");
+      toast?.show("Perfil actualizado correctamente", "success", 2000);
     } catch (error: any) {
       console.error("❌ Error al actualizar el perfil:", error);
-      Alert.alert("Error", error.message || "No se pudo actualizar el perfil");
+      toast?.show("Algo salió mal, intenta de nuevo", "error", 2000);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -276,7 +300,12 @@ export default function UpdateProfileScreen() {
           zIndex: 20,
         }}
       >
-        <CustomButton label="Guardar Cambios" onPress={handleSubmit(onUpdate)} />
+        <CustomButton 
+          label="Guardar Cambios" 
+          onPress={handleSubmit(onUpdate)}
+          disabled={isSubmitting} 
+          loading={isSubmitting}
+          />
       </View>
 
       <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
