@@ -3,11 +3,21 @@ import { useNavigation } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
 
-export default function BackButton() {
+interface BackButtonProps {
+  onPress?: () => void;
+}
+
+export default function BackButton( {onPress}: BackButtonProps) {
     const router = useNavigation();
 
     const handleBack = () => {
-        router.goBack();
+        if (onPress) {
+            onPress();
+            return;
+        }
+        else {
+            router.goBack();
+        }
     };
 
     return (

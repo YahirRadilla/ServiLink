@@ -3,7 +3,7 @@ import { auth, db } from "@/lib/firebaseConfig";
 import { storage } from "@/lib/firebaseStorageConfig";
 import { mapFirestoreUserToTUser } from "@/mappers/firebaseAuthToUser";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, verifyBeforeUpdateEmail } from "firebase/auth";
-import { collection, doc, getDocs, onSnapshot, query, updateDoc, where, } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const listenToUserChanges = (
@@ -11,10 +11,27 @@ export const listenToUserChanges = (
   onUpdate: (user: TUser) => void
 ) => {
   const ref = doc(db, "users", userId);
-  return onSnapshot(ref, (snap) => {
+  return onSnapshot(ref, async (snap) => {
     if (!snap.exists()) return;
-    const data = mapFirestoreUserToTUser({ ...snap.data(), id: snap.id });
-    onUpdate(data);
+    const userData = snap.data();
+    let providerData = null;
+    if (userData.profile_status === "provider" && userData.provider_id) {
+      const providerSnap = await getDoc(userData.provider_id);
+      if (providerSnap.exists()) {
+        const providerRaw = providerSnap.data();
+        providerData = providerRaw ? {
+          ...providerRaw,
+          id: providerSnap.id
+        } : null;
+      }
+    }
+    const mappedUser = mapFirestoreUserToTUser({
+      ...userData,
+      id: snap.id,
+      provider: providerData,
+    });
+    console.log("📦 User completo:", mappedUser);
+    onUpdate(mappedUser);
   });
 };
 
@@ -90,4 +107,32 @@ export const emailExistsInFirestore = async (email: string) => {
   const q = query(collection(db, "users"), where("email", "==", email));
   const snapshot = await getDocs(q);
   return !snapshot.empty;
+};
+
+export const updateProviderRFC = async (userId: string, rfc: string, providerId: string) => {
+  try {
+    console.log("✅ Iniciando update RFC");
+    const providerRef = doc(db, "providers", providerId);
+    await updateDoc(providerRef, { rfc });
+    console.log("✅ RFC actualizado en provider");
+
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, { profile_status: "provider" });
+    console.log("✅ Perfil actualizado a provider");
+  } catch (err) {
+    console.error("🔥 Error exacto:", err);
+    throw err;
+  }
+};
+
+export const updateProviderStatus = async (userId: string, status: "client" | "provider") => {
+  try {
+    console.log("✅ Iniciando update provider status");
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, { profile_status: status });
+    console.log(`✅ Perfil actualizado a ${status}`);
+  } catch (err) {
+    console.error("🔥 Error exacto:", err);
+    throw err;
+  }
 };
