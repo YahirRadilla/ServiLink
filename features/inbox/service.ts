@@ -5,6 +5,7 @@ import {
     addDoc,
     collection,
     doc,
+    getDocs,
     limit,
     onSnapshot,
     orderBy,
@@ -73,4 +74,35 @@ export const sendMessage = async (message: Omit<TMessage, "id" | "date">) => {
 const updateLastMessage = async (conversationId: string, lastMessage: string) => {
     const convRef = doc(db, "conversations", conversationId);
     await updateDoc(convRef, { last_message: lastMessage });
+};
+
+
+export const createConversationIfNotExists = async (
+    clientId: string,
+    providerId: string
+): Promise<string> => {
+    const clientRef = doc(db, "users", clientId);
+    const providerRef = doc(db, "users", providerId);
+
+    const q = query(
+        collection(db, "conversations"),
+        where("client_id", "==", clientRef),
+        where("provider_id", "==", providerRef)
+    );
+
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+        // Ya existe
+        return snapshot.docs[0].id;
+    }
+
+    // Si no existe, la creamos
+    const newConv = await addDoc(collection(db, "conversations"), {
+        client_id: clientRef,
+        provider_id: providerRef,
+        last_message: "",
+        created_at: serverTimestamp(),
+    });
+
+    return newConv.id;
 };

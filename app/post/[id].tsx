@@ -129,7 +129,7 @@ export default function Details() {
                         </View>
 
                         <View>
-                            <UserContact provider={post.provider} />
+                            <UserContact showStartChat={user?.profileStatus === 'client'} provider={post.provider} />
                         </View>
                         <View>
                             <Text className="font-semibold text-lg text-white">Galería</Text>
