@@ -3,7 +3,7 @@ import { auth, db } from "@/lib/firebaseConfig";
 import { storage } from "@/lib/firebaseStorageConfig";
 import { mapFirestoreUserToTUser } from "@/mappers/firebaseAuthToUser";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, verifyBeforeUpdateEmail } from "firebase/auth";
-import { doc, onSnapshot, updateDoc, } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot, query, updateDoc, where, } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const listenToUserChanges = (
@@ -22,7 +22,6 @@ export const updateUserFields = async (userId: string, fields: Partial<TUser>) =
   const ref = doc(db, "users", userId);
   await updateDoc(ref, fields);
 };
-
 
 export const uploadProfileImage = async (uri: string, userId: string): Promise<string> => {
   try {
@@ -66,20 +65,6 @@ export const changePassword = async (newPassword: string) => {
   }
 };
 
-/* export const changeEmail = async (newEmail: string) => {
-  const user = auth.currentUser;
-  if (user) {
-    try {
-      await updateEmail(user, newEmail);
-      await updateDoc(doc(db, "users", user.uid), { email: newEmail });
-      console.log("Email actualizado correctamente");
-    } catch (error) {
-      console.error("Error al actualizar el email:", error);
-      throw error;
-    }
-  }
-}; */
-
 export const changeEmail = async (newEmail: string) => {
   const user = auth.currentUser;
   if (!user) throw new Error("Usuario no autenticado");
@@ -101,10 +86,8 @@ export const reauthenticateUser = async (email: string, password: string) => {
   await reauthenticateWithCredential(user, credential);
 };
 
-/* export const reauthenticateUser = async (email: string, password: string) => {
-  const user = auth.currentUser;
-  if (!user || !user.email) throw new Error("Usuario no autenticado");
-
-  const credential = EmailAuthProvider.credential(email, password);
-  await reauthenticateWithCredential(user, credential);
-}; */
+export const emailExistsInFirestore = async (email: string) => {
+  const q = query(collection(db, "users"), where("email", "==", email));
+  const snapshot = await getDocs(q);
+  return !snapshot.empty;
+};

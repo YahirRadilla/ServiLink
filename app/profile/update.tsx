@@ -1,6 +1,6 @@
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
-import { changeEmail, changePassword, deleteProfileImage, reauthenticateUser, updateUserFields, uploadProfileImage } from "@/features/users/services";
+import { changePassword, deleteProfileImage, emailExistsInFirestore, reauthenticateUser, updateUserFields, uploadProfileImage } from "@/features/users/services";
 import { auth } from "@/lib/firebaseConfig";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
@@ -15,10 +15,10 @@ import { Dimensions, Image, KeyboardAvoidingView, Platform, Pressable, Text, Vie
 import { TabBar, TabView } from "react-native-tab-view";
 import * as Yup from "yup";
 import AddressTab from "./tabs/addressInfo";
+import AuthInfoTab from "./tabs/authInfo";
 import PersonalInfoTab from "./tabs/personalInfo";
 // @ts-ignore
 import Avatar from "../../shared/svg/avatar.svg";
-import AuthInfoTab from "./tabs/authInfo";
 
 const schema = (userEmail: string) => Yup.object({
   name: Yup.string().required("Campo requerido"),
@@ -30,9 +30,6 @@ const schema = (userEmail: string) => Yup.object({
   streetAddress: Yup.string(),
   zipCode: Yup.string(),
   email: Yup.string().email("Correo inválido"),
-  /* password: Yup.string().min(6, "Mínimo 6 caracteres").when((value) => {
-    return value ? Yup.string().notRequired() : Yup.string().required("Campo requerido");
-  }), */
   password: Yup.string()
     .transform((value) => (value === "" ? undefined : value))
     .min(6, "Mínimo 6 caracteres")
@@ -48,8 +45,6 @@ const schema = (userEmail: string) => Yup.object({
     }),
   currentPassword: Yup.string().when(["email", "password", "confirmPassword"], {
     is: (email: string, password: string, confirmPassword: string, schema: any) => {
-      /* !!password || !!confirmPassword, // Si se está cambiando la contraseña */
-      /* const emailChanged = email && schema?.options?.context?.userEmail !== email; */
       const emailChanged = !!email && userEmail !== email;
       const passwordChanged = !!password || !!confirmPassword;
 
@@ -60,7 +55,6 @@ const schema = (userEmail: string) => Yup.object({
     otherwise: (schema) => schema.notRequired(),
   }),
 });
-
 
 export default function UpdateProfileScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,10 +120,9 @@ export default function UpdateProfileScreen() {
         return null;
     }
   };
-  //TO-DO
+
   const onUpdate = async (data: any) => {
     if (!user?.id) return toast?.show("Usuario no encontrado", "error", 2000);
-    
     setIsSubmitting(true);
     try {
       const previousImageUrl = user.imageProfile;
@@ -159,12 +152,29 @@ export default function UpdateProfileScreen() {
         await deleteProfileImage(previousImageUrl);
       }
 
-      // Actualizar campos de usuario
+      if (data.email !== user.email) {
+        const exists = await emailExistsInFirestore(data.email);
+        if (exists) {
+          toast?.show("Este correo ya está en uso por otra cuenta", "error", 2000);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      // Reautenticación si se quiere cambiar email o password
+      if ((data.password?.length >= 6 || data.email !== user.email)) {
+        try {
+          await reauthenticateUser(user.email || "", data.currentPassword);
+        } catch (error) {
+          toast?.show("Contraseña actual incorrecta", "error", 2000);
+          setIsSubmitting(false);
+          return;
+        }
+      }
       const payload = {
         name: data.name,
         lastname: data.lastName,
         second_lastname: data.secondLastname,
-        email: auth.currentUser?.email || user.email,
+        email: data.email,
         phone_number: data.phone,
         birth_date: data.birthDate,
         image_profile: isImageRemoved ? "" : imageUrl,
@@ -177,33 +187,8 @@ export default function UpdateProfileScreen() {
 
       await updateUserFields(user.id, payload);
 
-      // Reautenticación si se quiere cambiar email o password
-      if ((data.password?.length >= 6 || data.email !== user.email)) {
-        try {
-          await reauthenticateUser(user.email || "", data.currentPassword);
-        } catch (error) {
-          toast?.show("Contraseña actual incorrecta", "error", 2000);
-          return;
-        }
-      }
       await auth.currentUser?.reload();
       console.log("Verificado:", auth.currentUser?.emailVerified);
-      // Cambiar correo si es distinto
-      if (isPasswordUser && data.email !== user.email) {
-        try {
-          await changeEmail(data.email);
-
-          // Revisa si ya está verificado (opcional)
-          await auth.currentUser?.reload();
-          const verified = auth.currentUser?.emailVerified;
-
-          if (!verified) {
-            toast?.show("Hemos enviado un correo de verificación", "info", 2000);
-          }
-        } catch (error) {
-          toast?.show("Error al actualizar el correo", "error", 2000);
-        }
-      }
       // Cambiar contraseña si aplica
       if (isPasswordUser && data.password?.length >= 6) {
         await changePassword(data.password);
@@ -216,8 +201,6 @@ export default function UpdateProfileScreen() {
       setIsSubmitting(false);
     }
   };
-
-
 
   return (
     <Screen>
@@ -283,7 +266,7 @@ export default function UpdateProfileScreen() {
                 }}
                 activeColor="#fff"
                 inactiveColor="#888"
-                pressColor="#3D5DC7"
+                pressColor="#161622"
               />
             )}
           />
@@ -300,12 +283,12 @@ export default function UpdateProfileScreen() {
           zIndex: 20,
         }}
       >
-        <CustomButton 
-          label="Guardar Cambios" 
+        <CustomButton
+          label="Guardar Cambios"
           onPress={handleSubmit(onUpdate)}
-          disabled={isSubmitting} 
+          disabled={isSubmitting}
           loading={isSubmitting}
-          />
+        />
       </View>
 
       <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
