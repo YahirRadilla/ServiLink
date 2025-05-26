@@ -1,7 +1,7 @@
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
 import { useAuth } from "@/features/auth/useAuth";
-import { CustomButton } from "@/shared/components/CustomButton";
+import FloatingSwitchButton from "@/shared/components/FloatingSwitchButton";
 import { ProfileButtons } from "@/shared/components/ProfileButtons";
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -19,7 +19,7 @@ export default function Profile() {
     router.push("/questions");
   };
 
-    const handleTouchUpdateProfile = () => {
+  const handleTouchUpdateProfile = () => {
     router.push("/profile/update");
   };
 
@@ -27,7 +27,7 @@ export default function Profile() {
     router.push("/workspace/workspace");
   };
 
-    const handleBeProvider = () => {
+  const handleBeProvider = () => {
     router.push("/provider/create");
   };
 
@@ -35,6 +35,7 @@ export default function Profile() {
   const user = useUserStore((state) => state.user);
   const hasProfileImage = !!user?.imageProfile?.trim();
 
+  const isProvider = user?.profileStatus === "provider";
 
   return (
     <Screen>
@@ -88,18 +89,12 @@ export default function Profile() {
                 onPress={handleTouchUpdateProfile}
               />
               <ProfileButtons
-                title="Convertirse en proveedor"
-                icon="briefcase-outline"
-                onPress={handleBeProvider}
-              />
-              <ProfileButtons
                 title="FAQs"
                 icon="information-circle-outline"
                 onPress={handleTouchQuestion}
               />
 
               <View className="border-t border-white/10 my-4" />
-
               <ProfileButtons
                 title="Eliminar Cuenta"
                 icon="close-circle-outline"
@@ -120,7 +115,12 @@ export default function Profile() {
         }
         renderItem={() => <></>}
       />
-      <CustomButton className="mt-6" label="Cerrar sesion" onPress={signOut} />
+
+      <FloatingSwitchButton
+        label={isProvider ? "Cambiar a cliente" : "Cambiar a proveedor"}
+        icon={isProvider ? "swap-horizontal" : "briefcase-outline"}
+        onPress={handleBeProvider}
+      />
     </Screen>
   );
 }
