@@ -1,16 +1,14 @@
 import { filtersData } from "@/data/filters";
 import { usePostStore } from "@/entities/posts";
-import { useUserStore } from "@/entities/users";
+
 import { useCreateProposals } from "@/features/proposals/useCreateProposal";
-import { db } from "@/lib/firebaseConfig";
+
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import CustomInput from "@/shared/components/CustomInput";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useStripe } from "@stripe/stripe-react-native";
-import * as Linking from "expo-linking";
+
 import { Stack, useRouter } from "expo-router";
-import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,8 +39,6 @@ export default function CreateProposalScreen() {
     const { loading, createNewProposal } = useCreateProposals();
     const currentPost = usePostStore((state) => state.currentPost);
 
-    const { initPaymentSheet, presentPaymentSheet } = useStripe();
-    const user = useUserStore((s) => s.user);
 
     const {
         control,
@@ -66,49 +62,6 @@ export default function CreateProposalScreen() {
 
     const payMethod = watch("payMethod");
 
-    const handleOpenStripe = async () => {
-        if (!user) return;
-
-        const sessionRef = await addDoc(
-            collection(db, "customers", user.id, "checkout_sessions"),
-            {
-                mode: "setup",
-                client: "mobile",
-                return_url: Linking.createURL("/proposal")
-            }
-        );
-
-        const unsubscribe = onSnapshot(sessionRef, async (snap) => {
-            const data = snap.data();
-            if (
-                !data?.setupIntentClientSecret ||
-                !data?.ephemeralKeySecret ||
-                !data?.customer
-            ) return;
-
-            const { error: initError } = await initPaymentSheet({
-                merchantDisplayName: "ServiLink",
-                customerId: data.customer,
-                customerEphemeralKeySecret: data.ephemeralKeySecret,
-                setupIntentClientSecret: data.setupIntentClientSecret,
-            });
-
-            if (initError) {
-                console.error("Error al inicializar PaymentSheet:", initError);
-                return;
-            }
-
-            const { error: presentError } = await presentPaymentSheet();
-
-            if (presentError) {
-                console.error("Error al mostrar PaymentSheet:", presentError.message);
-            } else {
-                console.log("✅ Método agregado correctamente");
-            }
-
-            unsubscribe();
-        });
-    };
 
     const onSubmit = async (data: any) => {
         console.log(data);
@@ -199,16 +152,6 @@ export default function CreateProposalScreen() {
                         />
                     )}
                 />
-
-                {payMethod === "Tarjeta" && (
-                    <View className="mb-4">
-                        <Text className="text-white font-medium mb-2">Agregar método con Stripe</Text>
-                        <CustomButton
-                            label="Abrir Stripe"
-                            onPress={handleOpenStripe}
-                        />
-                    </View>
-                )}
 
                 <Controller
                     control={control}
