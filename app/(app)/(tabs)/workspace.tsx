@@ -1,13 +1,13 @@
+import { ContractsTab } from "@/app/workspace/tabs/contracts";
+import { PostsTab } from "@/app/workspace/tabs/posts";
+import { ProposalsTab } from "@/app/workspace/tabs/proposals";
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
-import BackButton from "@/shared/components/BackButton";
 import { Stack } from "expo-router";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
-import { ContractsTab } from "./tabs/contracts";
-import { PostsTab } from "./tabs/posts";
-import { ProposalsTab } from "./tabs/proposals";
+
 
 
 
@@ -50,8 +50,12 @@ export default function WorkSpaceScreen() {
         <Screen>
             <Stack.Screen options={{ headerShown: false }} />
 
-            <View className="ml-14 p-4">
-                <Text className="text-white font-bold text-xl">Mi tablero</Text>
+            <View className="flex-row items-center justify-between ">
+                <View>
+                    <Text className="text-white text-2xl font-bold ml-2">
+                        Mi Tablero
+                    </Text>
+                </View>
             </View>
 
             <TabView
@@ -63,19 +67,14 @@ export default function WorkSpaceScreen() {
                 renderTabBar={(props) => (
                     <TabBar
                         {...props}
-                        style={{ backgroundColor: "#161622" }}
+                        style={{ backgroundColor: "#161622"}}
                         indicatorStyle={{ backgroundColor: "#3D5DC7", height: 3, borderRadius: 2 }}
                         activeColor="#fff"
                         inactiveColor="#888"
                         pressColor="#3D5DC7"
                     />
                 )}
-
             />
-
-            <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
-                <BackButton />
-            </View>
         </Screen>
     );
 }

@@ -4,6 +4,7 @@ import { updateProviderRFC, updateProviderStatus } from "@/features/users/servic
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import CustomInput from "@/shared/components/CustomInput";
+import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Stack, useRouter } from "expo-router";
@@ -22,6 +23,7 @@ const schema = () => Yup.object({
 export default function CreateProviderScreen() {
   const user = useUserStore((state) => state.user);
   const router = useRouter();
+  const toast = useToastStore((s) => s.toastRef);
 
 
   const { control, handleSubmit } = useForm({
@@ -42,8 +44,9 @@ export default function CreateProviderScreen() {
 
       await updateProviderRFC(user.id, data.rfc.trim(), user.provider.id);
       router.replace("/profile");
+      toast?.show("RFC actualizado correctamente", "success", 2000);
     } catch (error) {
-      console.error("❌ Error al actualizar el RFC:", error);
+      toast?.show("Error al actualizar el RFC", "error", 2000);
     }
   };
 

@@ -2,7 +2,7 @@ import { Screen } from "@/components/Screen";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 // @ts-ignore
-import Logo from "../../../shared/svg/logo.svg";
+import Logo from "../../shared/svg/logo.svg";
 
 const filtersData = [
   {

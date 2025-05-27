@@ -36,10 +36,10 @@ export default function TabLayout() {
             }}
           />
           <Tabs.Screen
-            name="saved"
+            name="workspace"
             options={{
-              title: 'Guardados',
-              tabBarIcon: ({ color }) => <Ionicons name="bookmark-outline" size={24} color={color} />,
+              title: 'Tablero',
+              tabBarIcon: ({ color }) => <Ionicons name="calendar-outline" size={24} color={color} />,
             }}
           />
           <Tabs.Screen

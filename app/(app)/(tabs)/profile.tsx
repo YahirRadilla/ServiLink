@@ -42,8 +42,8 @@ export default function Profile() {
     router.push("/profile/update");
   };
 
-  const handleTouchWorkspace = () => {
-    router.push("/workspace/workspace");
+  const hanldeSavedPosts = () => {
+    router.push("/saved/saved");
   };
 
   const handleBeProvider = async () => {
@@ -128,9 +128,9 @@ export default function Profile() {
 
               <View className="rounded-xl overflow-hidden">
                 <ProfileButtons
-                  title="Tablero"
-                  icon="calendar-outline"
-                  onPress={handleTouchWorkspace}
+                  title="Guardados"
+                  icon="bookmark-outline"
+                  onPress={hanldeSavedPosts}
                 />
                 <ProfileButtons
                   title="Pagos"
