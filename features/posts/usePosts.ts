@@ -42,7 +42,7 @@ export const usePosts = () => {
         console.log(user);
         try {
             setLoading(true);
-            const id = await createPost(post, (user?.provider as any).provider_id || "");
+            const id = await createPost(post, (user?.provider as any).id || "");
             return id;
         } catch (error) {
             console.error("Error al crear el post desde el hook:", error);

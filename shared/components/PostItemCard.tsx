@@ -1,7 +1,9 @@
+import { useUserStore } from "@/entities/users";
 import { listenToAverageReviewRating } from "@/features/reviews/service";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import { ActionPopover } from "./ActionPopover";
 import SaveButton from "./SavedButton";
 
 type PostItemCardProps = {
@@ -13,6 +15,7 @@ type PostItemCardProps = {
   provider: string;
   service: string;
   rate?: number;
+  ownerId?: string;
 };
 
 export function PostItemCard({
@@ -24,9 +27,14 @@ export function PostItemCard({
   provider,
   service,
   rate,
+  ownerId
 }: PostItemCardProps) {
 
   const [averageRating, setAverageRating] = useState(0);
+  const user = useUserStore((state) => state.user);
+  const isDeletable = user?.id === ownerId;
+  const anchorRef = React.createRef<View>();
+  const [showPopover, setShowPopover] = useState(false);
 
   useEffect(() => {
     const unsubscribe = listenToAverageReviewRating(postId, (avg) => {
@@ -61,6 +69,11 @@ export function PostItemCard({
 
   return (
     <View className="rounded-xl mb-6 overflow-hidden border border-links-servilink">
+      {isDeletable && (
+        <ActionPopover
+          onDelete={() => {}}
+        />
+      )}
       <Pressable
         onPress={onPress}
         android_ripple={{ color: "#ffffff10" }}

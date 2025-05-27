@@ -7,18 +7,17 @@ import {
   LayoutAnimation,
   LayoutChangeEvent,
   Platform,
-  Pressable,
   Text,
   TouchableOpacity,
   UIManager,
   View
 } from "react-native";
 import * as Animatable from 'react-native-animatable';
-import Popover, { PopoverPlacement } from "react-native-popover-view";
 
 import { useReviewStore } from "@/entities/reviews";
 import { useUserStore } from "@/entities/users";
 import { deleteReview } from "@/features/reviews/service";
+import { ActionPopover } from "./ActionPopover";
 import { Gallery } from "./Galery";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -154,41 +153,9 @@ export function ReviewCard({ review, onDeleteLocal }: ReviewCardProps) {
             </Text>
           </View>
           {isDeletable && (
-            <View style={{ position: "relative", zIndex: 9999 }}>
-              <Pressable
-                ref={anchorRef}
-                onPress={() => setShowPopover(true)}
-                className={"bg-black/20 rounded-full p-2"}
-              >
-                <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
-              </Pressable>
-              <Popover
-                isVisible={showPopover}
-                onRequestClose={() => setShowPopover(false)}
-                from={anchorRef as React.RefObject<any>}
-                placement={PopoverPlacement.LEFT}
-                backgroundStyle={{ backgroundColor: "transparent" }}
-                popoverStyle={{
-                  backgroundColor: "#1f1f2e",
-                  paddingVertical: 8,
-                  borderRadius: 8,
-                }}
-              >
-                <Pressable
-                  onPress={handleDelete}
-                  className="px-4 py-2"
-                  style={({ pressed }) => ({
-                    backgroundColor: pressed ? "#2a2a3a" : "transparent",
-                    borderRadius: 8,
-                  })}
-                >
-                  <View className="flex-row items-center gap-x-2">
-                    <Ionicons name="trash-outline" size={20} color="#F75555" />
-                    <Text className="text-[#F75555] font-medium text-base">Eliminar</Text>
-                  </View>
-                </Pressable>
-              </Popover>
-            </View>
+            <ActionPopover
+              onDelete={handleDelete}
+            />
           )}
         </View>
 

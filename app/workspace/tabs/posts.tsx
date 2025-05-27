@@ -69,6 +69,7 @@ export const PostsTab = () => {
                             provider={item.provider.name}
                             service={item.service}
                             rate={item.valoration}
+                            ownerId={item.provider.id}
                         />
                     </Animatable.View>
 

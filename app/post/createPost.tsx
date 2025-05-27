@@ -3,6 +3,7 @@ import { usePosts } from '@/features/posts/usePosts';
 import BackButton from '@/shared/components/BackButton';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
+import { useToastStore } from "@/shared/toastStore";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Stack, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
@@ -29,6 +30,7 @@ const schema = Yup.object({
 
 export default function CreatePostScreen() {
     const router = useRouter();
+    const toast = useToastStore((s) => s.toastRef);
     const { loading, createNewPost } = usePosts();
     const {
         control,
@@ -54,7 +56,15 @@ export default function CreatePostScreen() {
 
 
     const onSubmit = async (data: any) => {
-        createNewPost(data);
+        const isCreated = createNewPost(data);
+        if (!isCreated) {
+            toast?.show('Error al crear la publicación', 'error', 2000);
+            console.error('Error al crear la publicación');
+            return;
+        }else{
+            router.replace('/workspace');
+            toast?.show('Publicación creada correctamente', 'success', 2000);
+        }
         console.log('Publicación enviada:', data);
     };
 
