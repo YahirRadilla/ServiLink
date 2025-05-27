@@ -1,20 +1,69 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, View } from "react-native";
+import { useEffect } from "react";
+import { Pressable, StyleSheet } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from "react-native-reanimated";
 
 type FloatingActionButtonProps = {
   onPress: () => void;
 };
 
 export function FloatingActionButton({ onPress }: FloatingActionButtonProps) {
+  const scale = useSharedValue(0.85);
+  const opacity = useSharedValue(1);
+  const contentOpacity = useSharedValue(1);
+
+  useEffect(() => {
+    scale.value = withTiming(1.1, {
+      duration: 500,
+      easing: Easing.bezier(0.2, 1, 0.3, 1),
+    });
+    opacity.value = withTiming(1, {
+      duration: 500,
+      easing: Easing.out(Easing.exp),
+    });
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  const contentAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: contentOpacity.value,
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withTiming(1.05, {
+      duration: 700,
+      easing: Easing.out(Easing.exp),
+    });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withTiming(1.1, {
+      duration: 700,
+      easing: Easing.out(Easing.exp),
+    });
+  };
+
   return (
-    <View style={styles.container}>
-      <Pressable onPress={onPress} style={({ pressed }) => [
-        styles.button,
-        { opacity: pressed ? 0.85 : 1 },
-      ]}>
+    <Animated.View style={[styles.container, animatedStyle]}>
+      <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.button,
+          { opacity: pressed ? 0.85 : 1 },
+        ]}>
         <Ionicons name="add" size={28} color="#fff" />
       </Pressable>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -22,7 +71,7 @@ const styles = StyleSheet.create({
   container: {
     position: "absolute",
     right: 40,
-    bottom: 50,
+    bottom: 100,
     zIndex: 999,
   },
   button: {

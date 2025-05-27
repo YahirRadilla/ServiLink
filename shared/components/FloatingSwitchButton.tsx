@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
-        shadowRadius: 5,
+        shadowRadius: 4,
     },
     label: {
         color: "#fff",

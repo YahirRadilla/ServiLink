@@ -36,8 +36,7 @@ export const PostsTab = () => {
 
     return (
 
-        <View>
-            <FloatingActionButton onPress={handlePressFloating} />
+        <View className="flex-1">
             <FlatList
                 data={posts}
                 onEndReached={hasMore ? loadMore : undefined}
@@ -50,7 +49,6 @@ export const PostsTab = () => {
                         <Text className="text-white text-2xl font-bold ml-2">
                             Publicaciones
                         </Text>
-
                     </View>
                 }
                 renderItem={({ item, index }) => (
@@ -93,6 +91,7 @@ export const PostsTab = () => {
                     ) : null
                 }
             />
+            <FloatingActionButton onPress={handlePressFloating} />
         </View>
     );
 };
