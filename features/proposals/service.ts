@@ -201,13 +201,12 @@ export const acceptProposalAndCreateContract = async (
     try {
         const proposalRef = doc(db, "proposals", proposalId);
 
-
         await updateDoc(proposalRef, {
-            accept_status: "accepted"
+            accept_status: "accepted",
         });
 
-
         const contractsRef = collection(db, "contracts");
+
         const contractData = {
             client_id: doc(db, "users", data.client.id),
             provider_id: doc(db, "users", data.provider.id),
@@ -226,10 +225,28 @@ export const acceptProposalAndCreateContract = async (
                 neighborhood: data.address.neighborhood,
                 latitude: data.address.latitude,
                 longitude: data.address.longitude,
-            }
+            },
         };
 
-        await addDoc(contractsRef, contractData);
+        const contractDoc = await addDoc(contractsRef, contractData);
+
+        // ✅ Si el pago es con tarjeta, crear el checkout_session
+        if (data.paymentMethod === "card") {
+            const sessionRef = collection(db, `customers/${data.client.id}/checkout_sessions`);
+            const totalAmount = data.offers.reduce((acc: number, offer: any) => acc + Number(offer.price), 0);
+
+            await addDoc(sessionRef, {
+                client: "mobile",
+                mode: "payment",
+                amount: Math.round(totalAmount * 100), // en centavos
+                currency: "mxn",
+                success_url: "yourapp://payment-success",
+                cancel_url: "yourapp://payment-cancel",
+                metadata: {
+                    contract_id: contractDoc.id,
+                },
+            });
+        }
 
         return true;
     } catch (error) {

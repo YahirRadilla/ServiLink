@@ -2,6 +2,7 @@ import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { useUserStore } from "@/entities/users";
 import { manageStatusContract } from "@/features/contracts/service";
 import { useContractById } from "@/features/contracts/useContractById";
+import { usePaymentSheetSetup } from "@/features/contracts/usePaymentSheetSetup";
 import BackButton from "@/shared/components/BackButton";
 import { ConfirmModal } from "@/shared/components/ConfirmModal";
 import { CustomButton } from "@/shared/components/CustomButton";
@@ -12,10 +13,12 @@ import { StatusChip, StatusType } from "@/shared/components/StatusChip";
 import { UserContact } from "@/shared/components/UserContact";
 import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
+import { presentPaymentSheet } from "@stripe/stripe-react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
+
 import MapView, { MapMarker } from "react-native-maps";
 
 export default function ContractDetails() {
@@ -27,6 +30,12 @@ export default function ContractDetails() {
     const toast = useToastStore((s) => s.toastRef);
     const [modalVisible, setModalVisible] = useState(false);
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => { });
+    const [loadingPayment, setLoadingPayment] = useState(false);
+    const { showPaymentButton, initializePaymentSheet } = usePaymentSheetSetup({
+        contract,
+        userId: user?.id,
+        profileStatus: user?.profileStatus,
+    });
     const handleTouchPost = (id: string) => {
         if (!id) return;
         router.push({
@@ -61,6 +70,11 @@ export default function ContractDetails() {
             console.log("No se pudo activar el contrato");
         }
     };
+
+    useEffect(() => {
+        initializePaymentSheet();
+    }, [contract]);
+
 
     if (loading || !contract) {
         return (
@@ -212,16 +226,33 @@ export default function ContractDetails() {
                         </>
                     )}
 
+
+
                     {user?.profileStatus === "client" && (
-                        <CustomButton
-                            className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                            onPress={() => {
-                                // lógica para cancelar contrato
-                                setConfirmAction(() => handleCancelContract);
-                                setModalVisible(true);
-                            }}
-                            icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
-                        />
+                        <>
+                            <CustomButton
+                                className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                onPress={() => {
+                                    setConfirmAction(() => handleCancelContract);
+                                    setModalVisible(true);
+                                }}
+                                icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                            />
+                            {contract.paymentMethod === "card" && showPaymentButton && (
+                                <CustomButton
+                                    className="bg-[#3D5DC7] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                    onPress={async () => {
+                                        const { error } = await presentPaymentSheet();
+                                        if (error) {
+                                            console.error("Error al pagar:", error);
+                                        } else {
+                                            toast?.show("Pago exitoso ✅", "success", 3000);
+                                        }
+                                    }}
+                                    icon={<Ionicons name="card" size={24} color="white" />}
+                                />
+                            )}
+                        </>
                     )}
                 </View>
             )}
@@ -249,6 +280,8 @@ export default function ContractDetails() {
 
 
 
+
+
             <ConfirmModal
                 isVisible={modalVisible}
                 onClose={() => setModalVisible(false)}
@@ -257,6 +290,6 @@ export default function ContractDetails() {
                 }}
             />
 
-        </SingleEntityScreen>
+        </SingleEntityScreen >
     );
 }
