@@ -129,7 +129,7 @@ export default function Details() {
                         </View>
 
                         <View>
-                            <UserContact showStartChat={user?.profileStatus === 'client'} provider={post.provider} />
+                            <UserContact showStartChat={user?.profileStatus === 'client' && (user?.id !== post.provider.id)} provider={post.provider} />
                         </View>
                         <View>
                             <Text className="font-semibold text-lg text-white">Galería</Text>
@@ -219,7 +219,7 @@ export default function Details() {
                 </View>
             </ScrollView>
             {
-                user?.profileStatus === "client" && (
+                user?.profileStatus === "client" && (user?.id !== post.provider.id) && (
                     <View className="p-4 absolute bottom-0 w-full flex-row items-center justify-between bg-black/80">
                         <View className="flex-row items-center gap-x-2">
                             <Text className="text-lg text-white/60">Precios</Text>

@@ -63,7 +63,7 @@ export default function WorkSpaceScreen() {
                 renderScene={renderScene}
                 onIndexChange={setIndex}
                 initialLayout={{ width: layout.width }}
-                style={{ flex: 1 }}
+                style={{ flex: 1, paddingBottom: 66}}
                 renderTabBar={(props) => (
                     <TabBar
                         {...props}

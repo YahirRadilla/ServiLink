@@ -58,18 +58,29 @@ export const ContractsTab = () => {
                     </View>
                 </View>
             }
-            renderItem={({ item }) => (
-                <ItemCard
-                    onPress={() => { handleTouchProposal(item.id) }}
-                    image={item.referenceImages?.[0] || item.post.images[0]}
-                    title={item.post.title}
-                    status={item.progressStatus as any}
-                    provider={`${item.client.name} - ${item.post.service}`}
-                    date={item.createdAt.toDate().toLocaleDateString()}
-                    price={item.offers[item.offers.length - 1].price}
-                    type="contract"
-                />
-            )}
+            renderItem={({ item }) => {
+                const isPostDeleted = item.post.id === "deleted";
+                return (
+                    <ItemCard
+                        onPress={() => handleTouchProposal(item.id)}
+                        image={
+                            isPostDeleted
+                                ? item.referenceImages?.[0] || "https://placehold.co/600x400?text=Eliminado"
+                                : item.post.images[0]
+                        }
+                        title={isPostDeleted ? "Publicación eliminada" : item.post.title}
+                        status={item.progressStatus as any}
+                        provider={
+                            isPostDeleted
+                                ? item.client.name
+                                : `${item.client.name} - ${item.post.service}`
+                        }
+                        date={item.createdAt.toDate().toLocaleDateString()}
+                        price={item.offers[item.offers.length - 1].price}
+                        type="contract"
+                    />
+                );
+            }}
             keyExtractor={(item) => item.id}
             onEndReachedThreshold={0.1}
             refreshing={isRefreshing}

@@ -14,6 +14,7 @@ type PostState = {
     clearPosts: () => void;
     resetFilters: () => void;
     getProviderByPostId: (id: string) => string | null;
+    disablePostLocally: (id: string) => void;
 };
 
 export const usePostStore = create<PostState>((set, get) => ({
@@ -77,4 +78,15 @@ export const usePostStore = create<PostState>((set, get) => ({
         const post = get().posts.find((post) => post.id === id);
         return post ? post.provider.id : null;
     },
+
+
+    disablePostLocally: (id: string) =>
+        set((state) => ({
+            posts: state.posts.map((post) =>
+                post.id === id ? { ...post, status: false } : post
+            ),
+            filteredPosts: state.filteredPosts.map((post) =>
+                post.id === id ? { ...post, status: false } : post
+            ),
+        })),
 }));
