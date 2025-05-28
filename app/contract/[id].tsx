@@ -32,8 +32,8 @@ export default function ContractDetails() {
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => { });
     const { showPaymentButton, initializePaymentSheet, loadingIsPayment, setShowPaymentButton } = usePaymentSheetSetup({
         contract,
-        userId: user?.id,
-        profileStatus: user?.profileStatus,
+        userId: contract?.client.id,
+        profileStatus: contract?.client.profileStatus,
     });
     const handleTouchPost = (id: string) => {
         if (!id) return;
@@ -226,9 +226,10 @@ export default function ContractDetails() {
                 </View>
             </ScrollView>
 
-            {contract.progressStatus === "pending" && (
+            {contract && (
                 <View className="absolute bottom-6 right-4 items-end space-y-3">
-                    {user?.profileStatus === "provider" && (
+                    {/* PROVEEDOR - contrato pendiente */}
+                    {user?.profileStatus === "provider" && contract.progressStatus === "pending" && (
                         <>
                             <CustomButton
                                 className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
@@ -238,76 +239,87 @@ export default function ContractDetails() {
                                 }}
                                 icon={<Ionicons name="checkmark" size={24} color="#8DFAB9" />}
                             />
-                            <CustomButton
-                                className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                                onPress={() => {
-                                    // lógica para cancelar contrato
-                                    setConfirmAction(() => handleCancelContract);
-                                    setModalVisible(true);
-                                }}
-                                icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
-                            />
+                            {
+                                showPaymentButton && (
+                                    <CustomButton
+                                        className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                        onPress={() => {
+                                            setConfirmAction(() => handleCancelContract);
+                                            setModalVisible(true);
+                                        }}
+                                        icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                                    />
+
+                                )
+                            }
                         </>
                     )}
 
-
-
-                    {user?.profileStatus === "client" && (
+                    {/* PROVEEDOR - contrato activo */}
+                    {user?.profileStatus === "provider" && contract.progressStatus === "active" && (
                         <>
                             <CustomButton
-                                className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
+                                className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
                                 onPress={() => {
-                                    setConfirmAction(() => handleCancelContract);
-                                    setModalVisible(true);
+                                    // lógica para finalizar contrato
                                 }}
-                                icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                                icon={<Ionicons name="checkmark-done" size={24} color="#8DFAB9" />}
                             />
-                            {contract.paymentMethod === "card" && showPaymentButton && (
-                                <CustomButton
-                                    className="bg-[#3D5DC7] rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                                    onPress={async () => {
-                                        const { error } = await presentPaymentSheet();
+                            {
+                                showPaymentButton && (
+                                    <CustomButton
+                                        className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                        onPress={() => {
+                                            setConfirmAction(() => handleCancelContract);
+                                            setModalVisible(true);
+                                        }}
+                                        icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                                    />
 
-                                        if (error) {
-                                            if (error.code === "Canceled") {
-                                                console.log("🟡 Usuario canceló el pago.");
-                                            } else {
-                                                console.error("❌ Error al procesar el pago:", error);
-                                                toast?.show("Error al procesar el pago", "error", 3000);
-                                            }
-                                        } else {
-                                            toast?.show("Pago exitoso", "success", 3000);
-                                            setShowPaymentButton(false);
-                                        }
-                                    }}
-                                    icon={<Ionicons name="card" size={24} color="white" />}
-                                />
-                            )}
+                                )
+                            }
                         </>
                     )}
+
+                    {/* CLIENTE - siempre puede cancelar si el contrato está pendiente */}
+                    {user?.profileStatus === "client" && contract.progressStatus === "pending" && showPaymentButton && (
+                        <CustomButton
+                            className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                            onPress={() => {
+                                setConfirmAction(() => handleCancelContract);
+                                setModalVisible(true);
+                            }}
+                            icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                        />
+                    )}
+
+                    {/* CLIENTE - botón de pagar visible siempre que haya pago pendiente */}
+                    {user?.profileStatus === "client" &&
+                        contract.paymentMethod === "card" &&
+                        showPaymentButton && (
+                            <CustomButton
+                                className="bg-[#3D5DC7] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                onPress={async () => {
+                                    const { error } = await presentPaymentSheet();
+
+                                    if (error) {
+                                        if (error.code === "Canceled") {
+                                            console.log("🟡 Usuario canceló el pago.");
+                                        } else {
+                                            console.error("❌ Error al procesar el pago:", error);
+                                            toast?.show("Error al procesar el pago", "error", 3000);
+                                        }
+                                    } else {
+                                        toast?.show("Pago exitoso", "success", 3000);
+                                        setShowPaymentButton(false);
+                                    }
+                                }}
+                                icon={<Ionicons name="card" size={24} color="white" />}
+                            />
+                        )}
                 </View>
             )}
 
-            {contract.progressStatus === "active" && user?.profileStatus === "provider" && (
-                <View className="absolute bottom-6 right-4 items-end space-y-3">
-                    <CustomButton
-                        className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
-                        onPress={() => {
-                            // lógica para finalizar contrato
-                        }}
-                        icon={<Ionicons name="checkmark-done" size={24} color="#8DFAB9" />}
-                    />
-                    <CustomButton
-                        className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                        onPress={() => {
-                            // lógica para cancelar contrato
-                            setConfirmAction(() => handleCancelContract);
-                            setModalVisible(true);
-                        }}
-                        icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
-                    />
-                </View>
-            )}
 
 
 

@@ -21,7 +21,6 @@ export const usePaymentSheetSetup = ({
             !contract ||
             profileStatus !== "client" ||
             contract.paymentMethod !== "card" ||
-            contract.progressStatus !== "pending" ||
             !userId
         ) {
             return;
