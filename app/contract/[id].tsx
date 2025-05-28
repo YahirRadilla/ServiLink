@@ -198,16 +198,28 @@ export default function ContractDetails() {
 
                         <View className="mb-8 pb-16">
                             <Text className="font-semibold text-lg text-white pb-2">Publicación</Text>
-                            <PostItemCard
-                                postId={contract.post.id}
-                                onPress={() => handleTouchPost(contract.post.id)}
-                                image={contract.post.images[0]}
-                                title={contract.post.title}
-                                neighborhood={contract.post.address.neighborhood}
-                                provider={contract.post.provider.name}
-                                service={contract.post.service}
-                                rate={contract.post.valoration}
-                            />
+                            {contract.post && contract.post.id !== "deleted" ? (
+                                <PostItemCard
+                                    postId={contract.post.id}
+                                    onPress={() => handleTouchPost(contract.post.id)}
+                                    image={contract.post.images[0]}
+                                    title={contract.post.title}
+                                    neighborhood={contract.post.address.neighborhood}
+                                    provider={contract.post.provider.name}
+                                    service={contract.post.service}
+                                    rate={contract.post.valoration}
+                                />
+                            ) : (
+                                <View className="items-center py-8">
+                                    <Ionicons name="alert-circle-outline" size={60} color="#fff" />
+                                    <Text className="text-white/80 mt-4 text-xl font-semibold text-center">
+                                        Este contrato pertenece a una publicación eliminada.
+                                    </Text>
+                                    <Text className="text-white/60 mt-2 text-sm text-center">
+                                        Ya no es posible ver los detalles de la publicación, pero puedes consultar la información del contrato.
+                                    </Text>
+                                </View>
+                            )}
                         </View>
 
                     </View>

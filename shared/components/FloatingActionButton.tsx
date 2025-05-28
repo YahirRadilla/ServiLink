@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   container: {
     position: "absolute",
     right: 40,
-    bottom: 100,
+    bottom: 70,
     zIndex: 999,
   },
   button: {

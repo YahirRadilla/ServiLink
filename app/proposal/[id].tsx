@@ -86,7 +86,7 @@ export default function ProposalDetails() {
         }
     };
 
-    if (loading || !proposal) {
+    if (loading) {
         return (
             <SingleEntityScreen>
                 <Stack.Screen options={{ headerShown: false }} />
@@ -105,6 +105,23 @@ export default function ProposalDetails() {
         );
     }
 
+    // NUEVO: post fue eliminado
+    if (!proposal?.post || !proposal.post.title) {
+        return (
+            <SingleEntityScreen>
+                <Stack.Screen options={{ headerShown: false }} />
+                <View className="flex-1 justify-center items-center bg-primarybg-servilink px-4">
+                    <Ionicons name="alert-circle-outline" size={60} color="#fff" />
+                    <Text className="text-white/80 mt-4 text-xl font-semibold text-center">
+                        Esta propuesta pertenece a una publicación eliminada.
+                    </Text>
+                    <Text className="text-white/60 mt-2 text-sm text-center">
+                        Ya no es posible interactuar con esta propuesta.
+                    </Text>
+                </View>
+            </SingleEntityScreen>
+        );
+    }
 
     return (
         <SingleEntityScreen>
@@ -114,15 +131,20 @@ export default function ProposalDetails() {
                     <View className="bg-black/50 p-2 rounded-full mr-2">
                         <BackButton />
                     </View>
-                    <Text numberOfLines={2} style={{ maxWidth: "60%" }} ellipsizeMode="tail" className="font-semibold text-lg text-white">{proposal.post.title}</Text>
+                    <Text
+                        numberOfLines={2}
+                        style={{ maxWidth: "60%" }}
+                        ellipsizeMode="tail"
+                        className="font-semibold text-lg text-white"
+                    >
+                        {proposal.post && proposal.post.id !== "deleted"
+                            ? proposal.post.title
+                            : "Publicación eliminada"}
+                    </Text>
                 </View>
-
                 <StatusChip type="proposal" status={proposal.acceptStatus as StatusType} />
-
             </View>
             <ScrollView className="p-1 pt-4" showsVerticalScrollIndicator={false}>
-
-
                 <View className="p-4">
                     <View className="flex-col gap-y-4 mb-24">
 
@@ -196,16 +218,28 @@ export default function ProposalDetails() {
 
                         <View className="mb-8 pb-16">
                             <Text className="font-semibold text-lg text-white pb-2">Publicación</Text>
-                            <PostItemCard
-                                postId={proposal.post.id}
-                                onPress={() => handleTouchPost(proposal.post.id)}
-                                image={proposal.post.images[0]}
-                                title={proposal.post.title}
-                                neighborhood={proposal.post.address.neighborhood}
-                                provider={proposal.post.provider.name}
-                                service={proposal.post.service}
-                                rate={proposal.post.valoration}
-                            />
+                            {proposal.post && proposal.post.id !== "deleted" ? (
+                                <PostItemCard
+                                    postId={proposal.post.id}
+                                    onPress={() => handleTouchPost(proposal.post.id)}
+                                    image={proposal.post.images[0]}
+                                    title={proposal.post.title}
+                                    neighborhood={proposal.post.address.neighborhood}
+                                    provider={proposal.post.provider.name}
+                                    service={proposal.post.service}
+                                    rate={proposal.post.valoration}
+                                />
+                            ) : (
+                                <View className="items-center py-8">
+                                    <Ionicons name="alert-circle-outline" size={60} color="#fff" />
+                                    <Text className="text-white/80 mt-4 text-xl font-semibold text-center">
+                                        Esta propuesta pertenece a una publicación eliminada.
+                                    </Text>
+                                    <Text className="text-white/60 mt-2 text-sm text-center">
+                                        Ya no es posible ver los detalles de la publicación, pero puedes consultar la información de la propuesta.
+                                    </Text>
+                                </View>
+                            )}
                         </View>
 
                     </View>

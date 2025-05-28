@@ -1,6 +1,6 @@
 import { TContract } from "@/entities/contracts";
 import { getPostByRef } from "@/entities/posts";
-import { getUserByRef } from "@/entities/users";
+import { emptyUser, getUserByRef } from "@/entities/users";
 import { Timestamp } from "firebase/firestore";
 
 export type RawContractData = {
@@ -35,14 +35,34 @@ export const contractToEntity = async (
     const [client, provider, post] = await Promise.all([
         getUserByRef(data.client_id),
         getUserByRef(data.provider_id),
-        getPostByRef(data.post_id),
+        getPostByRef(data.post_id).catch(() => null),
     ]);
+
+    const safePost = post ?? {
+        id: "deleted",
+        title: "Publicación eliminada",
+        description: "",
+        valoration: 0,
+        images: [],
+        postType: "custom",
+        status: false,
+        minPrice: 0,
+        maxPrice: 0,
+        provider: emptyUser,
+        address: {
+            streetAddress: "",
+            zipCode: "",
+            neighborhood: data.address.neighborhood ?? "",
+        },
+        service: "N/A",
+        createdAt: data.created_at ?? Timestamp.fromDate(new Date()),
+    };
 
     return {
         id,
         client,
         provider,
-        post,
+        post: safePost,
         offers: data.offers,
         description: data.description,
         referenceImages: data.reference_image ?? [],

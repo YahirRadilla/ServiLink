@@ -1,4 +1,6 @@
+import { usePostStore } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
+import { deletePost } from "@/features/posts/services";
 import { listenToAverageReviewRating } from "@/features/reviews/service";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
@@ -27,14 +29,12 @@ export function PostItemCard({
   provider,
   service,
   rate,
-  ownerId
+  ownerId,
 }: PostItemCardProps) {
 
   const [averageRating, setAverageRating] = useState(0);
   const user = useUserStore((state) => state.user);
-  const isDeletable = user?.id === ownerId;
-  const anchorRef = React.createRef<View>();
-  const [showPopover, setShowPopover] = useState(false);
+  const showPopover = user?.id === ownerId;
 
   useEffect(() => {
     const unsubscribe = listenToAverageReviewRating(postId, (avg) => {
@@ -67,18 +67,27 @@ export function PostItemCard({
     return stars;
   };
 
+  const handleDelete = async () => {
+    const success = await deletePost(postId);
+    if (success) {
+      usePostStore.getState().disablePostLocally(postId);
+    }
+  }
+
   return (
     <View className="rounded-xl mb-6 overflow-hidden border border-links-servilink">
-      {isDeletable && (
+      { showPopover && (
         <ActionPopover
-          onDelete={() => {}}
+        onDelete={handleDelete}
         />
       )}
       <Pressable
         onPress={onPress}
         android_ripple={{ color: "#ffffff10" }}
-        className=""
-        style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+        className="relative"
+        style={({ pressed }) => [
+          { opacity: pressed ? 0.8 : 1 }
+        ]}
       >
         {/* Imagen */}
         <View className="relative w-full h-52">
@@ -96,7 +105,6 @@ export function PostItemCard({
               <Text className="text-white font-medium text-xs">{neighborhood}</Text>
             </View>
           </View>
-
         </View>
 
         {/* Contenido */}

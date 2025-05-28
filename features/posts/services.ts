@@ -2,8 +2,8 @@ import { TPost } from '@/entities/posts';
 import { db } from '@/lib/firebaseConfig';
 import { storage } from '@/lib/firebaseStorageConfig';
 import { postToEntity, RawPostData } from '@/mappers/postToEntity';
-import { addDoc, collection, doc, DocumentSnapshot, getDoc, getDocs, limit, onSnapshot, orderBy, query, startAfter, Timestamp, where } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { addDoc, collection, deleteDoc, doc, DocumentSnapshot, getDoc, getDocs, limit, onSnapshot, orderBy, query, startAfter, Timestamp, updateDoc, where } from 'firebase/firestore';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 export const listenToPosts = (onUpdate: (posts: TPost[]) => void) => {
     const postsRef = collection(db, 'posts');
@@ -186,5 +186,177 @@ export const getPostsByProviderRef = async (
     } catch (error) {
         console.error("Error al obtener posts por providerId:", error);
         return { posts: [], last: null };
+    }
+};
+
+/* export const disablePost = async (postId: string): Promise<boolean> => {
+    try {
+        const postRef = doc(db, "posts", postId);
+        const postSnapshot = await getDoc(postRef);
+
+        if (!postSnapshot.exists()) {
+            console.warn('Post no encontrado:', postId);
+            return false;
+        }
+
+        await updateDoc(postRef, { status: false });
+        return true;
+    } catch (error) {
+        console.error('Error al deshabilitar el post:', error);
+        return false;
+    }
+}; */
+
+/* export const deletePost = async (postId: string): Promise<boolean> => {
+    try {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await getDoc(postRef);
+
+        if (!postSnap.exists()) {
+            console.warn("Post no encontrado:", postId);
+            return false;
+        }
+
+        const data = postSnap.data();
+        const imageUrls: string[] = data.images || [];
+
+        await Promise.all(
+            imageUrls.map(async (url) => {
+                try {
+                    const pathStart = url.indexOf("/o/") + 3;
+                    const pathEnd = url.indexOf("?alt=");
+                    const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
+                    const imageRef = ref(storage, filePath);
+                    await deleteObject(imageRef);
+                } catch (err) {
+                    console.warn("No se pudo borrar una imagen:", err);
+                }
+            })
+        );
+
+        await deleteDoc(postRef);
+
+        return true;
+    } catch (error) {
+        console.error("🔥 Error al eliminar post e imágenes:", error);
+        return false;
+    }
+}; */
+
+/* export const deletePost = async (postId: string): Promise<boolean> => {
+    try {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await getDoc(postRef);
+
+        if (!postSnap.exists()) {
+            console.warn("Post no encontrado:", postId);
+            return false;
+        }
+
+        const data = postSnap.data();
+        const imageUrls: string[] = data.images || [];
+
+        await Promise.all(
+            imageUrls.map(async (url) => {
+                try {
+                    const pathStart = url.indexOf("/o/") + 3;
+                    const pathEnd = url.indexOf("?alt=");
+                    const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
+                    const imageRef = ref(storage, filePath);
+                    await deleteObject(imageRef);
+                } catch (err) {
+                    console.warn("No se pudo borrar una imagen:", err);
+                }
+            })
+        );
+
+        await deleteDoc(postRef);
+
+        const proposalsRef = collection(db, "proposals");
+        const q = query(proposalsRef, where("post_id", "==", postRef), where("accept_status", "==", "pending"));
+        const snapshot = await getDocs(q);
+
+        const updates = snapshot.docs.map((docSnap) =>
+            updateDoc(docSnap.ref, { accept_status: "rejected" })
+        );
+
+        await Promise.all(updates);
+
+        return true;
+    } catch (error) {
+        console.error("🔥 Error al eliminar post y rechazar propuestas:", error);
+        return false;
+    }
+}; */
+
+export const deletePost = async (postId: string): Promise<boolean> => {
+    try {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await getDoc(postRef);
+
+        if (!postSnap.exists()) {
+            console.warn("Post no encontrado:", postId);
+            return false;
+        }
+
+        const data = postSnap.data();
+        const imageUrls: string[] = data.images || [];
+
+        await Promise.all(
+            imageUrls.map(async (url) => {
+                try {
+                    const pathStart = url.indexOf("/o/") + 3;
+                    const pathEnd = url.indexOf("?alt=");
+                    const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
+                    const imageRef = ref(storage, filePath);
+                    await deleteObject(imageRef);
+                } catch (err) {
+                    console.warn("No se pudo borrar una imagen del post:", err);
+                }
+            })
+        );
+
+        const proposalsRef = collection(db, "proposals");
+        const proposalsQuery = query(proposalsRef, where("post_id", "==", postRef), where("accept_status", "==", "pending"));
+        const proposalsSnap = await getDocs(proposalsQuery);
+
+        const rejectOps = proposalsSnap.docs.map((docSnap) =>
+            updateDoc(docSnap.ref, { accept_status: "rejected" })
+        );
+        await Promise.all(rejectOps);
+
+        const reviewsRef = collection(db, "reviews");
+        const reviewsQuery = query(reviewsRef, where("post_id", "==", postRef));
+        const reviewsSnap = await getDocs(reviewsQuery);
+
+        const deleteReviewOps = reviewsSnap.docs.map(async (reviewDoc) => {
+            const reviewData = reviewDoc.data();
+            const reviewImageUrls: string[] = reviewData.images || [];
+
+            await Promise.all(
+                reviewImageUrls.map(async (url) => {
+                    try {
+                        const pathStart = url.indexOf("/o/") + 3;
+                        const pathEnd = url.indexOf("?alt=");
+                        const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
+                        const imageRef = ref(storage, filePath);
+                        await deleteObject(imageRef);
+                    } catch (err) {
+                        console.warn("No se pudo borrar una imagen de review:", err);
+                    }
+                })
+            );
+
+            return deleteDoc(reviewDoc.ref);
+        });
+
+        await Promise.all(deleteReviewOps);
+
+        await deleteDoc(postRef);
+
+        return true;
+    } catch (error) {
+        console.error("🔥 Error al eliminar post, propuestas y reviews:", error);
+        return false;
     }
 };
