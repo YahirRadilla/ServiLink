@@ -161,7 +161,6 @@ export const getPostsByProviderRef = async (
     try {
         const postsRef = collection(db, "posts");
         const providerRef = doc(db, "providers", providerId);
-
         const constraints: any[] = [
             where("provider_id", "==", providerRef),
             orderBy("created_at", "desc"),
@@ -188,106 +187,6 @@ export const getPostsByProviderRef = async (
         return { posts: [], last: null };
     }
 };
-
-/* export const disablePost = async (postId: string): Promise<boolean> => {
-    try {
-        const postRef = doc(db, "posts", postId);
-        const postSnapshot = await getDoc(postRef);
-
-        if (!postSnapshot.exists()) {
-            console.warn('Post no encontrado:', postId);
-            return false;
-        }
-
-        await updateDoc(postRef, { status: false });
-        return true;
-    } catch (error) {
-        console.error('Error al deshabilitar el post:', error);
-        return false;
-    }
-}; */
-
-/* export const deletePost = async (postId: string): Promise<boolean> => {
-    try {
-        const postRef = doc(db, "posts", postId);
-        const postSnap = await getDoc(postRef);
-
-        if (!postSnap.exists()) {
-            console.warn("Post no encontrado:", postId);
-            return false;
-        }
-
-        const data = postSnap.data();
-        const imageUrls: string[] = data.images || [];
-
-        await Promise.all(
-            imageUrls.map(async (url) => {
-                try {
-                    const pathStart = url.indexOf("/o/") + 3;
-                    const pathEnd = url.indexOf("?alt=");
-                    const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
-                    const imageRef = ref(storage, filePath);
-                    await deleteObject(imageRef);
-                } catch (err) {
-                    console.warn("No se pudo borrar una imagen:", err);
-                }
-            })
-        );
-
-        await deleteDoc(postRef);
-
-        return true;
-    } catch (error) {
-        console.error("🔥 Error al eliminar post e imágenes:", error);
-        return false;
-    }
-}; */
-
-/* export const deletePost = async (postId: string): Promise<boolean> => {
-    try {
-        const postRef = doc(db, "posts", postId);
-        const postSnap = await getDoc(postRef);
-
-        if (!postSnap.exists()) {
-            console.warn("Post no encontrado:", postId);
-            return false;
-        }
-
-        const data = postSnap.data();
-        const imageUrls: string[] = data.images || [];
-
-        await Promise.all(
-            imageUrls.map(async (url) => {
-                try {
-                    const pathStart = url.indexOf("/o/") + 3;
-                    const pathEnd = url.indexOf("?alt=");
-                    const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
-                    const imageRef = ref(storage, filePath);
-                    await deleteObject(imageRef);
-                } catch (err) {
-                    console.warn("No se pudo borrar una imagen:", err);
-                }
-            })
-        );
-
-        await deleteDoc(postRef);
-
-        const proposalsRef = collection(db, "proposals");
-        const q = query(proposalsRef, where("post_id", "==", postRef), where("accept_status", "==", "pending"));
-        const snapshot = await getDocs(q);
-
-        const updates = snapshot.docs.map((docSnap) =>
-            updateDoc(docSnap.ref, { accept_status: "rejected" })
-        );
-
-        await Promise.all(updates);
-
-        return true;
-    } catch (error) {
-        console.error("🔥 Error al eliminar post y rechazar propuestas:", error);
-        return false;
-    }
-}; */
 
 export const deletePost = async (postId: string): Promise<boolean> => {
     try {

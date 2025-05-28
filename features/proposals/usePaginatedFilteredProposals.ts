@@ -1,6 +1,9 @@
 import { TProposal } from "@/entities/proposals";
 import { useProposalStore } from "@/entities/proposals/store";
 import { TUser, useUserStore } from "@/entities/users";
+import { db } from "@/lib/firebaseConfig";
+import { proposalToEntity, RawProposalData } from "@/mappers/proposalToEntity";
+import { collection, doc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { fetchProposalsPage } from "./service";
 
@@ -24,6 +27,43 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const user = useUserStore((state) => state.user);
+
+    // --- NUEVO: Listener en tiempo real ---
+    useEffect(() => {
+        if (!user) return;
+
+        const userRef = doc(db, "users", user.id);
+        let q;
+
+        if (user.profileStatus === "client") {
+            q = query(
+                collection(db, "proposals"),
+                where("client_id", "==", userRef),
+                orderBy("created_at", "desc")
+            );
+        } else if (user.profileStatus === "provider") {
+            q = query(
+                collection(db, "proposals"),
+                where("provider_id", "==", userRef),
+                orderBy("created_at", "desc")
+            );
+        } else {
+            return;
+        }
+
+        const unsubscribe = onSnapshot(q, async (snapshot) => {
+            const proposalPromises = snapshot.docs.map((doc) =>
+                proposalToEntity(doc.id, doc.data() as RawProposalData)
+            );
+            const proposals = await Promise.all(proposalPromises);
+            setProposals(proposals);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1] ?? null);
+            setHasMore(!!snapshot.docs.length);
+        });
+
+        return () => unsubscribe();
+    // Solo depende de user
+    }, [user]);
 
     const filteredProposals = useMemo(() => {
         return proposals.filter((proposal: TProposal) => {

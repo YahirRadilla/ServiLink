@@ -62,7 +62,7 @@ export default function CreatePostScreen() {
             console.error('Error al crear la publicación');
             return;
         }else{
-            router.replace('/workspace');
+            router.replace({ pathname: '/workspace', params: { refetch: 'true', tab: 'posts' } });
             toast?.show('Publicación creada correctamente', 'success', 2000);
         }
         console.log('Publicación enviada:', data);

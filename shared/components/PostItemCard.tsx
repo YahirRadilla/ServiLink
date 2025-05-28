@@ -3,6 +3,7 @@ import { useUserStore } from "@/entities/users";
 import { deletePost } from "@/features/posts/services";
 import { listenToAverageReviewRating } from "@/features/reviews/service";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { ActionPopover } from "./ActionPopover";
@@ -69,6 +70,7 @@ export function PostItemCard({
 
   const handleDelete = async () => {
     const success = await deletePost(postId);
+    router.replace({ pathname: '/workspace', params: { refetch: 'true' } });
     if (success) {
       usePostStore.getState().disablePostLocally(postId);
     }

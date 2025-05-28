@@ -6,6 +6,7 @@ import { useCreateProposals } from "@/features/proposals/useCreateProposal";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import CustomInput from "@/shared/components/CustomInput";
+import { useToastStore } from "@/shared/toastStore";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Stack, useRouter } from "expo-router";
@@ -38,6 +39,7 @@ export default function CreateProposalScreen() {
     const router = useRouter();
     const { loading, createNewProposal } = useCreateProposals();
     const currentPost = usePostStore((state) => state.currentPost);
+    const toast = useToastStore((s) => s.toastRef);
 
 
     const {
@@ -88,6 +90,7 @@ export default function CreateProposalScreen() {
         });
 
         if (result) {
+            toast?.show("Propuesta enviada con éxito", "success", 2000);
             router.back();
         }
     };

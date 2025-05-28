@@ -3,7 +3,7 @@ import { PostsTab } from "@/app/workspace/tabs/posts";
 import { ProposalsTab } from "@/app/workspace/tabs/proposals";
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
@@ -20,8 +20,9 @@ const EmptyTab = ({ label }: { label: string }) => (
 export default function WorkSpaceScreen() {
     const user = useUserStore((state) => state.user);
     const layout = Dimensions.get("window");
-
-    const [index, setIndex] = React.useState(0);
+    const params = useLocalSearchParams();
+    const refetch = params.refetch === "true";
+    const tabParam = params.tab as string | undefined;
 
 
     const routes = [
@@ -32,6 +33,19 @@ export default function WorkSpaceScreen() {
             : []),
     ];
 
+    const initialTabIndex = tabParam
+        ? routes.findIndex(r => r.key === tabParam)
+        : 0;
+
+    const [index, setIndex] = React.useState(initialTabIndex);
+
+    React.useEffect(() => {
+        if (tabParam) {
+            const idx = routes.findIndex(r => r.key === tabParam);
+            if (idx !== -1) setIndex(idx);
+        }
+    }, [tabParam, routes.length]);
+
 
     const renderScene = ({ route }: { route: { key: string } }) => {
         switch (route.key) {
@@ -40,7 +54,7 @@ export default function WorkSpaceScreen() {
             case "contracts":
                 return <ContractsTab />;
             case "posts":
-                return <PostsTab />;
+                return <PostsTab refetch={refetch} />;
             default:
                 return null;
         }
@@ -63,11 +77,11 @@ export default function WorkSpaceScreen() {
                 renderScene={renderScene}
                 onIndexChange={setIndex}
                 initialLayout={{ width: layout.width }}
-                style={{ flex: 1, paddingBottom: 66}}
+                style={{ flex: 1, paddingBottom: 66 }}
                 renderTabBar={(props) => (
                     <TabBar
                         {...props}
-                        style={{ backgroundColor: "#161622"}}
+                        style={{ backgroundColor: "#161622" }}
                         indicatorStyle={{ backgroundColor: "#3D5DC7", height: 3, borderRadius: 2 }}
                         activeColor="#fff"
                         inactiveColor="#888"

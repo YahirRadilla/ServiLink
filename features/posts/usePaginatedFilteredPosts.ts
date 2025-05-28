@@ -1,6 +1,9 @@
+import { db } from "@/lib/firebaseConfig";
+import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 import { TPost } from "@/entities/posts";
+import { postToEntity, RawPostData } from "@/mappers/postToEntity";
 import { fetchPostsPage } from "./services";
 
 type Filters = {
@@ -16,9 +19,34 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const search = filters.searchTerm?.toLowerCase();
-
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    // --- NUEVO: Listener en tiempo real ---
+    useEffect(() => {
+        let constraints: any[] = [orderBy("created_at", "desc")];
+
+        if (filters.colonia) {
+            constraints.push(where("address.neighborhood", "==", filters.colonia));
+        }
+        if (filters.servicio) {
+            constraints.push(where("service", "==", filters.servicio));
+        }
+
+        const q = query(collection(db, "posts"), ...constraints);
+
+        const unsubscribe = onSnapshot(q, async (snapshot) => {
+            // Aquí puedes mapear los datos como lo haces normalmente
+            const postPromises = snapshot.docs.map((doc) =>
+                postToEntity(doc.id, doc.data() as RawPostData)
+            );
+            const posts = await Promise.all(postPromises);
+            setPosts(posts);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1] ?? null);
+            setHasMore(!!snapshot.docs.length);
+        });
+
+        return () => unsubscribe();
+    }, [filters.colonia, filters.servicio, filters.ordenar]);
 
     const filteredPosts = !search
         ? posts
@@ -66,10 +94,6 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
         setIsRefreshing(false);
     };
 
-
-    useEffect(() => {
-        refresh();
-    }, [filters.colonia, filters.servicio, filters.ordenar]);
 
     return { posts: filteredPosts, loadMore, loading, hasMore, refresh, isRefreshing };
 };

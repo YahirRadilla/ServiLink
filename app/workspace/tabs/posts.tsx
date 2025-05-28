@@ -6,7 +6,7 @@ import LottieView from "lottie-react-native";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
 import * as Animatable from "react-native-animatable";
-export const PostsTab = () => {
+export const PostsTab = ({ refetch }: {refetch?: boolean}) => {
     const router = useRouter();
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
@@ -33,6 +33,12 @@ export const PostsTab = () => {
     const handlePressFloating = () => {
         router.push("/post/createPost");
     };
+
+    React.useEffect(() =>{
+        if(refetch) {
+            refresh();
+        }
+    }, [refetch]);
 
     return (
 

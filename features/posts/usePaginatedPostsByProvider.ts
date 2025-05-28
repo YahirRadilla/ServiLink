@@ -1,8 +1,10 @@
 import { TPost } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
-import { getPostsByProviderRef } from "@/features/posts/services";
-import { DocumentSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+import { postToEntity, RawPostData } from "@/mappers/postToEntity";
+import { collection, doc, DocumentSnapshot, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { getPostsByProviderRef } from "./services";
 
 export const usePaginatedPostsByProvider = () => {
     const [posts, setPosts] = useState<TPost[]>([]);
@@ -14,22 +16,32 @@ export const usePaginatedPostsByProvider = () => {
     const user = useUserStore((state) => state.user);
     const providerId = user?.provider?.id;
 
-    const fetchPosts = async (isRefresh = false) => {
-        if (!providerId) return { posts: [], last: null };
-
-        const result = await getPostsByProviderRef(
-            providerId,
-            isRefresh ? undefined : lastDoc ?? undefined
+    useEffect(() => {
+        if (!providerId) return;
+        const q = query(
+            collection(db, "posts"),
+            where("provider_id", "==", doc(db, "providers", providerId)),
+            orderBy("created_at", "desc")
         );
 
-        return result;
-    };
+        const unsubscribe = onSnapshot(q, async (snapshot) => {
+            const postPromises = snapshot.docs.map((doc) =>
+                postToEntity(doc.id, doc.data() as RawPostData)
+            );
+            const posts = await Promise.all(postPromises);
+            setPosts(posts);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1] ?? null);
+            setHasMore(!!snapshot.docs.length);
+        });
+
+        return () => unsubscribe();
+    }, [providerId]);
 
     const loadMore = async () => {
-        if (loading || !hasMore) return;
+        if (loading || !hasMore || !providerId) return;
         setLoading(true);
 
-        const { posts: newPosts, last } = await fetchPosts();
+        const { posts: newPosts, last } = await getPostsByProviderRef(providerId, lastDoc ?? undefined);
         setPosts((prev) => {
             const all = [...prev, ...newPosts];
             const unique = all.filter(
@@ -47,17 +59,13 @@ export const usePaginatedPostsByProvider = () => {
         if (!providerId) return;
         setIsRefreshing(true);
 
-        const { posts: newPosts, last } = await fetchPosts(true);
+        const { posts: newPosts, last } = await getPostsByProviderRef(providerId, undefined);
 
         setPosts(newPosts);
         setLastDoc(last);
         setHasMore(!!last);
         setIsRefreshing(false);
     };
-
-    useEffect(() => {
-        refresh();
-    }, [providerId]);
 
     return {
         posts,

@@ -68,7 +68,7 @@ export const ContractsTab = () => {
                                 ? item.referenceImages?.[0] || "https://placehold.co/600x400?text=Eliminado"
                                 : item.post.images[0]
                         }
-                        title={isPostDeleted ? "Publicación eliminada" : item.post.title}
+                        title={isPostDeleted ? item.description : item.post.title}
                         status={item.progressStatus as any}
                         provider={
                             isPostDeleted
