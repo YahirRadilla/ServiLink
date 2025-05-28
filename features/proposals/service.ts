@@ -230,7 +230,7 @@ export const acceptProposalAndCreateContract = async (
 
         const contractDoc = await addDoc(contractsRef, contractData);
 
-        // ✅ Si el pago es con tarjeta, crear el checkout_session
+        // Si el pago es con tarjeta, crear el checkout_session
         if (data.paymentMethod === "card") {
             const sessionRef = collection(db, `customers/${data.client.id}/checkout_sessions`);
             const totalAmount = data.offers.reduce((acc: number, offer: any) => acc + Number(offer.price), 0);

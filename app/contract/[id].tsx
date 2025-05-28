@@ -70,6 +70,19 @@ export default function ContractDetails() {
         }
     };
 
+    const handleFinishContract = async () => {
+        if (!contract) return;
+
+        const success = await manageStatusContract(contract.id, "finished");
+        if (success) {
+            setModalVisible(false);
+            toast?.show("Contrato finalizado", "success", 2000);
+            console.log("Contrato finalizado");
+        } else {
+            console.log("No se pudo finalizar el contrato");
+        }
+    };
+
     useEffect(() => {
         initializePaymentSheet();
     }, [contract]);
@@ -261,7 +274,8 @@ export default function ContractDetails() {
                             <CustomButton
                                 className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
                                 onPress={() => {
-                                    // lógica para finalizar contrato
+                                    setConfirmAction(() => handleFinishContract);
+                                    setModalVisible(true);
                                 }}
                                 icon={<Ionicons name="checkmark-done" size={24} color="#8DFAB9" />}
                             />
