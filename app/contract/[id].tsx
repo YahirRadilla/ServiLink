@@ -30,8 +30,7 @@ export default function ContractDetails() {
     const toast = useToastStore((s) => s.toastRef);
     const [modalVisible, setModalVisible] = useState(false);
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => { });
-    const [loadingPayment, setLoadingPayment] = useState(false);
-    const { showPaymentButton, initializePaymentSheet } = usePaymentSheetSetup({
+    const { showPaymentButton, initializePaymentSheet, loadingIsPayment, setShowPaymentButton } = usePaymentSheetSetup({
         contract,
         userId: user?.id,
         profileStatus: user?.profileStatus,
@@ -76,7 +75,7 @@ export default function ContractDetails() {
     }, [contract]);
 
 
-    if (loading || !contract) {
+    if (loading || loadingIsPayment || !contract) {
         return (
             <SingleEntityScreen>
                 <Stack.Screen options={{ headerShown: false }} />
@@ -124,6 +123,11 @@ export default function ContractDetails() {
                         </View>
                         <View className="border-b border-gray-300/10" />
                         <View>
+                            <Text className="font-semibold text-lg text-white">Precio Final</Text>
+                            <Text className="text-sm text-white/60">${contract.offers[contract.offers.length - 1].price} MXN</Text>
+                        </View>
+                        <View className="border-b border-gray-300/10" />
+                        <View>
                             <Text className="font-semibold text-lg text-white">Detalles</Text>
                             <View className="flex-row gap-x-5 pt-2">
                                 <View className="flex-row items-center mb-2">
@@ -134,6 +138,14 @@ export default function ContractDetails() {
                                     <Ionicons name={contract.paymentMethod as string === "effective" ? "cash-outline" : "card-outline"} size={20} color="#ccc" />
                                     <Text className="text-xs text-white/60 pl-2">{contract.paymentMethod as string === "effective" ? "Efectivo" : "Tarjeta"}</Text>
                                 </View>
+                                {
+                                    contract.paymentMethod === "card" && (
+                                        <View className="flex-row items-center mb-2">
+                                            <Ionicons name={!showPaymentButton ? "checkmark-circle-outline" : "close-circle-outline"} size={20} color="#ccc" />
+                                            <Text className="text-xs text-white/60 pl-2">{!showPaymentButton ? "Pagado" : "No pagado"}</Text>
+                                        </View>
+                                    )
+                                }
                             </View>
                         </View>
                         <View className="border-b border-gray-300/10" />
@@ -231,7 +243,7 @@ export default function ContractDetails() {
                     {user?.profileStatus === "client" && (
                         <>
                             <CustomButton
-                                className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
                                 onPress={() => {
                                     setConfirmAction(() => handleCancelContract);
                                     setModalVisible(true);
@@ -243,10 +255,17 @@ export default function ContractDetails() {
                                     className="bg-[#3D5DC7] rounded-full w-14 h-14 justify-center items-center shadow-lg"
                                     onPress={async () => {
                                         const { error } = await presentPaymentSheet();
+
                                         if (error) {
-                                            console.error("Error al pagar:", error);
+                                            if (error.code === "Canceled") {
+                                                console.log("🟡 Usuario canceló el pago.");
+                                            } else {
+                                                console.error("❌ Error al procesar el pago:", error);
+                                                toast?.show("Error al procesar el pago", "error", 3000);
+                                            }
                                         } else {
-                                            toast?.show("Pago exitoso ✅", "success", 3000);
+                                            toast?.show("Pago exitoso", "success", 3000);
+                                            setShowPaymentButton(false);
                                         }
                                     }}
                                     icon={<Ionicons name="card" size={24} color="white" />}

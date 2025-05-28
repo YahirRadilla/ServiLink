@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebaseConfig";
 import { initPaymentSheet } from "@stripe/stripe-react-native";
-import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useState } from "react";
 
 interface UsePaymentSheetSetupProps {
@@ -15,7 +15,7 @@ export const usePaymentSheetSetup = ({
     profileStatus,
 }: UsePaymentSheetSetupProps) => {
     const [showPaymentButton, setShowPaymentButton] = useState(false);
-
+    const [loadingIsPayment, setLoadingIsPayment] = useState(false);
     const initializePaymentSheet = async () => {
         if (
             !contract ||
@@ -28,14 +28,18 @@ export const usePaymentSheetSetup = ({
         }
 
         try {
+            setLoadingIsPayment(true);
             // Verificar si ya se pagó
             const paymentsRef = collection(db, `customers/${userId}/payments`);
-            const latestPaymentQuery = query(paymentsRef, orderBy("created", "desc"), limit(1));
-            const paymentSnap = await getDocs(latestPaymentQuery);
-
+            const contractPaymentQuery = query(
+                paymentsRef,
+                where("metadata.contract_id", "==", contract.id),
+                where("status", "==", "succeeded")
+            );
+            const paymentSnap = await getDocs(contractPaymentQuery);
             if (!paymentSnap.empty) {
-                const paymentData = paymentSnap.docs[0].data();
-                if (paymentData.status === "succeeded") return;
+                setLoadingIsPayment(false);
+                return; // ya se pagó este contrato específico
             }
 
             // Obtener checkout_session relacionado al contrato
@@ -59,13 +63,17 @@ export const usePaymentSheetSetup = ({
                     setShowPaymentButton(true);
                 }
             }
+            setLoadingIsPayment(false);
         } catch (err) {
+            setLoadingIsPayment(false);
             console.error("Error inicializando PaymentSheet:", err);
         }
     };
 
     return {
         showPaymentButton,
+        loadingIsPayment,
         initializePaymentSheet,
+        setShowPaymentButton
     };
 };
