@@ -105,7 +105,6 @@ export default function ProposalDetails() {
         );
     }
 
-    // NUEVO: post fue eliminado
     if (!proposal?.post || !proposal.post.title) {
         return (
             <SingleEntityScreen>
@@ -147,8 +146,6 @@ export default function ProposalDetails() {
             <ScrollView className="p-1 pt-4" showsVerticalScrollIndicator={false}>
                 <View className="p-4">
                     <View className="flex-col gap-y-4 mb-24">
-
-
 
                         <View>
                             <Text className="font-semibold text-lg text-white">Descripción</Text>

@@ -13,11 +13,13 @@ export function FilterWorkspace({ type, value, onChange }: StatusFilterGroupProp
     const options =
         type === "proposal"
             ? [
+                { label: "Todas", value: "all" },
                 { label: "Aceptada", value: "accepted" },
                 { label: "Pendiente", value: "pending" },
                 { label: "Rechazada", value: "rejected" },
             ]
             : [
+                { label: "Todas", value: "all" },
                 { label: "Activo", value: "active" },
                 { label: "Pendiente", value: "pending" },
                 { label: "Finalizado", value: "finished" },

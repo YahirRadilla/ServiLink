@@ -21,7 +21,6 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
     const search = filters.searchTerm?.toLowerCase();
     const [isRefreshing, setIsRefreshing] = useState(false);
 
-    // --- NUEVO: Listener en tiempo real ---
     useEffect(() => {
         let constraints: any[] = [orderBy("created_at", "desc")];
 
@@ -35,7 +34,6 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
         const q = query(collection(db, "posts"), ...constraints);
 
         const unsubscribe = onSnapshot(q, async (snapshot) => {
-            // Aquí puedes mapear los datos como lo haces normalmente
             const postPromises = snapshot.docs.map((doc) =>
                 postToEntity(doc.id, doc.data() as RawPostData)
             );

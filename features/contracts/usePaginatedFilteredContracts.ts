@@ -28,7 +28,6 @@ export const usePaginatedFilteredContracts = (filters: Filters) => {
 
     const user = useUserStore((state) => state.user);
 
-    // --- NUEVO: Listener en tiempo real ---
     useEffect(() => {
         if (!user) return;
 
@@ -106,9 +105,9 @@ export const usePaginatedFilteredContracts = (filters: Filters) => {
         applyFilters(filters);
     };
 
-    useEffect(() => {
+/*     useEffect(() => {
         refresh();
-    }, [filters.ordenar, filters.status]);
+    }, [filters.ordenar, filters.status]); */
 
     return {
         contracts: filteredContracts,

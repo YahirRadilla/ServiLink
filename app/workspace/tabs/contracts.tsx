@@ -5,7 +5,7 @@ import { ItemCard } from "@/shared/components/ItemCard";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import React from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, ScrollView, Text, View } from "react-native";
 
 export const ContractsTab = () => {
     const router = useRouter();
@@ -47,13 +47,15 @@ export const ContractsTab = () => {
                     </Text>
                     <View className="flex-col mt-2">
                         <View>
-                            <FilterWorkspace
-                                type="contract"
-                                value={selectedFilters.status}
-                                onChange={(status) =>
-                                    setSelectedFilters((prev) => ({ ...prev, status }))
-                                }
-                            />
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                <FilterWorkspace
+                                    type="contract"
+                                    value={selectedFilters.status}
+                                    onChange={(status) =>
+                                        setSelectedFilters((prev) => ({ ...prev, status }))
+                                    }
+                                />
+                            </ScrollView>
                         </View>
                     </View>
                 </View>
