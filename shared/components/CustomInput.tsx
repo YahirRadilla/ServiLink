@@ -72,7 +72,7 @@ export default function CustomInput({
         });
         if (!result.canceled) {
             const uris = result.assets.map((asset) => asset.uri);
-            onChangeText?.(uris);
+            onChangeText?.([...(value || []), ...uris]);
         }
     };
 
@@ -176,7 +176,19 @@ export default function CustomInput({
                 {Array.isArray(value) && value.length > 0 && (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-4">
                         {value.map((uri, index) => (
-                            <Image key={index} source={{ uri }} className="w-28 h-28 rounded-lg mr-2" resizeMode="cover" />
+                            <View key={index} className="relative mr-2">
+                                <Image source={{ uri }} className="w-28 h-28 rounded-lg" resizeMode="cover" />
+                                <Pressable
+                                    onPress={() => {
+                                        const newImages = [...value];
+                                        newImages.splice(index, 1);
+                                        onChangeText?.(newImages);
+                                    }}
+                                    className="absolute top-1 right-1 bg-black/60 rounded-full p-1"
+                                >
+                                    <Ionicons name="close" size={16} color="#fff" />
+                                </Pressable>
+                            </View>
                         ))}
                     </ScrollView>
                 )}

@@ -259,3 +259,70 @@ export const deletePost = async (postId: string): Promise<boolean> => {
         return false;
     }
 };
+
+export const updatePost = async (postId: string, updatedData: any): Promise<boolean> => {
+    try {
+        const postRef = doc(db, "posts", postId);
+        const snapshot = await getDoc(postRef);
+
+        if (!snapshot.exists()) {
+            console.warn("Post no encontrado:", postId);
+            return false;
+        }
+
+        const prevImages: string[] = snapshot.data().images || [];
+        const newImageUrls: string[] = [];
+
+        for (const [index, uri] of updatedData.images.entries()) {
+            if (typeof uri === "string" && uri.startsWith("http")) {
+                newImageUrls.push(uri);
+            } else {
+                const response = await fetch(uri);
+                const blob = await response.blob();
+                const imageRef = ref(storage, `posts/${Date.now()}_${index}.jpg`);
+                await uploadBytes(imageRef, blob);
+                const downloadURL = await getDownloadURL(imageRef);
+                newImageUrls.push(downloadURL);
+            }
+        }
+        const deletedImages = prevImages.filter(prev => !newImageUrls.includes(prev));
+
+        await Promise.all(
+            deletedImages.map(async (url) => {
+                try {
+                    const pathStart = url.indexOf("/o/") + 3;
+                    const pathEnd = url.indexOf("?alt=");
+                    const filePath = decodeURIComponent(url.substring(pathStart, pathEnd));
+                    const imageRef = ref(storage, filePath);
+                    await deleteObject(imageRef);
+                } catch (error) {
+                    console.warn("No se pudo borrar una imagen eliminada del post:", error);
+                }
+            })
+        );
+
+        const updatedPost = {
+            title: updatedData.title,
+            description: updatedData.description,
+            post_type: updatedData.postType,
+            min_price: Number(updatedData.minPrice),
+            max_price: Number(updatedData.maxPrice),
+            images: newImageUrls,
+            address: {
+                neighborhood: updatedData.neighborhood,
+                street_address: updatedData.streetAddress,
+                zipcode: updatedData.zipCode,
+                latitude: updatedData.location.latitude,
+                longitude: updatedData.location.longitude,
+            },
+            service: updatedData.service,
+            updated_at: Timestamp.now(),
+        };
+
+        await updateDoc(postRef, updatedPost);
+        return true;
+    } catch (error) {
+        console.error("🔥 Error al actualizar el post:", error);
+        return false;
+    }
+};

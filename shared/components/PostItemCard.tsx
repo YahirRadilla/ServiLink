@@ -6,6 +6,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { ActionPopover } from "./ActionPopover";
 import SaveButton from "./SavedButton";
 
@@ -32,6 +38,12 @@ export function PostItemCard({
   rate,
   ownerId,
 }: PostItemCardProps) {
+  const scale = useSharedValue(1);
+  const shadowOpacity = useSharedValue(0.1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    shadowOpacity: shadowOpacity.value,
+  }));
 
   const [averageRating, setAverageRating] = useState(0);
   const user = useUserStore((state) => state.user);
@@ -68,6 +80,22 @@ export function PostItemCard({
     return stars;
   };
 
+  const handlePressIn = () => {
+    scale.value = withTiming(0.97, {
+      duration: 350,
+      easing: Easing.out(Easing.exp),
+    });
+    shadowOpacity.value = withTiming(0.05, { duration: 120 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withTiming(1, {
+      duration: 350,
+      easing: Easing.out(Easing.exp),
+    });
+    shadowOpacity.value = withTiming(0.1, { duration: 120 });
+  };
+
   const handleDelete = async () => {
     const success = await deletePost(postId);
     router.replace({ pathname: '/workspace', params: { refetch: 'true' } });
@@ -77,19 +105,30 @@ export function PostItemCard({
   }
 
   return (
-    <View className="rounded-xl mb-6 overflow-hidden border border-links-servilink">
-      { showPopover && (
+    <Animated.View
+      style={[
+        animatedStyle,
+        {
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowRadius: 4,
+        },
+      ]}
+      className="rounded-xl mb-6 overflow-hidden border border-links-servilink"
+    >
+      {showPopover && (
         <ActionPopover
-        onDelete={handleDelete}
+          onDelete={handleDelete}
+          type="post"
+          postId={postId}
         />
       )}
       <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         onPress={onPress}
         android_ripple={{ color: "#ffffff10" }}
         className="relative"
-        style={({ pressed }) => [
-          { opacity: pressed ? 0.8 : 1 }
-        ]}
       >
         {/* Imagen */}
         <View className="relative w-full h-52">
@@ -124,6 +163,6 @@ export function PostItemCard({
           </View>
         </View>
       </Pressable>
-    </View>
+    </Animated.View>
   );
 }
