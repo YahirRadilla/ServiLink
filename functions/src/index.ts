@@ -1,8 +1,6 @@
-import { initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
+import * as admin from "firebase-admin";
 import { onDocumentUpdated } from "firebase-functions/v2/firestore";
-
-initializeApp();
+export * from "./notifications";
 
 export const syncEmailChange = onDocumentUpdated("users/{userId}", async (event) => {
   const before = event.data?.before?.data();
@@ -17,7 +15,7 @@ export const syncEmailChange = onDocumentUpdated("users/{userId}", async (event)
   if (beforeEmail === afterEmail) return;
 
   try {
-    await getAuth().updateUser(userId, { email: afterEmail });
+    await admin.auth().updateUser(userId, { email: afterEmail });
   } catch (error) {
     throw new Error(`Error updating email in Auth: ${error}`);
   }

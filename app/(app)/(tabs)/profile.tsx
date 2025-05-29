@@ -46,6 +46,10 @@ export default function Profile() {
     router.push("/saved/saved");
   };
 
+  const handleTouchDashboard = () => {
+    router.push("/dashboard/dashboard");
+  };
+
   const handleBeProvider = async () => {
     try {
       if (!user?.id || isTogglingProvider) return;
@@ -136,6 +140,11 @@ export default function Profile() {
                   title="Pagos"
                   icon="card-outline"
                   onPress={() => { }}
+                />
+                <ProfileButtons
+                  title="Dashboard"
+                  icon="bar-chart-outline"
+                  onPress={handleTouchDashboard}
                 />
                 <View className="border-t border-white/10 my-4" />
 
