@@ -50,6 +50,10 @@ export default function Profile() {
     router.push("/dashboard/dashboard");
   };
 
+  const handleTouchPayments = () => {
+    router.push("/payments/payments");
+  };
+
   const handleBeProvider = async () => {
     try {
       if (!user?.id || isTogglingProvider) return;
@@ -139,7 +143,7 @@ export default function Profile() {
                 <ProfileButtons
                   title="Pagos"
                   icon="card-outline"
-                  onPress={() => { }}
+                  onPress={handleTouchPayments}
                 />
                 <ProfileButtons
                   title="Dashboard"
