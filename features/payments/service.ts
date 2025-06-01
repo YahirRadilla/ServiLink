@@ -27,7 +27,7 @@ export async function getPaymentsByCustomer() {
             currency: data.currency,
             status: data.status,
             createdAt: new Date(data.created * 1000),
-            contractId: data.contract_id,
+            contractId: data.metadata.contract_id,
             method: data.payment_method_types?.[0] || 'desconocido'
         }
     })
