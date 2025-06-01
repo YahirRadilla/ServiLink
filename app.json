@@ -42,7 +42,21 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-video"
+      "expo-video",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "minSdkVersion": 23
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      "burnt"
     ],
     "experiments": {
       "typedRoutes": true
