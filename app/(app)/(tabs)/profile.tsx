@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/useAuth";
 import { updateProviderStatus } from "@/features/users/services";
 import FloatingSwitchButton from "@/shared/components/FloatingSwitchButton";
 import { ProfileButtons } from "@/shared/components/ProfileButtons";
+import * as Burnt from "burnt";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -43,6 +44,12 @@ export default function Profile() {
   };
 
   const hanldeSavedPosts = () => {
+      Burnt.toast({
+        title: "prueba",
+        message: "Esto es una prueba de Burnt",
+        from: "top",
+        preset: "done",
+      });
     router.push("/saved/saved");
   };
 

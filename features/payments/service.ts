@@ -8,6 +8,9 @@ export type TPayment = {
     status: string
     createdAt: Date
     contractId: string
+    postId: string
+    providerId: string
+    clientId: string
     method: string
 }
 
@@ -28,6 +31,9 @@ export async function getPaymentsByCustomer() {
             status: data.status,
             createdAt: new Date(data.created * 1000),
             contractId: data.metadata.contract_id,
+            postId: data.metadata.post_id,
+            providerId: data.metadata.provider_id,
+            clientId: data.metadata.client_id,
             method: data.payment_method_types?.[0] || 'desconocido'
         }
     })

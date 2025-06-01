@@ -4,14 +4,14 @@ import { changePassword, deleteProfileImage, emailExistsInFirestore, reauthentic
 import { auth } from "@/lib/firebaseConfig";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
-import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as Burnt from "burnt";
 import * as ImagePicker from "expo-image-picker";
 import { Stack } from "expo-router";
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { Dimensions, Image, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
+import { Dimensions, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
 import { TabBar, TabView } from "react-native-tab-view";
 import * as Yup from "yup";
 import AddressTab from "./tabs/addressInfo";
@@ -58,7 +58,6 @@ const schema = (userEmail: string) => Yup.object({
 
 export default function UpdateProfileScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const toast = useToastStore((s) => s.toastRef);
   const user = useUserStore((state) => state.user);
   const [profileImage, setProfileImage] = useState(user?.imageProfile || "");
   const methods = useForm({
@@ -86,7 +85,12 @@ export default function UpdateProfileScreen() {
   const handlePickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      return toast?.show("Acceso a galería denegado", "error", 2000);
+      return Burnt.toast({
+        title: "Permiso denegado",
+        message: "Necesitamos acceso a tu galería para seleccionar una imagen.",
+        preset: "error",
+        from: "top"
+      })
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -122,7 +126,13 @@ export default function UpdateProfileScreen() {
   };
 
   const onUpdate = async (data: any) => {
-    if (!user?.id) return toast?.show("Usuario no encontrado", "error", 2000);
+    Keyboard.dismiss();
+    if (!user?.id) return Burnt.toast({
+      title: "Error",
+      message: "Usuario no encontrado",
+      preset: "error",
+      from: "top"
+    })
     setIsSubmitting(true);
     try {
       const previousImageUrl = user.imageProfile;
@@ -155,7 +165,12 @@ export default function UpdateProfileScreen() {
       if (data.email !== user.email) {
         const exists = await emailExistsInFirestore(data.email);
         if (exists) {
-          toast?.show("Este correo ya está en uso por otra cuenta", "error", 2000);
+          Burnt.toast({
+            title: "Correo ya registrado",
+            message: "El correo electrónico ya está en uso por otro usuario.",
+            preset: "error",
+            from: "top"
+          })
           setIsSubmitting(false);
           return;
         }
@@ -165,7 +180,12 @@ export default function UpdateProfileScreen() {
         try {
           await reauthenticateUser(user.email || "", data.currentPassword);
         } catch (error) {
-          toast?.show("Contraseña actual incorrecta", "error", 2000);
+          Burnt.toast({
+            title: "Error de autenticación",
+            message: "La contraseña actual es incorrecta.",
+            preset: "error",
+            from: "top"
+          });
           setIsSubmitting(false);
           return;
         }
@@ -193,10 +213,21 @@ export default function UpdateProfileScreen() {
       if (isPasswordUser && data.password?.length >= 6) {
         await changePassword(data.password);
       }
-      toast?.show("Perfil actualizado correctamente", "success", 2000);
+      Burnt.toast({
+        title: "Perfil actualizado correctamente",
+        preset: "done",
+        haptic: "success",
+        shouldDismissByDrag: true,
+        from: "top",
+      });
     } catch (error: any) {
       console.error("❌ Error al actualizar el perfil:", error);
-      toast?.show("Algo salió mal, intenta de nuevo", "error", 2000);
+      Burnt.toast({
+        title: "Error al actualizar el perfil",
+        message: error.message || "Ocurrió un error inesperado",
+        preset: "error",
+        from: "top"
+      })
     } finally {
       setIsSubmitting(false);
     }
@@ -205,7 +236,6 @@ export default function UpdateProfileScreen() {
   return (
     <Screen>
       <Stack.Screen options={{ headerShown: false }} />
-
       <View className="ml-14 p-4">
         <Text className="text-white font-bold text-xl">Editar Perfil</Text>
       </View>
@@ -273,16 +303,7 @@ export default function UpdateProfileScreen() {
         </FormProvider>
       </KeyboardAvoidingView>
 
-      <View
-        className="px-4 pt-4 pb-4 bg-primarybg-servilink"
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 20,
-        }}
-      >
+      <View className="px-4 pt-4 pb-4 bg-primarybg-servilink">
         <CustomButton
           label="Guardar Cambios"
           onPress={handleSubmit(onUpdate)}

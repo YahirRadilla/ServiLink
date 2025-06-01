@@ -1,6 +1,8 @@
 import { Screen } from "@/components/Screen";
+import { toast } from 'burnt';
+import { Stack } from "expo-router";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Button, ScrollView, StyleSheet, Text, View } from "react-native";
 // @ts-ignore
 import Logo from "../../shared/svg/logo.svg";
 
@@ -76,6 +78,7 @@ export default function Saved() {
   };
   return (
     <Screen>
+      <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -96,6 +99,13 @@ export default function Saved() {
           <Logo />
         </View>
 
+        <Button
+          title="Filtros"
+          onPress={async () => {
+            toast({duration:2, message: "Filtros no implementados aún", title: "papu"})
+          }}
+          color="#4CAF50" 
+        />
       </ScrollView>
     </Screen>
   );

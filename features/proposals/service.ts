@@ -244,6 +244,9 @@ export const acceptProposalAndCreateContract = async (
                 cancel_url: "yourapp://payment-cancel",
                 metadata: {
                     contract_id: contractDoc.id,
+                    client_id: data.client.id,
+                    provider_id: data.provider.id,
+                    post_id: data.post.id,
                 },
             });
         }
