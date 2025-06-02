@@ -67,7 +67,7 @@ export default function PersonalInfoTab() {
                     name="birthDate"
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                         <CustomInput
-                            type="date"
+                            type="birthday"
                             label="Fecha de nacimiento"
                             placeholder="Seleccionar fecha"
                             value={value}

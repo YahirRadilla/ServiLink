@@ -20,7 +20,7 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 
 interface CustomInputProps extends TextInputProps {
-    type?: 'text' | 'email' | 'password' | 'number' | 'checkbox' | 'date' | 'select' | 'image' | 'location';
+    type?: 'text' | 'email' | 'password' | 'number' | 'checkbox' | 'date' | 'select' | 'image' | 'location' | 'birthday' | 'futureDate';
     placeholder?: string;
     className?: string;
     label?: string;
@@ -52,7 +52,7 @@ export default function CustomInput({
     const [loadingLocation, setLoadingLocation] = useState(false);
     const [mapVisible, setMapVisible] = useState(false);
     const [pickedLocation, setPickedLocation] = useState<any>(value || null);
-    const mapCustomStyle = [ { "elementType": "geometry", "stylers": [ { "color": "#242f3e" } ] }, { "elementType": "labels.text.fill", "stylers": [ { "color": "#746855" } ] }, { "elementType": "labels.text.stroke", "stylers": [ { "color": "#242f3e" } ] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [ { "color": "#263c3f" } ] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76" } ] }, { "featureType": "road", "elementType": "geometry", "stylers": [ { "color": "#38414e" } ] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#212a37" } ] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [ { "color": "#9ca5b3" } ] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [ { "color": "#746855" } ] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#1f2835" } ] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [ { "color": "#f3d19c" } ] }, { "featureType": "transit", "elementType": "geometry", "stylers": [ { "color": "#2f3948" } ] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563" } ] }, { "featureType": "water", "elementType": "geometry", "stylers": [ { "color": "#17263c" } ] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#515c6d" } ] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } ]
+    const mapCustomStyle = [{ "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] }, { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] }, { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#2f3948" }] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }]
 
     const keyboardType =
         type === 'email' ? 'email-address' :
@@ -112,15 +112,19 @@ export default function CustomInput({
         );
     }
 
-    if (type === 'date') {
+    if (type === 'date' || type === 'birthday' || type === 'futureDate') {
+        const today = new Date();
+        const maxDate = type === 'birthday' ? dayjs().subtract(18, 'year').toDate() : undefined;
+        const minDate = type === 'futureDate' ? today : undefined;
+
         return (
             <View className="gap-y-2">
                 {label && <Text className="text-white/90 pt-4">{label}</Text>}
                 <Pressable onPress={() => setShowDatePicker(true)} className={`w-full px-4 py-3 rounded-xl border ${error ? 'border-red-500' : 'border-auth-border-servilink'} flex-row justify-between items-center`}>
                     <Text className={`text-white/50 ${!value ? 'italic' : ''}`}>
                         {value instanceof Date && !isNaN(value.getTime())
-                        ? dayjs(value).format("DD/MM/YYYY")
-                        : placeholder || 'Seleccionar fecha'}
+                            ? dayjs(value).format("DD/MM/YYYY")
+                            : placeholder || 'Seleccionar fecha'}
                     </Text>
                     <Ionicons name="calendar-outline" size={22} color="#888" />
                 </Pressable>
@@ -130,12 +134,15 @@ export default function CustomInput({
                         mode="date"
                         display="default"
                         onChange={handleDateChange}
+                        maximumDate={maxDate}
+                        minimumDate={minDate}
                     />
                 )}
                 {error && <Text className="text-red-500 text-sm mt-1">{error}</Text>}
             </View>
         );
     }
+
 
     if (type === 'select') {
         return (

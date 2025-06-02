@@ -130,7 +130,7 @@ export default function CreateProposalScreen() {
                     name="startDate"
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                         <CustomInput
-                            type="date"
+                            type="futureDate"
                             label="Fecha inicio"
                             value={value}
                             onDateChange={onChange}

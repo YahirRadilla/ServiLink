@@ -142,21 +142,21 @@ export default function Profile() {
               </View>
 
               <View className="rounded-xl overflow-hidden">
-                <ProfileButtons
+                {/* <ProfileButtons
                   title="Guardados"
                   icon="bookmark-outline"
                   onPress={hanldeSavedPosts}
-                />
+                /> */}
                 <ProfileButtons
                   title="Pagos"
                   icon="card-outline"
                   onPress={handleTouchPayments}
                 />
-                <ProfileButtons
+                {/* <ProfileButtons
                   title="Dashboard"
                   icon="bar-chart-outline"
                   onPress={handleTouchDashboard}
-                />
+                /> */}
                 <View className="border-t border-white/10 my-4" />
 
                 <ProfileButtons

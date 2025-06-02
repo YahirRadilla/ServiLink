@@ -147,7 +147,7 @@ export default function RegisterScreen() {
                                     name="birthDate"
                                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                                         <CustomInput
-                                            type="date"
+                                            type="birthday"
                                             label="Fecha de nacimiento"
                                             value={value}
                                             onDateChange={onChange}

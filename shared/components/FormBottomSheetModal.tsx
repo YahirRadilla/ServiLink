@@ -86,7 +86,7 @@ export function FormBottomSheetModal({ visible, onClose, onSubmit, title, defaul
                             name="startDate"
                             render={({ field: { onChange, value }, fieldState: { error } }) => (
                                 <CustomInput
-                                    type="date"
+                                    type="futureDate"
                                     label="Fecha inicio"
                                     value={value}
                                     onDateChange={onChange}
