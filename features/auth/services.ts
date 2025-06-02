@@ -119,3 +119,11 @@ export const logoutUser = async () => {
     }
 };
 
+export async function saveExpoPushToken(token: string) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    await setDoc(doc(db, 'users', uid), {
+        pushToken: token
+    }, { merge: true })
+}
+

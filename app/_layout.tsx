@@ -1,3 +1,4 @@
+import { useNotificationListener } from '@/features/notifications/useNotificationListener';
 import Toast, { IToast } from '@/shared/components/Toast';
 import { useToastStore } from '@/shared/toastStore';
 import { StripeProvider } from '@stripe/stripe-react-native';
@@ -8,7 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 export default function RootLayout() {
-  //useNotificationListener();
+  useNotificationListener();
   const toastRef = useRef<IToast>(null);
   const setToastRef = useToastStore((s) => s.setToastRef);
 
