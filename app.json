@@ -13,17 +13,13 @@
       "bundleIdentifier": "com.yahirradilla.servilink"
     },
     "android": {
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyCJ3_9tBgkOAl-pvEyghSYMRtGiq91PSUs"
-        }
-      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.yahirradilla.servilink"
+      "package": "com.yahirradilla.servilink",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +38,8 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-video"
+      "expo-video",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true

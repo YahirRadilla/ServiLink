@@ -1,7 +1,8 @@
 // /components/PaymentItem.tsx
-import { Ionicons } from '@expo/vector-icons'
-import React from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { auth } from '@/lib/firebaseConfig'; // asegúrate que apunta a tu instancia de auth
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { Pressable, Text, View } from 'react-native';
 
 type Props = {
     amount: number
@@ -9,6 +10,10 @@ type Props = {
     createdAt: Date
     contractId: string
     method: string
+    metadata: {
+        provider_id: string
+        client_id: string
+    }
     onPress?: () => void
 }
 
@@ -18,18 +23,22 @@ export default function PaymentItem({
     createdAt,
     contractId,
     method,
+    metadata,
     onPress
 }: Props) {
-    const isIngreso = status === 'succeeded' ? 'Exitoso' : 'Fallido'
+    const currentUid = auth.currentUser?.uid
+    const isIngreso = metadata?.provider_id === currentUid
 
     return (
-
         <View className="border-links-servilink bg-primarybg-servilink border rounded-xl mb-4">
-            <Pressable onPress={onPress} className="p-4" android_ripple={{ color: "#ffffff10" }}>
+            <Pressable onPress={onPress} className="p-4" android_ripple={{ color: '#ffffff10' }}>
                 <View className="flex-row items-center justify-between">
                     {/* Icono + info */}
                     <View className="flex-row items-center gap-4">
-                        <View className={`w-10 h-10 rounded-xl items-center justify-center ${isIngreso ? 'bg-green-100' : 'bg-red-100'}`}>
+                        <View
+                            className={`w-10 h-10 rounded-xl items-center justify-center ${isIngreso ? 'bg-green-100' : 'bg-red-100'
+                                }`}
+                        >
                             <Ionicons
                                 name={isIngreso ? 'arrow-down-outline' : 'arrow-up-outline'}
                                 size={20}

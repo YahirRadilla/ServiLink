@@ -44,13 +44,13 @@ export default function Profile() {
   };
 
   const hanldeSavedPosts = () => {
-      Burnt.toast({
-        title: "prueba",
-        message: "Esto es una prueba de Burnt",
-        from: "top",
-        preset: "done",
-      });
-    router.push("/saved/saved");
+    Burnt.toast({
+      title: "prueba",
+      message: "Esto es una prueba de Burnt",
+      from: "top",
+      preset: "done",
+    });
+    router.push("/notification/notification");
   };
 
   const handleTouchDashboard = () => {

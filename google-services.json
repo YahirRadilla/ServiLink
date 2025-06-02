@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "441884552116",
+    "firebase_url": "https://servilink-68398-default-rtdb.firebaseio.com",
+    "project_id": "servilink-68398",
+    "storage_bucket": "servilink-68398.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441884552116:android:77d5a3822f1ac257df60e1",
+        "android_client_info": {
+          "package_name": "com.yahirradilla.servilink"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441884552116-12npn9smh5f3cp6e1okqgqhbch8gva1c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yahirradilla.servilink",
+            "certificate_hash": "c5eec48213ea271fcc49eb0c703d1e3650b27816"
+          }
+        },
+        {
+          "client_id": "441884552116-nue6o6l02l9hdfkgqbjrr31t7ko9me63.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA23yvi1W-_EeBOsL-ICXpnROfssopd_N8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441884552116-nue6o6l02l9hdfkgqbjrr31t7ko9me63.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

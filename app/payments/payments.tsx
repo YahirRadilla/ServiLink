@@ -1,5 +1,6 @@
 import { SingleEntityScreen } from '@/components/SingleEntityScreen'
 import { usePaymentStore } from '@/features/payments/store'
+import { auth } from '@/lib/firebaseConfig'
 import BackButton from '@/shared/components/BackButton'
 import PaymentItem from '@/shared/components/PaymentItem'
 import { Stack, useRouter } from 'expo-router'
@@ -10,6 +11,13 @@ import { FlatList, Text, View } from 'react-native'
 export default function PaymentHistoryScreen() {
     const { payments, fetchPayments, isLoading } = usePaymentStore()
 
+    const currentUid = auth.currentUser?.uid
+
+    const visiblePayments = payments.filter(
+        (p) => p.clientId === currentUid || p.providerId === currentUid
+    )
+
+    console.log(payments);
     const router = useRouter()
 
     useEffect(() => {
@@ -55,7 +63,7 @@ export default function PaymentHistoryScreen() {
             </View>
 
             <FlatList
-                data={payments}
+                data={visiblePayments}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <PaymentItem
@@ -64,6 +72,7 @@ export default function PaymentHistoryScreen() {
                         createdAt={item.createdAt}
                         contractId={item.contractId}
                         method={item.method}
+                        metadata={{ provider_id: item.providerId, client_id: item.clientId }}
                         onPress={() => handleTouchContract(item.contractId)}
                     />
                 )}
@@ -71,6 +80,8 @@ export default function PaymentHistoryScreen() {
                     <Text className="text-center text-gray-400 mt-8">No hay pagos registrados.</Text>
                 }
             />
+
+
         </View>
     )
 }
