@@ -5,14 +5,14 @@ import BackButton from '@/shared/components/BackButton'
 import PaymentItem from '@/shared/components/PaymentItem'
 import { Stack, useRouter } from 'expo-router'
 import LottieView from 'lottie-react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { FlatList, Text, View } from 'react-native'
 
 export default function PaymentHistoryScreen() {
     const { payments, fetchPayments, isLoading } = usePaymentStore()
 
     const currentUid = auth.currentUser?.uid
-
+    const pressLockRef = useRef(false);
     const visiblePayments = payments.filter(
         (p) => p.clientId === currentUid || p.providerId === currentUid
     )
@@ -25,12 +25,20 @@ export default function PaymentHistoryScreen() {
     }, [])
 
     const handleTouchContract = (id: string) => {
-        if (!id) return;
+        if (!id || pressLockRef.current) return;
+
+        pressLockRef.current = true;
+
         router.push({
             pathname: "/contract/[id]",
             params: { id },
         });
+
+        setTimeout(() => {
+            pressLockRef.current = false;
+        }, 1000);
     };
+
 
     if (isLoading || !payments) {
         return (
@@ -53,7 +61,7 @@ export default function PaymentHistoryScreen() {
 
 
     return (
-        <View className="flex-1 bg-gray-900 p-4 pt-16">
+        <View className="flex-1 bg-primarybg-servilink p-4 pt-16">
             <Stack.Screen options={{ headerShown: false }} />
             <View className="flex-row items-center space-x-4 mb-4">
                 <View className="bg-black/50 p-2 rounded-full">
