@@ -5,9 +5,10 @@ import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { useToastStore } from "@/shared/toastStore";
 import { yupResolver } from '@hookform/resolvers/yup';
+import { BlurView } from 'expo-blur';
 import { Stack, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 
@@ -61,7 +62,7 @@ export default function CreatePostScreen() {
             toast?.show('Error al crear la publicación', 'error', 2000);
             console.error('Error al crear la publicación');
             return;
-        }else{
+        } else {
             router.replace({ pathname: '/workspace', params: { refetch: 'true', tab: 'posts' } });
             toast?.show('Publicación creada correctamente', 'success', 2000);
         }
@@ -254,8 +255,15 @@ export default function CreatePostScreen() {
                     )}
                 />
                 <View className="mb-6" />
-                <CustomButton label="Publicar" onPress={handleSubmit(onSubmit)} />
+                <CustomButton label="Publicar" loading={loading} onPress={handleSubmit(onSubmit)} />
             </ScrollView>
+            {loading && (
+                <View className="absolute inset-0 z-50 w-full h-full">
+                    <BlurView intensity={60} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
+                        <ActivityIndicator size="large" color="white" />
+                    </BlurView>
+                </View>
+            )}
         </SafeAreaView>
     );
 }

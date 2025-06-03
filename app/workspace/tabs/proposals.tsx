@@ -1,10 +1,12 @@
 import { usePaginatedFilteredProposals } from "@/features/proposals/usePaginatedFilteredProposals";
 import { FilterWorkspace } from "@/shared/components/FilterWorkspace";
 import { ItemCard } from "@/shared/components/ItemCard";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 export const ProposalsTab = () => {
     const router = useRouter();
@@ -47,13 +49,15 @@ export const ProposalsTab = () => {
                     </Text>
                     <View className="flex-col mt-2">
                         <View>
-                            <FilterWorkspace
-                                type="proposal"
-                                value={selectedFilters.status}
-                                onChange={(status) =>
-                                    setSelectedFilters((prev) => ({ ...prev, status }))
-                                }
-                            />
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                <FilterWorkspace
+                                    type="contract"
+                                    value={selectedFilters.status}
+                                    onChange={(status) =>
+                                        setSelectedFilters((prev) => ({ ...prev, status }))
+                                    }
+                                />
+                            </ScrollView>
                         </View>
                     </View>
                 </View>
@@ -96,6 +100,29 @@ export const ProposalsTab = () => {
                         />
                     </View>
                 ) : null
+            }
+            ListEmptyComponent={
+                loading ? (
+                    <View className="w-full mt-20 items-center justify-center">
+                        <LottieView
+                            source={require("../../../assets/animations/loading.json")}
+                            autoPlay
+                            loop
+                            style={{ width: 100, height: 100 }}
+                        />
+                        <Text className="text-white/60 mt-4">Cargando propuestas...</Text>
+                    </View>
+                ) : (
+                    <View className="items-center py-8">
+                        <Ionicons name="information-circle-outline" size={60} color="#fff" />
+                        <Text className="text-white/80 mt-4 text-xl font-semibold text-center">
+                            No hay propuestas disponibles
+                        </Text>
+                        <Text className="text-white/60 mt-2 text-sm text-center">
+                            No tienes propuestas disponibles pero puedes crear una nueva
+                        </Text>
+                    </View>
+                )
             }
         />
     );

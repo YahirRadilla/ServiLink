@@ -8,10 +8,11 @@ import { CustomButton } from "@/shared/components/CustomButton";
 import CustomInput from "@/shared/components/CustomInput";
 import { useToastStore } from "@/shared/toastStore";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { BlurView } from "expo-blur";
 
 import { Stack, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 
@@ -247,10 +248,17 @@ export default function CreateProposalScreen() {
                 <View className="mb-6" />
                 <CustomButton
                     label="Mandar solicitud"
+                    loading={loading}
                     onPress={handleSubmit(onSubmit)}
-                    disabled={loading}
                 />
             </ScrollView>
+            {loading && (
+                <View className="absolute inset-0 z-50 w-full h-full">
+                    <BlurView intensity={60} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
+                        <ActivityIndicator size="large" color="white" />
+                    </BlurView>
+                </View>
+            )}
         </SafeAreaView>
     );
 }

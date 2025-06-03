@@ -1,12 +1,13 @@
 import { usePaginatedPostsByProvider } from "@/features/posts/usePaginatedPostsByProvider";
 import { FloatingActionButton } from "@/shared/components/FloatingActionButton";
 import { PostItemCard } from "@/shared/components/PostItemCard";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
 import * as Animatable from "react-native-animatable";
-export const PostsTab = ({ refetch }: {refetch?: boolean}) => {
+export const PostsTab = ({ refetch }: { refetch?: boolean }) => {
     const router = useRouter();
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
@@ -34,8 +35,8 @@ export const PostsTab = ({ refetch }: {refetch?: boolean}) => {
         router.push("/post/createPost");
     };
 
-    React.useEffect(() =>{
-        if(refetch) {
+    React.useEffect(() => {
+        if (refetch) {
             refresh();
         }
     }, [refetch]);
@@ -96,6 +97,29 @@ export const PostsTab = ({ refetch }: {refetch?: boolean}) => {
                             />
                         </View>
                     ) : null
+                }
+                ListEmptyComponent={
+                    loading ? (
+                        <View className="w-full mt-20 items-center justify-center">
+                            <LottieView
+                                source={require("../../../assets/animations/loading.json")}
+                                autoPlay
+                                loop
+                                style={{ width: 100, height: 100 }}
+                            />
+                            <Text className="text-white/60 mt-4">Cargando publicaciones...</Text>
+                        </View>
+                    ) : (
+                        <View className="items-center py-8">
+                            <Ionicons name="information-circle-outline" size={60} color="#fff" />
+                            <Text className="text-white/80 mt-4 text-xl font-semibold text-center">
+                                No hay publicaciones disponibles
+                            </Text>
+                            <Text className="text-white/60 mt-2 text-sm text-center">
+                                No tienes publicaciones disponibles pero puedes crear una nueva
+                            </Text>
+                        </View>
+                    )
                 }
             />
             <FloatingActionButton onPress={handlePressFloating} />
