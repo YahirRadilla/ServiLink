@@ -4,13 +4,14 @@ import { TConversationEntity } from "@/entities/conversations";
 import { useInbox } from "@/features/inbox/useInbox";
 import { Stack, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 
 
 const InboxScreen = () => {
     const { conversations } = useInbox();
     const router = useRouter();
+    const pressLockRef = useRef(false);
 
     const handleTouchConversation = (item: TConversationEntity) => {
         if (!item.id) return;
@@ -28,11 +29,21 @@ const InboxScreen = () => {
     }, []);
 
     const renderItem = ({ item }: { item: TConversationEntity }) => {
+        const handleSinglePress = () => {
+            if (pressLockRef.current) return;
+            pressLockRef.current = true;
+
+            handleTouchConversation(item);
+
+            setTimeout(() => {
+                pressLockRef.current = false;
+            }, 1000);
+        };
 
         return (
             <View className="overflow-hidden">
                 <Pressable
-                    onPress={() => handleTouchConversation(item)}
+                    onPress={handleSinglePress}
                     className="flex-row items-center gap-4 px-4 py-3"
                     android_ripple={{
                         color: "#ffffff10",
@@ -57,8 +68,6 @@ const InboxScreen = () => {
                     </View>
                 </Pressable>
             </View>
-
-
         );
     };
 
