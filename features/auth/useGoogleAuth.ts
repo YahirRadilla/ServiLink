@@ -2,6 +2,7 @@ import { TProvider } from '@/entities/providers';
 import { TUser, TUserType, useUserStore } from '@/entities/users';
 import { auth, db } from '@/lib/firebaseConfig';
 import { mapFirestoreUserToTUser } from '@/mappers/firebaseAuthToUser';
+import { useToastStore } from '@/shared/toastStore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
@@ -13,7 +14,7 @@ export const useGoogleLogin = () => {
     const { setUser } = useUserStore();
     const { setAuth, setLoading } = useAuthStore();
     const router = useRouter();
-
+    const toast = useToastStore((s) => s.toastRef);
     useEffect(() => {
         GoogleSignin.configure({
             webClientId: '441884552116-nue6o6l02l9hdfkgqbjrr31t7ko9me63.apps.googleusercontent.com',
@@ -111,6 +112,7 @@ export const useGoogleLogin = () => {
 
             setUser(userData);
             setAuth(true);
+            toast?.show('Inicio de sesión exitoso', 'success', 1500);
             router.replace('/(app)/(tabs)');
         } catch (error) {
             console.error('Error en login con Google:', error);
