@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { StatusChip } from "./StatusChip";
 
@@ -25,12 +26,25 @@ export function ItemCard({
   price,
   type = "proposal",
 }: ItemCardProps) {
+  const [isPressing, setIsPressing] = useState(false);
+
+  const handleSinglePress = () => {
+    if (isPressing) return;
+    setIsPressing(true);
+    try {
+      onPress?.();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTimeout(() => setIsPressing(false), 800);
+    }
+  };
 
 
   return (
     <View className="rounded-xl mb-6 overflow-hidden ">
       <Pressable
-        onPress={onPress}
+        onPress={handleSinglePress}
         android_ripple={{ color: "#ffffff10" }}
         className="rounded-xl flex-row  gap-x-2 items-center h-28 w-full justify-between"
         style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}

@@ -48,6 +48,21 @@ export function PostItemCard({
   const [averageRating, setAverageRating] = useState(0);
   const user = useUserStore((state) => state.user);
   const showPopover = user?.id === ownerId;
+  const [isPressing, setIsPressing] = useState(false);
+
+  const handleSinglePress = () => {
+    if (isPressing) return;
+
+    setIsPressing(true);
+    try {
+      onPress?.();
+    } catch (err) {
+      console.error(err);
+    } finally {
+
+      setTimeout(() => setIsPressing(false), 800);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = listenToAverageReviewRating(postId, (avg) => {
@@ -126,7 +141,7 @@ export function PostItemCard({
       <Pressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        onPress={onPress}
+        onPress={handleSinglePress}
         android_ripple={{ color: "#ffffff10" }}
         className="relative"
       >

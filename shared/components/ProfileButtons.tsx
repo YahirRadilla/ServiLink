@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 
 type ProfileButtonsProps = {
@@ -18,9 +19,23 @@ export function ProfileButtons({
 }: ProfileButtonsProps) {
   const textColor = type === "primary" ? "text-white" : "text-red-400";
   const iconColor = type === "primary" ? "#ccc" : "#f87171";
+
+  const isPressedRef = useRef(false);
+
+  const handleSinglePress = () => {
+    if (isPressedRef.current || !onPress) return;
+
+    isPressedRef.current = true;
+    onPress();
+
+    setTimeout(() => {
+      isPressedRef.current = false;
+    }, 1000);
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handleSinglePress}
       android_ripple={{ color: "#ffffff10" }}
       className="flex-row items-center justify-between p-4"
       style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
