@@ -73,6 +73,7 @@ export default function WorkSpaceScreen() {
             </View>
 
             <TabView
+                swipeEnabled={false}
                 navigationState={{ index, routes }}
                 renderScene={renderScene}
                 onIndexChange={setIndex}
