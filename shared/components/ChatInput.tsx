@@ -20,10 +20,14 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
     const [media, setMedia] = useState<
         { uri: string; type: "image" | "video" }[]
     >([]);
+    const [loading, setLoading] = useState(false);
 
     const handleSend = async () => {
         if (media.length > 0) {
-            for (const item of media) {
+            setLoading(true);
+            const itemsToSend = [...media];
+            setMedia([]);
+            for (const item of itemsToSend) {
                 const url = await uploadFileToStorage(
                     item.uri,
                     item.type === "image" ? "chat-images" : "chat-videos"
@@ -31,11 +35,14 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
                 onSend(url, item.type);
             }
             setMedia([]);
+            setLoading(false);
         }
 
         if (message.trim()) {
+            setLoading(true);
             onSend(message.trim(), "text");
             setMessage("");
+            setLoading(false);
         }
     };
 
@@ -120,7 +127,11 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
                         radius: 20,
                     }}
                 >
-                    <Ionicons name="send" size={22} color="#FFF" />
+                    {loading ? (
+                        <Ionicons name="hourglass" size={22} color="#FFF" />
+                    ) :
+                        <Ionicons name="send" size={22} color="#FFF" />
+                    }
                 </Pressable>
             </View>
         </View>
