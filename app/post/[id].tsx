@@ -9,7 +9,6 @@ import { CustomButton } from "@/shared/components/CustomButton";
 import { Gallery } from "@/shared/components/Galery";
 import { ReviewCard } from "@/shared/components/ReviewCard";
 import { ReviewsModal } from "@/shared/components/ReviewModal";
-import SaveButton from "@/shared/components/SavedButton";
 import { UserContact } from "@/shared/components/UserContact";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -85,9 +84,9 @@ export default function Details() {
                         <Text className="text-sm text-white/60">{post.service}</Text>
                     </View>
 
-                    <View className="absolute z-10 top-5 right-5 bg-black/50 p-2 rounded-full">
+                    {/* <View className="absolute z-10 top-5 right-5 bg-black/50 p-2 rounded-full">
                         <SaveButton />
-                    </View>
+                    </View> */}
 
                     <View className="absolute z-10 top-5 left-5 bg-black/50 p-2 rounded-full">
                         <BackButton />

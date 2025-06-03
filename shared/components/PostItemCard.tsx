@@ -13,7 +13,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { ActionPopover } from "./ActionPopover";
-import SaveButton from "./SavedButton";
 
 type PostItemCardProps = {
   onPress: () => void;
@@ -174,7 +173,7 @@ export function PostItemCard({
           <Text className="text-base text-white">{provider}</Text>
           <View className="flex-row justify-between items-center p-0.5">
             <View className="flex-row">{renderStars()}</View>
-            <SaveButton />
+            {/* <SaveButton /> */}
           </View>
         </View>
       </Pressable>
