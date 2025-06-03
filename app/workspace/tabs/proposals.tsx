@@ -51,7 +51,7 @@ export const ProposalsTab = () => {
                         <View>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 <FilterWorkspace
-                                    type="contract"
+                                    type="proposal"
                                     value={selectedFilters.status}
                                     onChange={(status) =>
                                         setSelectedFilters((prev) => ({ ...prev, status }))
