@@ -1,7 +1,10 @@
 import { Screen } from "@/components/Screen";
+import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { TConversationEntity } from "@/entities/conversations";
 import { useInbox } from "@/features/inbox/useInbox";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
+import React from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 
 
@@ -16,6 +19,13 @@ const InboxScreen = () => {
             params: { id: item.id, conversationReceiver: item.userRef.id },
         });
     };
+
+    const [showLoader, setShowLoader] = React.useState(true);
+
+    React.useEffect(() => {
+        const timeout = setTimeout(() => setShowLoader(false), 1000);
+        return () => clearTimeout(timeout);
+    }, []);
 
     const renderItem = ({ item }: { item: TConversationEntity }) => {
 
@@ -52,6 +62,25 @@ const InboxScreen = () => {
         );
     };
 
+    if (conversations.length === 0 && showLoader) {
+        return (
+            <SingleEntityScreen>
+                <Stack.Screen options={{ headerShown: false }} />
+                <View className="flex-1 justify-center items-center bg-primarybg-servilink px-4">
+                    <LottieView
+                        source={require("@/assets/animations/loading.json")}
+                        autoPlay
+                        loop
+                        style={{ width: 120, height: 120 }}
+                    />
+                    <Text className="text-white/60 mt-4 text-base">
+                        Cargando conversaciones...
+                    </Text>
+                </View>
+            </SingleEntityScreen>
+        );
+    }
+
     return (
         <Screen>
             <Text className="text-2xl text-white font-bold px-4 pt-4 pb-2">Conversaciones</Text>
@@ -60,6 +89,11 @@ const InboxScreen = () => {
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 ItemSeparatorComponent={() => <View className="border-b border-gray-300/10" />}
+                ListEmptyComponent={
+                    <Text className="text-white text-center mt-10">
+                        No hay conversaciones disponibles
+                    </Text>
+                }
             />
         </Screen>
     );

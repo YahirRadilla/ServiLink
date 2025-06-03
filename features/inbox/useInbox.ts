@@ -7,9 +7,12 @@ export const useInbox = () => {
     const { user } = useUserStore();
     const [conversations, setConversations] = useState<TConversationEntity[]>([]);
 
+
     useEffect(() => {
         if (!user?.id || !user?.profileStatus) return;
+
         const unsub = listenUserConversations(user.id, user.profileStatus, setConversations);
+
         return () => unsub();
     }, [user]);
 
