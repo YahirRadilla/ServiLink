@@ -1,12 +1,14 @@
 import { RegisterUserProps } from '@/features/auth/services';
+import { useAuthStore } from '@/features/auth/store';
 import { useAuth } from '@/features/auth/useAuth';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { BlurView } from 'expo-blur';
 import { Link, router, useNavigation } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Dimensions, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Dimensions, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 // @ts-ignore
@@ -29,6 +31,7 @@ export default function RegisterScreen() {
     const { height } = Dimensions.get('window');
     const navigation = useNavigation();
     const { register } = useAuth();
+    const loading = useAuthStore((state) => state.isLoading);
 
     const {
         control,
@@ -214,6 +217,7 @@ export default function RegisterScreen() {
 
                                 <CustomButton
                                     className=""
+                                    loading={loading}
                                     label="Registrar"
                                     onPress={handleSubmit(onSubmit)}
                                 />
@@ -229,6 +233,13 @@ export default function RegisterScreen() {
                     </View>
                 </View>
             </ScrollView>
+            {loading && (
+                <View className="absolute inset-0 z-50 w-full h-full">
+                    <BlurView intensity={60} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
+                        <ActivityIndicator size="large" color="white" />
+                    </BlurView>
+                </View>
+            )}
         </SafeAreaView>
     );
 }

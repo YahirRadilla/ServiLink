@@ -2,15 +2,17 @@ import { useAuth } from '@/features/auth/useAuth';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { BlurView } from 'expo-blur';
 import { Link, router, Stack } from 'expo-router';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Dimensions, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Dimensions, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 
 import { useGoogleLogin } from '@/features/auth/useGoogleAuth';
 
+import { useAuthStore } from '@/features/auth/store';
 import { GoogleLoginButton } from '@/shared/components/GoogleLoginButton';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
@@ -29,7 +31,7 @@ export default function LoginScreen() {
 
     const { login } = useAuth();
     const { loginWithGoogle } = useGoogleLogin();
-
+    const loading = useAuthStore((state) => state.isLoading);
 
     const {
         control,
@@ -141,6 +143,7 @@ export default function LoginScreen() {
 
                                 <CustomButton
                                     className=''
+                                    loading={loading}
                                     label="Iniciar sesión"
                                     onPress={handleSubmit(handleClick)}
                                 />
@@ -157,6 +160,13 @@ export default function LoginScreen() {
                     </View>
                 </View>
             </ScrollView>
+            {loading && (
+                <View className="absolute inset-0 z-50 w-full h-full">
+                    <BlurView intensity={60} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
+                        <ActivityIndicator size="large" color="white" />
+                    </BlurView>
+                </View>
+            )}
         </SafeAreaView>
 
 

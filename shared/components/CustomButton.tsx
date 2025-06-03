@@ -19,11 +19,11 @@ export function CustomButton({
     ...rest
 }: CustomButtonProps) {
     const baseStyles = variant === 'disabled' ? 'bg-gray-400' : 'bg-primary-servilink';
-
+    const disabledStyles = 'bg-gray-400';
     return (
         <View className="overflow-hidden rounded-xl">
             <Pressable
-                className={`px-4 py-3 items-center justify-center ${baseStyles} ${className}`}
+                className={`px-4 py-3 items-center justify-center ${loading ? disabledStyles : baseStyles} ${className}`}
                 onPress={onPress}
                 android_ripple={{ color: "#ffffff10" }}
                 disabled={loading || variant === 'disabled'}
@@ -33,7 +33,7 @@ export function CustomButton({
                 {icon ? (
                     icon
                 ) : (
-                    <Text className="text-white text-base font-medium">
+                    <Text className="text-white/80 text-base font-medium">
                         {loading ? 'Cargando...' : label}
                     </Text>
                 )}
