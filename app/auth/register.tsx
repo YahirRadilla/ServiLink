@@ -3,6 +3,7 @@ import { useAuthStore } from '@/features/auth/store';
 import { useAuth } from '@/features/auth/useAuth';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
+import { useToastStore } from '@/shared/toastStore';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { BlurView } from 'expo-blur';
 import { Link, router, useNavigation } from 'expo-router';
@@ -32,7 +33,7 @@ export default function RegisterScreen() {
     const navigation = useNavigation();
     const { register } = useAuth();
     const loading = useAuthStore((state) => state.isLoading);
-
+    const toast = useToastStore((s) => s.toastRef);
     const {
         control,
         handleSubmit,
@@ -67,8 +68,12 @@ export default function RegisterScreen() {
 
         try {
             await register(registerData);
+            toast?.show("La cuenta se ha creado exitosamente", "success", 1500);
             router.replace('/auth/login');
-        } catch (error) {
+        } catch (error: any) {
+            if ((error as { message: string }).message.includes("auth/email-already-in-use")) {
+                toast?.show("El correo ya se encuentra registrado", "error", 2000);
+            }
             console.log(error);
         }
     };

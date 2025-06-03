@@ -14,6 +14,7 @@ import { useGoogleLogin } from '@/features/auth/useGoogleAuth';
 
 import { useAuthStore } from '@/features/auth/store';
 import { GoogleLoginButton } from '@/shared/components/GoogleLoginButton';
+import { useToastStore } from '@/shared/toastStore';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
 
@@ -25,7 +26,7 @@ const schema = Yup.object({
 
 export default function LoginScreen() {
     const { height } = Dimensions.get('window');
-
+    const toast = useToastStore((s) => s.toastRef);
 
     const [remember, setRemember] = React.useState(false);
 
@@ -46,11 +47,12 @@ export default function LoginScreen() {
     });
 
     const handleClick = async (data: any) => {
-
         try {
             await login(data.email, data.password);
+            toast?.show("Inicio de sesión exitoso", "success", 1500);
             router.replace('/(app)/(tabs)');
         } catch (error) {
+            toast?.show("Credenciales invalidas", "error", 2000);
             console.log(error);
         }
     }
