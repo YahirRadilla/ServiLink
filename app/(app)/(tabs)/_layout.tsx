@@ -1,13 +1,12 @@
-import { useAuth } from '@/features/auth/useAuth';
+import { auth } from '@/lib/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 
 export default function TabLayout() {
-  const { isAuthenticated } = useAuth();
 
 
-  return !isAuthenticated ? <Redirect href="/auth/login" /> :
+  return !auth.currentUser ? <Redirect href="/auth/login" /> :
     (
       <>
         <Tabs
