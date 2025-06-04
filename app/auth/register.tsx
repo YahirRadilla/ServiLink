@@ -1,12 +1,14 @@
 import { RegisterUserProps } from '@/features/auth/services';
 import { useAuthStore } from '@/features/auth/store';
 import { useAuth } from '@/features/auth/useAuth';
+import { db } from '@/lib/firebaseConfig';
 import { CustomButton } from '@/shared/components/CustomButton';
 import CustomInput from '@/shared/components/CustomInput';
 import { useToastStore } from '@/shared/toastStore';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { BlurView } from 'expo-blur';
 import { Link, router, useNavigation } from 'expo-router';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, Dimensions, ScrollView, Text, View } from 'react-native';
@@ -67,6 +69,14 @@ export default function RegisterScreen() {
         };
 
         try {
+            const q = query(collection(db, "users"), where("phone_number", "==", data.phone));
+            const snapshot = await getDocs(q);
+
+            if (!snapshot.empty) {
+                toast?.show("El número de teléfono ya está registrado", "error", 2000);
+                return;
+            }
+
             await register(registerData);
             toast?.show("La cuenta se ha creado exitosamente", "success", 1500);
             router.replace('/auth/login');
