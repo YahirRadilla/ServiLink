@@ -1,5 +1,5 @@
 import { Screen } from "@/components/Screen";
-import { auth } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebaseConfig";
 import BackButton from "@/shared/components/BackButton";
 import { CustomButton } from "@/shared/components/CustomButton";
 import CustomInput from "@/shared/components/CustomInput";
@@ -7,6 +7,7 @@ import { useToastStore } from "@/shared/toastStore";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Stack, useRouter } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text } from "react-native";
@@ -35,15 +36,23 @@ export default function forgotPasswordScreen() {
 
         try {
             setLoading(true);
+
+            const q = query(collection(db, "users"), where("email", "==", data.email));
+            const snapshot = await getDocs(q);
+
+            if (snapshot.empty) {
+                toast?.show("No hay una cuenta asociada a este correo.", "error", 3000);
+                return;
+            }
+
             await sendPasswordResetEmail(auth, data.email);
-            router.replace("/profile");
             toast?.show("Correo de restablecimiento enviado", "success", 3000);
+            router.replace("/profile");
+
         } catch (error: any) {
             console.error("Error:", error);
             let message = "Ocurrió un error. Intenta más tarde.";
-            if (error.code === "auth/user-not-found") {
-                message = "No hay una cuenta asociada a este correo.";
-            } else if (error.code === "auth/invalid-email") {
+            if (error.code === "auth/invalid-email") {
                 message = "Correo electrónico inválido.";
             }
             toast?.show(message, "error", 3000);
@@ -51,6 +60,7 @@ export default function forgotPasswordScreen() {
             setLoading(false);
         }
     };
+
 
 
 
