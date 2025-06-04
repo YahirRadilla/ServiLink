@@ -28,7 +28,6 @@ export default function LoginScreen() {
     const { height } = Dimensions.get('window');
     const toast = useToastStore((s) => s.toastRef);
 
-    const [remember, setRemember] = React.useState(false);
 
     const { login } = useAuth();
     const { loginWithGoogle } = useGoogleLogin();
@@ -65,7 +64,7 @@ export default function LoginScreen() {
             <Stack.Screen
                 options={{
                     headerShown: false,
-                    title: 'Recuperar contraseña',
+
                 }}
             />
             <View style={{ height: height / 2.2 }} className="w-full bg-neutral800 absolute top-0 z-1" />
@@ -133,12 +132,7 @@ export default function LoginScreen() {
                                     )}
                                 />
                                 <View className='flex-row justify-between w-full items-center pt-4 mb-6'>
-                                    <CustomInput
-                                        type="checkbox"
-                                        label="Recuerdame"
-                                        checked={remember}
-                                        onCheckedChange={setRemember}
-                                    />
+
                                     <Link className='text-links-servilink' href="/forgotPassword">¿Olvidó su contraseña?</Link>
                                 </View>
 
