@@ -14,7 +14,10 @@ import { UserContact } from "@/shared/components/UserContact";
 import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { presentPaymentSheet } from "@stripe/stripe-react-native";
+import { Asset } from "expo-asset";
+import * as Print from "expo-print";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import LottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -87,6 +90,128 @@ export default function ContractDetails() {
         initializePaymentSheet();
     }, [contract]);
 
+    const generatePdf = async () => {
+        if (!contract) return;
+
+        const logoAsset = Asset.fromModule(require("@/assets/images/logo.png"));
+        await logoAsset.downloadAsync();
+
+        const htmlContent = `
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #333;
+          }
+          h1 {
+            color: #3D5DC7;
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
+          .section {
+            margin-bottom: 20px;
+          }
+          .label {
+            font-weight: bold;
+            color: #555;
+          }
+          .value {
+            margin-bottom: 8px;
+          }
+          .divider {
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+          }
+          .logo {
+            width: 80px;            
+          }
+          .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+          }
+        </style>
+      </head>
+      <body>
+
+        <div class="header">
+            <h1>Contrato de Servicio</h1>
+            <img src="${logoAsset.uri}" class="logo" />          
+        </div>
+        
+        <div class="section">
+          <div class="label">ID del Contrato:</div>
+          <div class="value">${contract.id}</div>
+        </div>
+
+        <div class="section">
+          <div class="label">Título de la Publicación:</div>
+          <div class="value">${contract.post.title}</div>
+        </div>
+
+        <div class="section">
+          <div class="label">Descripción del Servicio:</div>
+          <div class="value">${contract.description}</div>
+        </div>
+
+        <div class="section">
+          <div class="label">Precio Final:</div>
+          <div class="value">$${contract.offers[contract.offers.length - 1].price} MXN</div>
+        </div>
+
+        <div class="section">
+          <div class="label">Fecha de Inicio:</div>
+          <div class="value">${contract.startDate.toDate().toLocaleDateString("es-MX")}</div>
+        </div>
+
+        <div class="section">
+          <div class="label">Método de Pago:</div>
+          <div class="value">${contract.paymentMethod === "card" ? "Tarjeta" : "Efectivo"}</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+          <div class="label">Dirección del Servicio:</div>
+          <div class="value">
+            Calle: ${contract.address.streetAddress}<br/>
+            Colonia: ${contract.address.neighborhood}
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="label">Cliente:</div>
+          <div class="value">Nombre: ${contract.client.name}</div>
+          <div class="value">Correo: ${contract.client.email}</div>
+        </div>
+
+        <div class="section">
+          <div class="label">Proveedor:</div>
+          <div class="value">Nombre: ${contract.provider.name}</div>
+          <div class="value">Correo: ${contract.provider.email}</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="font-size: 12px; color: #888;">
+          Documento generado automáticamente desde la plataforma ServiLink.
+        </div>
+      </body>
+    </html>
+  `;
+
+        const { uri } = await Print.printToFileAsync({ html: htmlContent });
+
+        if (uri && (await Sharing.isAvailableAsync())) {
+            await Sharing.shareAsync(uri);
+        }
+    };
+
+
+
 
     if (loading || loadingIsPayment || !contract) {
         return (
@@ -127,7 +252,6 @@ export default function ContractDetails() {
 
                 <View className="p-4">
                     <View className="flex-col gap-y-4 mb-24">
-
 
 
                         <View>
@@ -240,7 +364,13 @@ export default function ContractDetails() {
             </ScrollView>
 
             {contract && (
+
                 <View className="absolute bottom-6 right-4 items-end space-y-3">
+                    <CustomButton
+                        className="bg-[#3B3B3B] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                        onPress={generatePdf}
+                        icon={<Ionicons name="download-outline" size={24} color="white" />}
+                    />
                     {/* PROVEEDOR - contrato pendiente */}
                     {user?.profileStatus === "provider" && contract.progressStatus === "pending" && (
                         <>
