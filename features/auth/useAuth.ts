@@ -1,16 +1,64 @@
 import { usePostStore } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
-import { db } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebaseConfig";
+import { mapFirestoreUserToTUser } from "@/mappers/firebaseAuthToUser";
 import { registerForPushNotificationsAsync } from "@/shared/utils/registerForPushNotificationsAsync";
-import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { useEffect } from "react";
 import { loginUser, logoutUser, registerUser, RegisterUserProps, saveExpoPushToken } from "./services";
 import { useAuthStore } from "./store";
 
 let unsubscribeUserSnapshot: (() => void) | null = null;
 
 export const useAuth = () => {
-    const { setAuth, setLoading, logout, isAuthenticated } = useAuthStore();
+    const { setAuth, setLoading, isLoading, logout, isAuthenticated } = useAuthStore();
     const { setUser } = useUserStore();
+
+
+    useEffect(() => {
+        setLoading(true);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                const userRef = doc(db, "users", firebaseUser.uid);
+
+                const unsub = onSnapshot(userRef, async (snap) => {
+
+                    if (!snap.exists()) return;
+
+                    const data = snap.data();
+                    let providerData = null;
+                    console.log(data);
+                    if (data.profile_status === "provider" && data.provider_id) {
+                        const providerSnap = await getDoc(data.provider_id);
+                        const providerDataRaw = providerSnap.data();
+                        providerData = providerDataRaw
+                            ? { ...providerDataRaw, provider_id: providerSnap.id }
+                            : null;
+                    }
+
+                    const user = mapFirestoreUserToTUser({
+                        id: snap.id,
+                        ...data,
+                        provider: providerData,
+                    });
+
+                    setUser(user);
+                    setAuth(true);
+                    unsubscribeUserSnapshot = unsub;
+                    setLoading(false);
+                });
+            } else {
+                setAuth(false);
+                logout();
+                setLoading(false);
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
 
     const login = async (email: string, password: string) => {
         setLoading(true);
@@ -74,5 +122,6 @@ export const useAuth = () => {
         isAuthenticated,
         register,
         signOut,
+        isLoading
     };
 };

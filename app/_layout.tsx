@@ -1,8 +1,9 @@
+import { useAuth } from '@/features/auth/useAuth';
 import { useNotificationListener } from '@/features/notifications/useNotificationListener';
 import Toast, { IToast } from '@/shared/components/Toast';
 import { useToastStore } from '@/shared/toastStore';
 import { StripeProvider } from '@stripe/stripe-react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -12,13 +13,25 @@ export default function RootLayout() {
   useNotificationListener();
   const toastRef = useRef<IToast>(null);
   const setToastRef = useToastStore((s) => s.setToastRef);
-
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (toastRef.current) {
       setToastRef(toastRef.current);
     }
+
   }, []);
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push({
+        pathname: "/(app)/(tabs)",
+      });
+    }
+
+  }, [isAuthenticated]);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StripeProvider
