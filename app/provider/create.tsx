@@ -7,9 +7,10 @@ import CustomInput from "@/shared/components/CustomInput";
 import { useToastStore } from "@/shared/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useFocusEffect, useRouter } from "expo-router";
+import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Text } from "react-native";
+import { BackHandler, Text } from "react-native";
 import { View } from "react-native-animatable";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Yup from "yup";
@@ -25,6 +26,19 @@ export default function CreateProviderScreen() {
   const router = useRouter();
   const toast = useToastStore((s) => s.toastRef);
 
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (user?.id && (!user.provider?.rfc || user.provider.rfc.trim() === "")) {
+          updateProviderStatus(user.id, "client").catch(console.error);
+        }
+
+        return false;
+      });
+
+      return () => subscription.remove();
+    }, [user?.id, user?.provider?.rfc])
+  );
 
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(schema()),
@@ -33,8 +47,6 @@ export default function CreateProviderScreen() {
     },
   })
   const onSubmit = async (data: { rfc: string }) => {
-    /* console.log(user?.provider);
-    console.log("📤 Enviando datos del formulario:", data); */
 
     try {
       if (!user?.id || !user.provider?.id) {

@@ -5,9 +5,10 @@ import { updateProviderStatus } from "@/features/users/services";
 import FloatingSwitchButton from "@/shared/components/FloatingSwitchButton";
 import { ProfileButtons } from "@/shared/components/ProfileButtons";
 import * as Burnt from "burnt";
+import { BlurView } from "expo-blur";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
@@ -192,6 +193,14 @@ export default function Profile() {
           renderItem={() => <></>}
         />
       </Animated.View>
+
+      {isTogglingProvider && (
+        <View className="absolute inset-0 z-50 w-full h-full">
+          <BlurView intensity={0} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="white" />
+          </BlurView>
+        </View>
+      )}
 
       <FloatingSwitchButton
         key={animationKey}
