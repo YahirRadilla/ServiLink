@@ -373,7 +373,7 @@ export default function ContractDetails() {
                     />
                     {/* PROVEEDOR - contrato pendiente */}
                     {user?.profileStatus === "provider" && contract.progressStatus === "pending" && (
-                        <>
+                        <View>
                             <CustomButton
                                 className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
                                 onPress={() => {
@@ -395,12 +395,12 @@ export default function ContractDetails() {
 
                                 )
                             }
-                        </>
+                        </View>
                     )}
 
                     {/* PROVEEDOR - contrato activo */}
                     {user?.profileStatus === "provider" && contract.progressStatus === "active" && (
-                        <>
+                        <View>
                             <CustomButton
                                 className="bg-[#286741] rounded-full w-14 h-14 justify-center items-center shadow-lg mb-3"
                                 onPress={() => {
@@ -422,7 +422,7 @@ export default function ContractDetails() {
 
                                 )
                             }
-                        </>
+                        </View>
                     )}
 
                     {/* CLIENTE - siempre puede cancelar si el contrato está pendiente */}
