@@ -1,4 +1,3 @@
-import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
 import { useAuth } from "@/features/auth/useAuth";
 import { disableUser, updateProviderStatus } from "@/features/users/services";
@@ -12,6 +11,7 @@ import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { SingleEntityScreen } from "@/components/SingleEntityScreen";
 import { ConfirmModal } from "@/shared/components/ConfirmModal";
 // @ts-ignore
 import Avatar from "../../../shared/svg/avatar.svg";
@@ -134,7 +134,7 @@ export default function Profile() {
   const isProvider = user?.profileStatus === "provider";
 
   return (
-    <Screen>
+    <SingleEntityScreen>
       <Animated.View style={animatedStyle}>
         <FlatList
           data={[]}
@@ -230,13 +230,7 @@ export default function Profile() {
         />
       </Animated.View>
 
-      {isTogglingProvider && (
-        <View className="absolute inset-0 z-50 w-full h-full">
-          <BlurView intensity={0} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="white" />
-          </BlurView>
-        </View>
-      )}
+
 
       <FloatingSwitchButton
         key={animationKey}
@@ -254,7 +248,15 @@ export default function Profile() {
           setModalVisible(false)
         }}
       />
-    </Screen>
+
+      {isTogglingProvider && (
+        <View className="absolute inset-0 z-50 w-full h-full">
+          <BlurView intensity={0} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="white" />
+          </BlurView>
+        </View>
+      )}
+    </SingleEntityScreen>
   );
 }
 

@@ -93,7 +93,7 @@ export default function ContractDetails() {
     const generatePdf = async () => {
         if (!contract) return;
 
-        const logoAsset = Asset.fromModule(require("@/assets/images/logo.png"));
+        const logoAsset = Asset.fromModule(require("@/assets/images/splash-icon.png"));
         await logoAsset.downloadAsync();
 
         const htmlContent = `

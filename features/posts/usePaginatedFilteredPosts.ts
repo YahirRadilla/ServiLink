@@ -22,7 +22,10 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
-        let constraints: any[] = [orderBy("created_at", "desc")];
+        let constraints: any[] = [
+            where("status", "==", true),
+            orderBy("created_at", "desc")
+        ];
 
         if (filters.colonia) {
             constraints.push(where("address.neighborhood", "==", filters.colonia));
@@ -45,6 +48,7 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
 
         return () => unsubscribe();
     }, [filters.colonia, filters.servicio, filters.ordenar]);
+
 
     const filteredPosts = !search
         ? posts
