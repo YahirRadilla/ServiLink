@@ -13,7 +13,7 @@ export const ContractsTab = () => {
     const [selectedFilters, setSelectedFilters] = React.useState({
         colonia: "",
         ordenar: "",
-        status: "all",
+        status: "pending",
     });
 
     const {

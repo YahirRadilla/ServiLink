@@ -12,6 +12,7 @@ import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { ConfirmModal } from "@/shared/components/ConfirmModal";
 // @ts-ignore
 import Avatar from "../../../shared/svg/avatar.svg";
 
@@ -22,6 +23,8 @@ export default function Profile() {
   const user: any = useUserStore((state) => state.user);
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => () => { });
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -61,6 +64,7 @@ export default function Profile() {
 
   const handleDisableUser = async () => {
     try {
+      setIsTogglingProvider(true);
       if (!user?.id || !user?.provider?.id) {
         console.error("Faltan datos del usuario o del proveedor.");
         return;
@@ -69,7 +73,10 @@ export default function Profile() {
       console.log("User completo:", JSON.stringify(user, null, 2));
 
       await disableUser(user.id, user.provider.id);
-      await signOut();
+      await signOut().then(() => {
+        setIsTogglingProvider(false);
+      });
+
     } catch (error) {
       console.error("Error al deshabilitar usuario:", error);
     }
@@ -191,9 +198,12 @@ export default function Profile() {
 
                 <View className="border-t border-white/10 my-4" />
                 <ProfileButtons
-                  title="Eliminar Cuenta"
+                  title="Desactivar Cuenta"
                   icon="close-circle-outline"
-                  onPress={handleDisableUser}
+                  onPress={() => {
+                    setConfirmAction(() => handleDisableUser);
+                    setModalVisible(true);
+                  }}
                   type="secondary"
                   chevron={false}
                 />
@@ -201,7 +211,15 @@ export default function Profile() {
                 <ProfileButtons
                   title="Cerrar Sesión"
                   icon="log-out-outline"
-                  onPress={signOut}
+
+                  onPress={() => {
+                    setConfirmAction(() => async () => {
+                      setIsTogglingProvider(true);
+                      await signOut().then(() => { setIsTogglingProvider(false); });
+                    });
+                    setModalVisible(true);
+                  }}
+
                   type="secondary"
                   chevron={false}
                 />
@@ -226,6 +244,15 @@ export default function Profile() {
         icon={isProvider ? "swap-horizontal" : "briefcase-outline"}
         onPress={handleBeProvider}
         visible={!isTogglingProvider}
+      />
+
+      <ConfirmModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onConfirm={() => {
+          confirmAction();
+          setModalVisible(false)
+        }}
       />
     </Screen>
   );
