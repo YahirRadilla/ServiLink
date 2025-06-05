@@ -3,7 +3,7 @@ import { useProposalStore } from "@/entities/proposals/store";
 import { TUser, useUserStore } from "@/entities/users";
 import { db } from "@/lib/firebaseConfig";
 import { proposalToEntity, RawProposalData } from "@/mappers/proposalToEntity";
-import { collection, doc, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, doc, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { fetchProposalsPage } from "./service";
 
@@ -38,13 +38,15 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
             q = query(
                 collection(db, "proposals"),
                 where("client_id", "==", userRef),
-                orderBy("created_at", "desc")
+                orderBy("created_at", "desc"),
+                limit(5)
             );
         } else if (user.profileStatus === "provider") {
             q = query(
                 collection(db, "proposals"),
                 where("provider_id", "==", userRef),
-                orderBy("created_at", "desc")
+                orderBy("created_at", "desc"),
+                limit(5)
             );
         } else {
             return;
@@ -70,7 +72,7 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
             }
             return true;
         });
-    }, [ proposals, filters.status]);
+    }, [proposals, filters.status]);
 
     const loadMore = async () => {
         if (loading || !hasMore) return;
@@ -101,9 +103,9 @@ export const usePaginatedFilteredProposals = (filters: Filters) => {
         applyFilters(filters);
     };
 
-/*     useEffect(() => {
-        refresh();
-    }, [filters.ordenar, filters.status]); */
+    /*     useEffect(() => {
+            refresh();
+        }, [filters.ordenar, filters.status]); */
 
     return {
         proposals: filteredProposals,

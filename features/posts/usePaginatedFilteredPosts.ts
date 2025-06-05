@@ -1,9 +1,5 @@
-import { db } from "@/lib/firebaseConfig";
-import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
-import { useEffect, useState } from "react";
-
 import { TPost } from "@/entities/posts";
-import { postToEntity, RawPostData } from "@/mappers/postToEntity";
+import { useEffect, useState } from "react";
 import { fetchPostsPage } from "./services";
 
 type Filters = {
@@ -18,37 +14,21 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
     const [lastDoc, setLastDoc] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const search = filters.searchTerm?.toLowerCase();
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const search = filters.searchTerm?.toLowerCase();
 
+    // Cargar primera página manualmente
     useEffect(() => {
-        let constraints: any[] = [
-            where("status", "==", true),
-            orderBy("created_at", "desc")
-        ];
-
-        if (filters.colonia) {
-            constraints.push(where("address.neighborhood", "==", filters.colonia));
-        }
-        if (filters.servicio) {
-            constraints.push(where("service", "==", filters.servicio));
-        }
-
-        const q = query(collection(db, "posts"), ...constraints);
-
-        const unsubscribe = onSnapshot(q, async (snapshot) => {
-            const postPromises = snapshot.docs.map((doc) =>
-                postToEntity(doc.id, doc.data() as RawPostData)
-            );
-            const posts = await Promise.all(postPromises);
-            setPosts(posts);
-            setLastDoc(snapshot.docs[snapshot.docs.length - 1] ?? null);
-            setHasMore(!!snapshot.docs.length);
-        });
-
-        return () => unsubscribe();
+        const loadInitial = async () => {
+            setLoading(true);
+            const { posts: initialPosts, last } = await fetchPostsPage(filters as any);
+            setPosts(initialPosts);
+            setLastDoc(last);
+            setHasMore(!!last);
+            setLoading(false);
+        };
+        loadInitial();
     }, [filters.colonia, filters.servicio, filters.ordenar]);
-
 
     const filteredPosts = !search
         ? posts
@@ -79,23 +59,25 @@ export const usePaginatedFilteredPosts = (filters: Filters) => {
         setLoading(false);
     };
 
-
     const refresh = async () => {
         setIsRefreshing(true);
         const { posts: newPosts, last } = await fetchPostsPage(filters as any);
-
-
         const unique = newPosts.filter(
             (post, index, self) =>
                 self.findIndex((p) => p.id === post.id) === index
         );
-
         setPosts(unique);
         setLastDoc(last);
         setHasMore(!!last);
         setIsRefreshing(false);
     };
 
-
-    return { posts: filteredPosts, loadMore, loading, hasMore, refresh, isRefreshing };
+    return {
+        posts: filteredPosts,
+        loadMore,
+        loading,
+        hasMore,
+        refresh,
+        isRefreshing
+    };
 };

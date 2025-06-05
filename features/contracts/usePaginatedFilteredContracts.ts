@@ -3,7 +3,7 @@ import { useContractStore } from "@/entities/contracts/store";
 import { TUser, useUserStore } from "@/entities/users";
 import { db } from "@/lib/firebaseConfig";
 import { contractToEntity, RawContractData } from "@/mappers/contractToEntity";
-import { collection, doc, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, doc, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { fetchContractsPage } from "./service";
 
@@ -38,13 +38,15 @@ export const usePaginatedFilteredContracts = (filters: Filters) => {
             q = query(
                 collection(db, "contracts"),
                 where("client_id", "==", userRef),
-                orderBy("created_at", "desc")
+                orderBy("created_at", "desc"),
+                limit(5)
             );
         } else if (user.profileStatus === "provider") {
             q = query(
                 collection(db, "contracts"),
                 where("provider_id", "==", userRef),
-                orderBy("created_at", "desc")
+                orderBy("created_at", "desc"),
+                limit(5)
             );
         } else {
             return;
@@ -70,7 +72,7 @@ export const usePaginatedFilteredContracts = (filters: Filters) => {
             }
             return true;
         })
-    }, [ contracts, filters.status]);
+    }, [contracts, filters.status]);
 
     const loadMore = async () => {
         if (loading || !hasMore) return;
@@ -92,7 +94,7 @@ export const usePaginatedFilteredContracts = (filters: Filters) => {
     const refresh = async () => {
         setIsRefreshing(true);
 
-        const { contracts: newContracts, last } = await fetchContractsPage(filters as any,user as TUser);
+        const { contracts: newContracts, last } = await fetchContractsPage(filters as any, user as TUser);
         const unique = newContracts.filter(
             (contract, index, self) =>
                 self.findIndex((c) => c.id === contract.id) === index
@@ -105,9 +107,9 @@ export const usePaginatedFilteredContracts = (filters: Filters) => {
         applyFilters(filters);
     };
 
-/*     useEffect(() => {
-        refresh();
-    }, [filters.ordenar, filters.status]); */
+    /*     useEffect(() => {
+            refresh();
+        }, [filters.ordenar, filters.status]); */
 
     return {
         contracts: filteredContracts,
