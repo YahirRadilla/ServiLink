@@ -1,7 +1,7 @@
 import { Screen } from "@/components/Screen";
 import { useUserStore } from "@/entities/users";
 import { useAuth } from "@/features/auth/useAuth";
-import { updateProviderStatus } from "@/features/users/services";
+import { disableUser, updateProviderStatus } from "@/features/users/services";
 import FloatingSwitchButton from "@/shared/components/FloatingSwitchButton";
 import { ProfileButtons } from "@/shared/components/ProfileButtons";
 import * as Burnt from "burnt";
@@ -19,7 +19,7 @@ import Avatar from "../../../shared/svg/avatar.svg";
 export default function Profile() {
   const [animationKey, setAnimationKey] = useState(Date.now());
   const [isTogglingProvider, setIsTogglingProvider] = useState(false);
-
+  const user: any = useUserStore((state) => state.user);
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
 
@@ -57,6 +57,24 @@ export default function Profile() {
   const handleTouchDashboard = () => {
     router.push("/dashboard/dashboard");
   };
+
+
+  const handleDisableUser = async () => {
+    try {
+      if (!user?.id || !user?.provider?.id) {
+        console.error("Faltan datos del usuario o del proveedor.");
+        return;
+      }
+
+      console.log("User completo:", JSON.stringify(user, null, 2));
+
+      await disableUser(user.id, user.provider.id);
+      await signOut();
+    } catch (error) {
+      console.error("Error al deshabilitar usuario:", error);
+    }
+  };
+
 
   const handleTouchPayments = () => {
     router.push("/payments/payments");
@@ -103,7 +121,7 @@ export default function Profile() {
 
 
   const { signOut } = useAuth();
-  const user = useUserStore((state) => state.user);
+
   const hasProfileImage = !!user?.imageProfile?.trim();
   /* console.log(user?.provider) */
   const isProvider = user?.profileStatus === "provider";
@@ -175,7 +193,7 @@ export default function Profile() {
                 <ProfileButtons
                   title="Eliminar Cuenta"
                   icon="close-circle-outline"
-                  onPress={() => { }}
+                  onPress={handleDisableUser}
                   type="secondary"
                   chevron={false}
                 />

@@ -44,7 +44,10 @@ export const fetchPostsPage = async (
 
         let constraints: any[] = [];
 
-        // Filtros
+        // Filtrar solo los posts activos
+        constraints.push(where("status", "==", true));
+
+        // Filtros personalizados
         if (filters.colonia) {
             constraints.push(where("address.neighborhood", "==", filters.colonia));
         }
@@ -53,7 +56,7 @@ export const fetchPostsPage = async (
             constraints.push(where("service", "==", filters.servicio));
         }
 
-        // Orden
+        // Ordenamiento
         if (filters.ordenar === "Más Antigüos") {
             constraints.push(orderBy("created_at", "asc"));
         } else {
@@ -83,6 +86,7 @@ export const fetchPostsPage = async (
         return { posts: [], last: null };
     }
 };
+
 
 
 export const getPostById = async (id: string): Promise<TPost | null> => {

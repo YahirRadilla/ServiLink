@@ -3,7 +3,7 @@ import { auth, db } from "@/lib/firebaseConfig";
 import { storage } from "@/lib/firebaseStorageConfig";
 import { mapFirestoreUserToTUser } from "@/mappers/firebaseAuthToUser";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, verifyBeforeUpdateEmail } from "firebase/auth";
-import { collection, doc, getDoc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, query, updateDoc, where, writeBatch } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const listenToUserChanges = (
@@ -134,5 +134,79 @@ export const updateProviderStatus = async (userId: string, status: "client" | "p
   } catch (err) {
     console.error("🔥 Error exacto:", err);
     throw err;
+  }
+};
+
+export const disableUser = async (userId: string, providerId: string) => {
+  console.log("🚨 Deshabilitando usuario", JSON.stringify({ userId, providerId }));
+  const userRef = doc(db, "users", userId);
+  const providerRef = doc(db, "providers", providerId);
+
+  // Paso 1: Desactivar usuario
+  await updateDoc(userRef, { status: false });
+
+  const batch = writeBatch(db);
+
+  // Paso 2: Posts (donde el user es provider)
+  const postsRef = collection(db, "posts");
+  const postsSnap = await getDocs(query(postsRef, where("provider_id", "==", providerRef)));
+  postsSnap.forEach((doc) => {
+    batch.update(doc.ref, { status: false });
+  });
+
+  // Paso 3: Proposals (donde el user es provider)
+  const proposalsRef = collection(db, "proposals");
+  const proposalsSnap = await getDocs(query(proposalsRef, where("provider_id", "==", userRef)));
+
+  proposalsSnap.forEach((doc) => {
+    const data = doc.data();
+    if (data.accept_status === "pending") {
+      batch.update(doc.ref, { accept_status: "rejected" });
+    }
+  });
+
+  // Paso 4: Contracts (donde el user es provider)
+  const contractsRef = collection(db, "contracts");
+  const contractsSnap = await getDocs(query(contractsRef, where("provider_id", "==", userRef)));
+
+  contractsSnap.forEach((doc) => {
+    const data = doc.data();
+    if (data.progress_status === "pending") {
+      batch.update(doc.ref, { progress_status: "cancelled" });
+    }
+  });
+
+  // Paso final: Confirmar todas las actualizaciones
+  await batch.commit();
+};
+
+
+export const enableUser = async (userId: string, providerId: string) => {
+  try {
+    // Activar usuario
+    const userRef = doc(db, "users", userId);
+    const providerRef = doc(db, "providers", providerId);
+    await updateDoc(userRef, { status: true });
+
+    // Activar posts del usuario
+    const postsQuery = query(
+      collection(db, "posts"),
+      where("provider_id", "==", providerRef)
+    );
+    const postsSnap = await getDocs(postsQuery);
+    const postsBatch = writeBatch(db);
+    postsSnap.forEach((postDoc) => {
+      postsBatch.update(postDoc.ref, { status: true });
+    });
+    await postsBatch.commit();
+
+    // ⚠ Opcional: restaurar propuestas (si aplica una lógica)
+    // Por ahora, no cambiaremos el `accept_status` de proposals ni `progress_status` de contracts
+    // para evitar inconsistencias con el flujo del negocio.
+
+    console.log("✅ Usuario reactivado correctamente.");
+  } catch (error) {
+    console.error("❌ Error al habilitar usuario:", error);
+    throw error;
   }
 };

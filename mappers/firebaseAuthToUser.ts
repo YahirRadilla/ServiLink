@@ -17,10 +17,10 @@ export const mapFirestoreUserToTUser = (doc: any): TUser => {
         birthDate: doc.birth_date instanceof Timestamp
             ? doc.birth_date.toDate()
             : typeof doc.birth_date === "string"
-              ? new Date(doc.birth_date)
-              : undefined,
+                ? new Date(doc.birth_date)
+                : undefined,
         provider:
-            doc.profile_status === "provider" && doc.provider
+            doc.provider
                 ? {
                     id: doc.provider_id?.id ?? "",
                     rfc: doc.provider.rfc,

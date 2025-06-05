@@ -28,8 +28,8 @@ export const useAuth = () => {
 
                     const data = snap.data();
                     let providerData = null;
-                    console.log(data);
-                    if (data.profile_status === "provider" && data.provider_id) {
+
+                    if (data.provider_id) {
                         const providerSnap = await getDoc(data.provider_id);
                         const providerDataRaw = providerSnap.data();
                         providerData = providerDataRaw

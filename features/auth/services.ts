@@ -10,6 +10,7 @@ import {
     signOut
 } from "firebase/auth";
 import { addDoc, collection, doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { enableUser } from "../users/services";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -45,12 +46,17 @@ export const loginUser = async (
 
     return new Promise((resolve, reject) => {
         const unsub = onSnapshot(userRef, async (snap) => {
-            if (!snap.exists()) return;
+            if (!snap.exists()) return reject(new Error("Usuario no encontrado."));
 
             const data = snap.data();
+
+            if (data.status === false) {
+                await enableUser(uid, data.provider_id.id);
+            }
+
             let providerData = null;
 
-            if (data.profile_status === "provider" && data.provider_id) {
+            if (data.provider_id) {
                 const providerSnap = await getDoc(data.provider_id);
                 const providerDataRaw = providerSnap.data();
                 providerData = providerDataRaw ? { ...providerDataRaw, provider_id: providerSnap.id } : null;
