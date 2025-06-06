@@ -15,8 +15,14 @@ import * as Yup from 'yup';
 const schema = Yup.object({
     title: Yup.string().required('Campo requerido'),
     description: Yup.string().required('Campo requerido'),
-    minPrice: Yup.string().required('Campo requerido'),
-    maxPrice: Yup.string().required('Campo requerido'),
+    minPrice: Yup.number()
+        .typeError('Debe ser un número')
+        .min(1, 'No puede ser negativo o cero')
+        .required('Campo requerido'),
+    maxPrice: Yup.number()
+        .typeError('Debe ser un número')
+        .moreThan(Yup.ref('minPrice'), 'Debe ser mayor que el precio mínimo')
+        .required('Campo requerido'),
     neighborhood: Yup.string().required('Campo requerido'),
     streetAddress: Yup.string().required('Campo requerido'),
     service: Yup.string().required('Campo requerido'),
@@ -43,8 +49,8 @@ export default function CreatePostScreen() {
         defaultValues: {
             title: '',
             description: '',
-            minPrice: '',
-            maxPrice: '',
+            minPrice: undefined,
+            maxPrice: undefined,
             zipCode: '',
             location: null as any,
             images: [],

@@ -17,7 +17,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 
 const schema = Yup.object({
-    price: Yup.string().required("Campo requerido"),
+    price: Yup.number()
+        .typeError("Debe ser un número")
+        .min(1, "El precio no puede ser negativo o cero")
+        .required("Campo requerido"),
     startDate: Yup.date().nullable().required('Selecciona una fecha'),
     payMethod: Yup.string().required("Campo requerido"),
     description: Yup.string().required("Campo requerido"),
@@ -51,7 +54,7 @@ export default function CreateProposalScreen() {
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            price: currentPost?.minPrice.toString(),
+            price: currentPost?.minPrice,
             startDate: undefined,
             payMethod: "",
             description: "",

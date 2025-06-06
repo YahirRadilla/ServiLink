@@ -57,6 +57,10 @@ const schema = (userEmail: string) => Yup.object({
 });
 
 export default function UpdateProfileScreen() {
+  const isGoogleUser = auth.currentUser?.providerData.some(
+    (p) => p.providerId === "google.com"
+  );
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const user = useUserStore((state) => state.user);
   const [profileImage, setProfileImage] = useState(user?.imageProfile || "");
@@ -109,8 +113,9 @@ export default function UpdateProfileScreen() {
   const routes = [
     { key: "personal", title: "Información Personal" },
     { key: "address", title: "Dirección" },
-    { key: "auth", title: "Credenciales" }
+    ...(isGoogleUser ? [] : [{ key: "auth", title: "Credenciales" }]),
   ];
+
 
   const renderScene = ({ route }: { route: { key: string } }) => {
     switch (route.key) {

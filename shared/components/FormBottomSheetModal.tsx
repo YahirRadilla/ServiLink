@@ -7,19 +7,36 @@ import { Controller, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import * as Yup from "yup";
 
-const schema = Yup.object({
-    price: Yup.string().required("Campo requerido"),
-    startDate: Yup.date().nullable().required('Selecciona una fecha'),
+type FormValues = {
+    price: number;
+    startDate: Date | null;
+};
+
+const schema: Yup.ObjectSchema<FormValues> = Yup.object({
+    price: Yup.number()
+        .typeError("Debe ser un número")
+        .min(1, "El precio no puede ser negativo o cero")
+        .required("Campo requerido"),
+    startDate: Yup.date()
+        .nullable()
+        .required("Selecciona una fecha"),
 });
 
-export function FormBottomSheetModal({ visible, onClose, onSubmit, title, defaultValues }: {
+
+export function FormBottomSheetModal({
+    visible,
+    onClose,
+    onSubmit,
+    title,
+    defaultValues,
+}: {
     visible: boolean;
     onClose: () => void;
     onSubmit: (data: any) => void;
     title: string;
     defaultValues: {
         price: number;
-        startDate: Date;
+        startDate: Date | null | undefined;
     };
 }) {
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -29,13 +46,17 @@ export function FormBottomSheetModal({ visible, onClose, onSubmit, title, defaul
         control,
         handleSubmit,
         formState: { errors },
-    } = useForm({
+    } = useForm<FormValues>({
         resolver: yupResolver(schema),
+        mode: "onSubmit",
         defaultValues: {
-            price: defaultValues.price.toString(),
-            startDate: defaultValues.startDate || undefined,
+            price: defaultValues.price,
+            startDate: defaultValues.startDate ?? null,
         },
     });
+
+
+
 
     const renderBackdrop = (props: any) => (
         <BottomSheetBackdrop
@@ -65,6 +86,7 @@ export function FormBottomSheetModal({ visible, onClose, onSubmit, title, defaul
                         showsVerticalScrollIndicator={false}
                     >
                         <Text className="text-white text-2xl font-bold mb-4">{title}</Text>
+
                         <Controller
                             control={control}
                             name="price"
@@ -79,7 +101,6 @@ export function FormBottomSheetModal({ visible, onClose, onSubmit, title, defaul
                                 />
                             )}
                         />
-
 
                         <Controller
                             control={control}
