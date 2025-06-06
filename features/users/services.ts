@@ -164,11 +164,29 @@ export const disableUser = async (userId: string, providerId: string) => {
     }
   });
 
+
+  const proposalsProviderSnap = await getDocs(query(proposalsRef, where("provider_id", "==", userRef)));
+  proposalsProviderSnap.forEach((doc) => {
+    const data = doc.data();
+    if (data.accept_status === "pending") {
+      batch.update(doc.ref, { accept_status: "rejected" });
+    }
+  });
+
   // Paso 4: Contracts (donde el user es provider)
   const contractsRef = collection(db, "contracts");
   const contractsSnap = await getDocs(query(contractsRef, where("client_id", "==", userRef)));
 
   contractsSnap.forEach((doc) => {
+    const data = doc.data();
+    if (data.progress_status === "pending") {
+      batch.update(doc.ref, { progress_status: "cancelled" });
+    }
+  });
+
+
+  const contractsProviderSnap = await getDocs(query(contractsRef, where("provider_id", "==", userRef)));
+  contractsProviderSnap.forEach((doc) => {
     const data = doc.data();
     if (data.progress_status === "pending") {
       batch.update(doc.ref, { progress_status: "cancelled" });
