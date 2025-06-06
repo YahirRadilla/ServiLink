@@ -426,7 +426,7 @@ export default function ContractDetails() {
                     )}
 
                     {/* CLIENTE - siempre puede cancelar si el contrato está pendiente */}
-                    {user?.profileStatus === "client" && contract.progressStatus === "pending" && showPaymentButton && (
+                    {contract.progressStatus === "pending" && (contract.paymentMethod === "effective" || showPaymentButton) && (
                         <CustomButton
                             className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
                             onPress={() => {

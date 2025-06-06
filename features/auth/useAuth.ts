@@ -6,6 +6,7 @@ import { registerForPushNotificationsAsync } from "@/shared/utils/registerForPus
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useEffect } from "react";
+import { enableUser } from "../users/services";
 import { loginUser, logoutUser, registerUser, RegisterUserProps, saveExpoPushToken } from "./services";
 import { useAuthStore } from "./store";
 
@@ -23,12 +24,17 @@ export const useAuth = () => {
                 const userRef = doc(db, "users", firebaseUser.uid);
 
                 const unsub = onSnapshot(userRef, async (snap) => {
-
                     if (!snap.exists()) return;
 
                     const data = snap.data();
-                    let providerData = null;
 
+                    // Validar si está deshabilitado
+                    if (data.status === false) {
+                        setAuth(false);
+                        return;
+                    }
+
+                    let providerData = null;
                     if (data.provider_id) {
                         const providerSnap = await getDoc(data.provider_id);
                         const providerDataRaw = providerSnap.data();
@@ -48,6 +54,7 @@ export const useAuth = () => {
                     unsubscribeUserSnapshot = unsub;
                     setLoading(false);
                 });
+
             } else {
                 setAuth(false);
                 logout();
@@ -64,6 +71,12 @@ export const useAuth = () => {
         setLoading(true);
         try {
             unsubscribeUserSnapshot = await loginUser(email, password, async (user) => {
+                // Si el usuario está desactivado, lo reactivamos
+                if (user.status === false && user.provider.id) {
+                    await enableUser(user.id, user.provider.id);
+                    user.status = true;
+                }
+
                 setUser(user);
                 setAuth(true);
 

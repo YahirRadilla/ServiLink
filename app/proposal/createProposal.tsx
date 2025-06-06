@@ -67,7 +67,6 @@ export default function CreateProposalScreen() {
 
 
     const onSubmit = async (data: any) => {
-        //console.log(data);
         const result = await createNewProposal({
             ...data,
             providerId: currentPost?.provider.id,

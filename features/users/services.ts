@@ -157,7 +157,7 @@ export const disableUser = async (userId: string, providerId: string) => {
   // Paso 3: Proposals (donde el user es provider)
   const proposalsRef = collection(db, "proposals");
   const proposalsSnap = await getDocs(query(proposalsRef, where("provider_id", "==", userRef)));
-
+  //TODO cambiar provider_id por client_id
   proposalsSnap.forEach((doc) => {
     const data = doc.data();
     if (data.accept_status === "pending") {
