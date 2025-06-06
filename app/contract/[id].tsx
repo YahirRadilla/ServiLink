@@ -383,7 +383,10 @@ export default function ContractDetails() {
                                 icon={<Ionicons name="checkmark" size={24} color="#8DFAB9" />}
                             />
                             {
-                                showPaymentButton && (
+                                (
+                                    contract.paymentMethod === "effective" ||
+                                    (contract.paymentMethod === "card" && showPaymentButton)
+                                ) && (
                                     <CustomButton
                                         className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
                                         onPress={() => {
@@ -392,9 +395,9 @@ export default function ContractDetails() {
                                         }}
                                         icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
                                     />
-
                                 )
                             }
+
                         </View>
                     )}
 
@@ -426,16 +429,22 @@ export default function ContractDetails() {
                     )}
 
                     {/* CLIENTE - siempre puede cancelar si el contrato está pendiente */}
-                    {contract.progressStatus === "pending" && (contract.paymentMethod === "effective" || showPaymentButton) && (
-                        <CustomButton
-                            className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
-                            onPress={() => {
-                                setConfirmAction(() => handleCancelContract);
-                                setModalVisible(true);
-                            }}
-                            icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
-                        />
-                    )}
+                    {user?.profileStatus === "client" &&
+                        contract.progressStatus === "pending" &&
+                        (
+                            contract.paymentMethod === "effective" ||
+                            (contract.paymentMethod === "card" && showPaymentButton)
+                        ) && (
+                            <CustomButton
+                                className="bg-[#642E2E] rounded-full w-14 h-14 justify-center items-center shadow-lg"
+                                onPress={() => {
+                                    setConfirmAction(() => handleCancelContract);
+                                    setModalVisible(true);
+                                }}
+                                icon={<Ionicons name="close" size={24} color="#E4A2A2" />}
+                            />
+                        )}
+
 
                     {/* CLIENTE - botón de pagar visible siempre que haya pago pendiente */}
                     {user?.profileStatus === "client" &&
