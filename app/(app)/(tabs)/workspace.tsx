@@ -54,7 +54,7 @@ export default function WorkSpaceScreen() {
             case "contracts":
                 return <ContractsTab />;
             case "posts":
-                return <PostsTab refetch={refetch} />;
+                return <PostsTab />;
             default:
                 return null;
         }

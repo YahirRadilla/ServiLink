@@ -1,4 +1,3 @@
-import { usePostStore } from "@/entities/posts";
 import { useUserStore } from "@/entities/users";
 import { deletePost } from "@/features/posts/services";
 import { listenToAverageReviewRating } from "@/features/reviews/service";
@@ -48,6 +47,8 @@ export function PostItemCard({
   const user = useUserStore((state) => state.user);
   const showPopover = user?.id === ownerId;
   const [isPressing, setIsPressing] = useState(false);
+
+
 
   const handleSinglePress = () => {
     if (isPressing) return;
@@ -112,11 +113,13 @@ export function PostItemCard({
 
   const handleDelete = async () => {
     const success = await deletePost(postId);
-    router.replace({ pathname: '/workspace', params: { refetch: 'true' } });
+
+    console.log(success);
     if (success) {
-      usePostStore.getState().disablePostLocally(postId);
+      router.replace({ pathname: '/workspace', params: { refetch: 'true', tab: 'posts' } });
     }
-  }
+  };
+
 
   return (
     <Animated.View

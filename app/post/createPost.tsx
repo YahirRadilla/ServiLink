@@ -63,8 +63,8 @@ export default function CreatePostScreen() {
 
 
     const onSubmit = async (data: any) => {
-        const isCreated = createNewPost(data);
-        if (!isCreated) {
+        const id = await createNewPost(data);
+        if (!id) {
             toast?.show('Error al crear la publicación', 'error', 2000);
             console.error('Error al crear la publicación');
             return;

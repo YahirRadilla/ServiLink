@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "react-native";
 import Popover, { PopoverPlacement } from "react-native-popover-view";
 
 type ActionPopoverProps = {
-    onDelete?: () => void;
+    onDelete?: () => Promise<void>;
     iconColor?: string;
     popoverColor?: string;
     visible?: boolean;
@@ -88,8 +88,9 @@ export const ActionPopover = ({
 
                 {onDelete && (
                     <Pressable
-                        onPress={() => {
-                            onDelete();
+                        onPress={async () => {
+                            handleClose();
+                            await onDelete();
                         }}
                         className="px-4 py-2"
                         style={({ pressed }) => ({

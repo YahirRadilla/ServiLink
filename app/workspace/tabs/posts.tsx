@@ -9,18 +9,12 @@ import { FlatList, Text, View } from "react-native";
 import * as Animatable from "react-native-animatable";
 export const PostsTab = ({ refetch }: { refetch?: boolean }) => {
     const router = useRouter();
-    const [selectedFilters, setSelectedFilters] = React.useState({
-        colonia: "",
-        ordenar: "",
-    });
 
     const {
         posts,
         refresh,
         isRefreshing,
         loading,
-        hasMore,
-        loadMore,
     } = usePaginatedPostsByProvider();
 
     const handleTouchPost = (id: string) => {
@@ -46,7 +40,6 @@ export const PostsTab = ({ refetch }: { refetch?: boolean }) => {
         <View className="flex-1">
             <FlatList
                 data={posts}
-                onEndReached={hasMore ? loadMore : undefined}
                 showsVerticalScrollIndicator={false}
                 ListHeaderComponent={
                     <View className="py-6">
