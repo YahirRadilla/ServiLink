@@ -40,8 +40,8 @@ export default function LoginScreen() {
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            email: 'yahirradi@hotmail.com',
-            password: '123456',
+            email: '',
+            password: '',
         },
     });
 

@@ -10,7 +10,6 @@ import {
     signOut
 } from "firebase/auth";
 import { addDoc, collection, doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
-import { enableUser } from "../users/services";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -51,7 +50,7 @@ export const loginUser = async (
             const data = snap.data();
 
             if (data.status === false) {
-                await enableUser(uid, data.provider_id.id);
+                return reject(new Error("Usuario deshabilitado."));
             }
 
             let providerData = null;

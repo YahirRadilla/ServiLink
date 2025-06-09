@@ -63,6 +63,8 @@ export default function Profile() {
 
 
   const handleDisableUser = async () => {
+    const userId = user?.id;
+    const providerId = user?.provider?.id;
     try {
       setIsTogglingProvider(true);
       if (!user?.id || !user?.provider?.id) {
@@ -70,12 +72,11 @@ export default function Profile() {
         return;
       }
 
-      console.log("User completo:", JSON.stringify(user, null, 2));
 
-      await disableUser(user.id, user.provider.id);
       await signOut().then(() => {
         setIsTogglingProvider(false);
       });
+      await disableUser(userId, providerId);
 
     } catch (error) {
       console.error("Error al deshabilitar usuario:", error);

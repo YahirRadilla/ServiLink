@@ -9,13 +9,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { BlurView } from 'expo-blur';
 import { Link, router, useNavigation } from 'expo-router';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Dimensions, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 // @ts-ignore
 import Logo from '../../shared/svg/logo.svg';
+
 
 const schema = Yup.object({
     name: Yup.string().min(3, 'Mínimo 3 caracteres').required('Campo requerido'),
@@ -52,6 +53,8 @@ export default function RegisterScreen() {
             remember: false,
         },
     });
+    const [isTermsVisible, setIsTermsVisible] = useState(false);
+
 
     const onSubmit = async (data: any) => {
         const registerData: RegisterUserProps = {
@@ -218,9 +221,12 @@ export default function RegisterScreen() {
                                                         checked={value}
                                                         onCheckedChange={onChange}
                                                     />
-                                                    <Text className="text-links-servilink ml-1">Términos</Text>
-                                                    <Text className="text-white/90 ml-1">y</Text>
-                                                    <Text className="text-links-servilink ml-1">condiciones</Text>
+                                                    <Pressable onPress={() => setIsTermsVisible(true)} className="flex-row">
+                                                        <Text className="text-links-servilink ml-1">Términos</Text>
+                                                        <Text className="text-white/90 ml-1">y</Text>
+                                                        <Text className="text-links-servilink ml-1">condiciones</Text>
+                                                    </Pressable>
+
                                                 </View>
                                                 {error && (
                                                     <Text className="text-red-500 text-sm">{error.message}</Text>
@@ -248,6 +254,8 @@ export default function RegisterScreen() {
                     </View>
                 </View>
             </ScrollView>
+
+
             {loading && (
                 <View className="absolute inset-0 z-50 w-full h-full">
                     <BlurView intensity={60} tint="systemChromeMaterialDark" className="flex-1 justify-center items-center">
@@ -255,6 +263,68 @@ export default function RegisterScreen() {
                     </BlurView>
                 </View>
             )}
+
+
+            <Modal
+                visible={isTermsVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setIsTermsVisible(false)}
+            >
+                <View className="flex-1 bg-black/80 justify-center items-center p-6">
+                    <View className="bg-white rounded-xl p-6 max-w-md w-full">
+                        <Text className="text-lg font-bold mb-4">Términos y Condiciones</Text>
+                        <ScrollView className="mb-4" style={{ maxHeight: 300 }}>
+                            <Text className="text-sm text-black" style={{ lineHeight: 20 }}>
+                                {`TÉRMINOS Y CONDICIONES DE USO – SERVILINK\n\n`}
+
+                                {`Última actualización: junio 2025\n\n`}
+
+                                {`1. ACEPTACIÓN DE LOS TÉRMINOS\n`}
+                                {`Al registrarte o utilizar la plataforma, aceptas cumplir con los presentes Términos y Condiciones. Si no estás de acuerdo, no debes usar el servicio.\n\n`}
+
+                                {`2. REGISTRO DE CUENTA\n`}
+                                {`Debes proporcionar información veraz, actualizada y completa al momento de registrarte. Está prohibido usar datos falsos o suplantar a terceros.\n\n`}
+
+                                {`3. USO DE LA PLATAFORMA\n`}
+                                {`- Los usuarios pueden solicitar servicios, calificar proveedores y gestionar contratos.\n`}
+                                {`- Los proveedores pueden ofrecer servicios, responder a propuestas y administrar sus perfiles.\n`}
+                                {`- Queda prohibido el uso de la plataforma para fines ilegales o no autorizados.\n\n`}
+
+                                {`4. CONTRATACIÓN DE SERVICIOS\n`}
+                                {`Toda relación contractual generada dentro de la plataforma es responsabilidad de las partes involucradas. ServiLink no se hace responsable de incumplimientos entre usuario y proveedor.\n\n`}
+
+                                {`5. PAGOS\n`}
+                                {`Si la plataforma implementa pagos en línea, estos serán gestionados mediante un proveedor externo y estarán sujetos a sus propios términos.\n\n`}
+
+                                {`6. CONTENIDO Y COMPORTAMIENTO\n`}
+                                {`Los usuarios se comprometen a:\n`}
+                                {`- No publicar contenido ofensivo, discriminatorio o fraudulento.\n`}
+                                {`- No acosar a otros usuarios o proveedores.\n`}
+                                {`- No manipular calificaciones o comentarios.\n\n`}
+
+                                {`7. SUSPENSIÓN Y CANCELACIÓN\n`}
+                                {`Nos reservamos el derecho de suspender o eliminar cuentas que infrinjan estos términos o hagan mal uso del sistema.\n\n`}
+
+                                {`8. PRIVACIDAD\n`}
+                                {`Tus datos personales serán tratados conforme a nuestra Política de Privacidad. No compartiremos tu información sin tu consentimiento, salvo requerimiento legal.\n\n`}
+
+                                {`9. MODIFICACIONES\n`}
+                                {`Estos términos pueden actualizarse ocasionalmente. Te notificaremos de cambios importantes mediante la aplicación o tu correo electrónico registrado.\n\n`}
+
+                                {`10. CONTACTO\n`}
+                                {`Para dudas o reclamos, contáctanos a través del correo: soporte@servilink.com\n`}
+                            </Text>
+
+                        </ScrollView>
+                        <CustomButton
+                            label="Cerrar"
+                            onPress={() => setIsTermsVisible(false)}
+                        />
+                    </View>
+                </View>
+            </Modal>
+
         </SafeAreaView>
     );
 }
